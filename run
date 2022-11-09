@@ -1,0 +1,47 @@
+#!/bin/zsh
+set -eu
+
+if [ $# -lt 1 ]; then
+  echo 'No task is specified.' >&2
+  exit 1
+fi
+
+external_args=()
+found_double_hyphen=false
+for arg in "$@"; do
+  if [ "$arg" = '--' ]; then
+    found_double_hyphen=true
+    continue
+  fi
+  if [ "$found_double_hyphen" = true ]; then
+    external_args+=("$arg")
+  fi
+done
+
+cd $(dirname $0)
+
+case $1 in
+  'cmake' )
+    mkdir -p build
+    cd build
+    cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release $external_args
+    ;;
+  'b'|'build' )
+    cd build
+    ninja
+    ;;
+  'r'|'run' )
+    ./build/$2 $external_args
+    ;;
+  't'|'test' )
+    cd build
+    ctest -V
+    ;;
+  'lint' )
+    clang-tidy -p build src/main.cc
+    ;;
+  * )
+    echo "Unrecognized task: $1" >&2
+    exit 1
+    ;;
+esac

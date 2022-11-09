@@ -1,0 +1,6 @@
+.idea/
+.vscode/
+build/
+.DS_Store
+*.obj
+*.off
