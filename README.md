@@ -22,7 +22,7 @@ The following conditions must be satisfied so that Boolean operations work prope
 1. A mesh must not have degenerate (zero-area) faces.
 1. Mesh faces must be oriented consistently.
 1. A mesh must not self-intersect, i.e., the interior of a face must not intersect with the interior of another face.
-1. There must exist a closed convex subset of $ℝ^3$, $\mathcal{R}$, such that $∀M ∈ \\{M_1, M_2\\} : M ⊂ \mathcal{R} ∧ ∂M = M ∩ ∂\mathcal{R}$, where $M_1$ and $M_2$ are input meshes.
+1. There must exist closed subsets $\mathcal{M}_1, \mathcal{M}_2 ⊂ ℝ^3$, and a closed convex subset $\mathcal{R} ⊂ ℝ^3$, such that $∀i ∈ \\{1, 2\\} : M_i = ∂\mathcal{M}_i ∩ \mathcal{R}$, where $M_1$ and $M_2$ are the input meshes.
 
 ## TODO
 
