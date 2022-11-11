@@ -35,7 +35,7 @@ class Corefine {
 
     std::vector<Intersection_info> infos;
 
-#pragma omp parallel default(shared)
+#pragma omp parallel
     {
       std::vector<Intersection_info> local_infos;
 
@@ -79,7 +79,7 @@ class Corefine {
     }
     left_face_starts.push_back(infos.size());
 
-#pragma omp parallel for schedule(guided) default(shared)
+#pragma omp parallel for schedule(guided)
     for (std::size_t i = 0; i < left_face_starts.size() - 1; ++i) {
       auto left_face = infos.at(left_face_starts.at(i)).left_face;
       auto& triangulator = left_triangulators_.at(left_face);
@@ -106,7 +106,7 @@ class Corefine {
     }
     right_face_starts.push_back(infos.size());
 
-#pragma omp parallel for schedule(guided) default(shared)
+#pragma omp parallel for schedule(guided)
     for (std::size_t i = 0; i < right_face_starts.size() - 1; ++i) {
       auto right_face = infos.at(right_face_starts.at(i)).right_face;
       auto& triangulator = right_triangulators_.at(right_face);
@@ -175,13 +175,13 @@ class Corefine {
       return;
     }
 
-    if (auto* s = boost::get<Segment>(&*intersection)) {
+    if (const auto* s = boost::get<Segment>(&*intersection)) {
       auto p = s->source();
       auto q = s->target();
       auto vh0 = triangulator.insert(p);
       auto vh1 = triangulator.insert(q);
       triangulator.insert_constraint(vh0, vh1);
-    } else if (auto* t = boost::get<Triangle>(&*intersection)) {
+    } else if (const auto* t = boost::get<Triangle>(&*intersection)) {
       auto p = t->vertex(0);
       auto q = t->vertex(1);
       auto r = t->vertex(2);
@@ -191,7 +191,7 @@ class Corefine {
       triangulator.insert_constraint(vh0, vh1);
       triangulator.insert_constraint(vh1, vh2);
       triangulator.insert_constraint(vh2, vh0);
-    } else if (auto* points = boost::get<std::vector<Point>>(&*intersection)) {
+    } else if (const auto* points = boost::get<std::vector<Point>>(&*intersection)) {
       std::vector<typename Triangulator<K>::Vertex_handle> vhs;
       // Four to six points.
       for (const auto& p : *points) {

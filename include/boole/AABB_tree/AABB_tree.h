@@ -114,7 +114,7 @@ class AABB_tree {
         node_it->set_left_node(&*left_node_it);
         node_it->set_right_node(&*right_node_it);
 
-#pragma omp parallel sections if (node_depth < concurrency_depth_limit_) default(shared)
+#pragma omp parallel sections if (node_depth < concurrency_depth_limit_)
         {
 #pragma omp section
           build(left_node_it, leaves_begin, leaves_begin + num_left_leaves, node_depth + 1);

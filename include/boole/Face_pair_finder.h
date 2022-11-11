@@ -23,7 +23,7 @@ class Face_pair_finder {
   std::vector<Face_pair> find_face_pairs() const {
     std::vector<Face_pair> pairs;
 
-#pragma omp parallel default(shared)
+#pragma omp parallel
     {
       std::vector<Face_pair> local_pairs;
       std::vector<const Leaf*> leaves;

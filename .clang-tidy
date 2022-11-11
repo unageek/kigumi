@@ -9,10 +9,10 @@ Checks: "-*,\
   -google-runtime-references,\
   misc-*,\
   -misc-const-correctness,\
+  -misc-non-private-member-variables-in-classes,\
   modernize-*,\
   -modernize-use-nodiscard,\
   -modernize-use-trailing-return-type,\
-  openmp-*,\
   performance-*,\
   portability-*,\
   readability-*,\

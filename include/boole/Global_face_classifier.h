@@ -28,7 +28,8 @@ class Global_face_classifier {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> dist(0, m.n_faces() - 1);
 
-#pragma omp parallel for schedule(dynamic) default(shared)
+#pragma omp parallel for schedule(dynamic)
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (std::size_t i = 0; i < representative_faces.size(); ++i) {
       auto fh_src = representative_faces.at(i);
       auto& f_src = m.data(fh_src);
@@ -74,7 +75,7 @@ class Global_face_classifier {
     tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves), ray);
 
     std::vector<Intersection> intersections;
-    for (auto leaf : leaves) {
+    for (const auto* leaf : leaves) {
       auto fh = leaf->face_handle();
       auto& f = m_.data(fh);
       if (f.from_left == src_from_left) {
@@ -86,10 +87,10 @@ class Global_face_classifier {
         continue;
       }
 
-      if (auto* p = boost::get<Point>(&*result)) {
+      if (const auto* p = boost::get<Point>(&*result)) {
         auto d = CGAL::squared_distance(p_src, *p);
         intersections.push_back({d, fh});
-      } else if (auto* s = boost::get<Segment>(&*result)) {
+      } else if (const auto* s = boost::get<Segment>(&*result)) {
         return {};
       }
     }
