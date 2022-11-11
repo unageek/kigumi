@@ -33,9 +33,9 @@ class Point_list {
   struct Point_hash {
     std::size_t operator()(const Point& p) const noexcept {
       std::size_t seed{};
-      boost::hash_combine(seed, std::hash<double>()(CGAL::to_double(p.x().approx())));
-      boost::hash_combine(seed, std::hash<double>()(CGAL::to_double(p.y().approx())));
-      boost::hash_combine(seed, std::hash<double>()(CGAL::to_double(p.z().approx())));
+      boost::hash_combine(seed, std::hash<double>()(CGAL::to_double(p.x().exact())));
+      boost::hash_combine(seed, std::hash<double>()(CGAL::to_double(p.y().exact())));
+      boost::hash_combine(seed, std::hash<double>()(CGAL::to_double(p.z().exact())));
       return seed;
     }
   };
