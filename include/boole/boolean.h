@@ -12,6 +12,8 @@
 #include <boole/extract.h>
 
 #include <iostream>
+#include <iterator>
+#include <vector>
 
 namespace boole {
 
@@ -26,24 +28,27 @@ inline Boolean_result boolean(const Polygon_soup<K>& left, const Polygon_soup<K>
   std::cout << "Corefining..." << std::endl;
 
   Corefine<K> corefine(left, right);
-  const auto& left2 = corefine.left();
-  const auto& right2 = corefine.right();
 
   std::cout << "Constructing mixed mesh..." << std::endl;
 
   Mixed_mesh m;
 
-  for (const auto& f : left2.faces()) {
-    const auto& p = left2.points().at(f[0]);
-    const auto& q = left2.points().at(f[1]);
-    const auto& r = left2.points().at(f[2]);
+  std::vector<K::Triangle_3> tris;
+  corefine.get_left_triangles(std::back_inserter(tris));
+  for (const auto& tri : tris) {
+    auto p = tri.vertex(0);
+    auto q = tri.vertex(1);
+    auto r = tri.vertex(2);
     auto fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
     m.data(fh).from_left = true;
   }
-  for (const auto& f : right2.faces()) {
-    const auto& p = right2.points().at(f[0]);
-    const auto& q = right2.points().at(f[1]);
-    const auto& r = right2.points().at(f[2]);
+
+  tris.clear();
+  corefine.get_right_triangles(std::back_inserter(tris));
+  for (const auto& tri : tris) {
+    auto p = tri.vertex(0);
+    auto q = tri.vertex(1);
+    auto r = tri.vertex(2);
     auto fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
     m.data(fh).from_left = false;
   }

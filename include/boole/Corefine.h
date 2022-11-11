@@ -3,11 +3,9 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/intersection_3.h>
 #include <boole/Face_pair_finder.h>
-#include <boole/Point_list.h>
 #include <boole/Polygon_soup.h>
 #include <boole/Triangulator.h>
 
-#include <array>
 #include <iterator>
 #include <stdexcept>
 #include <unordered_map>
@@ -26,10 +24,11 @@ class Corefine {
       decltype(CGAL::intersection(std::declval<Triangle>(), std::declval<Triangle>()));
 
  public:
-  Corefine(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+  Corefine(const Polygon_soup<K>& left, const Polygon_soup<K>& right) : left_(left), right_(right) {
     std::cout << "Finding face pairs..." << std::endl;
 
-    Face_pair_finder<K> finder(left, right);
+    Face_pair_finder<K> finder(left_, right_);
     auto pairs = finder.find_face_pairs();
 
     std::cout << "Finding intersections..." << std::endl;
@@ -43,8 +42,8 @@ class Corefine {
 #pragma omp for schedule(guided)
       for (std::size_t i = 0; i < pairs.size(); ++i) {
         auto [left_face, right_face] = pairs.at(i);
-        auto left_tri = left.triangle(left_face);
-        auto right_tri = right.triangle(right_face);
+        auto left_tri = left_.triangle(left_face);
+        auto right_tri = right_.triangle(right_face);
         auto result = CGAL::intersection(left_tri, right_tri);
         if (result) {
           local_infos.emplace_back(left_face, right_face, std::move(result));
@@ -58,16 +57,14 @@ class Corefine {
 
     std::cout << "Triangulating..." << std::endl;
 
-    std::unordered_map<std::size_t, Triangulator<K>> left_triangulators;
-    std::unordered_map<std::size_t, Triangulator<K>> right_triangulators;
     for (const auto& info : infos) {
-      if (!left_triangulators.contains(info.left_face)) {
-        auto tri = left.triangle(info.left_face);
-        left_triangulators.emplace(info.left_face, Triangulator<K>(tri));
+      if (!left_triangulators_.contains(info.left_face)) {
+        auto tri = left_.triangle(info.left_face);
+        left_triangulators_.emplace(info.left_face, Triangulator<K>(tri));
       }
-      if (!right_triangulators.contains(info.right_face)) {
-        auto tri = right.triangle(info.right_face);
-        right_triangulators.emplace(info.right_face, Triangulator<K>(tri));
+      if (!right_triangulators_.contains(info.right_face)) {
+        auto tri = right_.triangle(info.right_face);
+        right_triangulators_.emplace(info.right_face, Triangulator<K>(tri));
       }
     }
 
@@ -85,14 +82,14 @@ class Corefine {
 #pragma omp parallel for schedule(guided) default(shared)
     for (std::size_t i = 0; i < left_face_starts.size() - 1; ++i) {
       auto left_face = infos.at(left_face_starts.at(i)).left_face;
-      auto& triangulator = left_triangulators.at(left_face);
+      auto& triangulator = left_triangulators_.at(left_face);
 
       for (auto j = left_face_starts.at(i); j < left_face_starts.at(i + 1); ++j) {
         insert_intersection(triangulator, infos.at(j).intersection);
       }
     }
 
-    for (auto& [_, t] : left_triangulators) {
+    for (auto& [_, t] : left_triangulators_) {
       if (!t.is_valid()) {
         throw std::runtime_error("invalid triangulation");
       }
@@ -112,26 +109,29 @@ class Corefine {
 #pragma omp parallel for schedule(guided) default(shared)
     for (std::size_t i = 0; i < right_face_starts.size() - 1; ++i) {
       auto right_face = infos.at(right_face_starts.at(i)).right_face;
-      auto& triangulator = right_triangulators.at(right_face);
+      auto& triangulator = right_triangulators_.at(right_face);
 
       for (auto j = right_face_starts.at(i); j < right_face_starts.at(i + 1); ++j) {
         insert_intersection(triangulator, infos.at(j).intersection);
       }
     }
 
-    for (auto& [_, t] : right_triangulators) {
+    for (auto& [_, t] : right_triangulators_) {
       if (!t.is_valid()) {
         throw std::runtime_error("invalid triangulation");
       }
     }
-
-    left_ = get_polygon_soup(left, left_triangulators);
-    right_ = get_polygon_soup(right, right_triangulators);
   }
 
-  const Polygon_soup<K>& left() const { return left_; }
+  template <class OutputIterator>
+  void get_left_triangles(OutputIterator tris) const {
+    get_triangles(left_, left_triangulators_, tris);
+  }
 
-  const Polygon_soup<K>& right() const { return right_; }
+  template <class OutputIterator>
+  void get_right_triangles(OutputIterator tris) const {
+    get_triangles(right_, right_triangulators_, tris);
+  }
 
  private:
   struct Intersection_info {
@@ -156,33 +156,18 @@ class Corefine {
     }
   };
 
-  Polygon_soup<K> get_polygon_soup(
-      const Polygon_soup<K>& soup,
-      const std::unordered_map<std::size_t, Triangulator<K>>& triangulations) {
-    std::vector<std::array<std::size_t, 3>> faces;
-    Point_list<K> points;
-
+  template <class OutputIterator>
+  void get_triangles(const Polygon_soup<K>& soup,
+                     const std::unordered_map<std::size_t, Triangulator<K>>& triangulators,
+                     OutputIterator tris) const {
     for (std::size_t i = 0; i < soup.faces().size(); ++i) {
-      if (!triangulations.contains(i)) {
-        auto tri = soup.triangle(i);
-        auto p = tri.vertex(0);
-        auto q = tri.vertex(1);
-        auto r = tri.vertex(2);
-        faces.push_back({points.insert(p), points.insert(q), points.insert(r)});
+      auto it = triangulators.find(i);
+      if (it == triangulators.end()) {
+        *tris++ = soup.triangle(i);
       } else {
-        std::vector<Triangle> triangles;
-        const auto& t = triangulations.at(i);
-        t.get_triangles(std::back_inserter(triangles));
-        for (const auto& tri : triangles) {
-          auto p = tri.vertex(0);
-          auto q = tri.vertex(1);
-          auto r = tri.vertex(2);
-          faces.push_back({points.insert(p), points.insert(q), points.insert(r)});
-        }
+        it->second.get_triangles(tris);
       }
     }
-
-    return {points.into_vector(), std::move(faces)};
   }
 
   void insert_intersection(Triangulator<K>& triangulator, const Intersection& intersection) {
@@ -218,8 +203,10 @@ class Corefine {
     }
   }
 
-  Polygon_soup<K> left_;
-  Polygon_soup<K> right_;
+  const Polygon_soup<K>& left_;
+  std::unordered_map<std::size_t, Triangulator<K>> left_triangulators_;
+  const Polygon_soup<K>& right_;
+  std::unordered_map<std::size_t, Triangulator<K>> right_triangulators_;
 };
 
 }  // namespace boole
