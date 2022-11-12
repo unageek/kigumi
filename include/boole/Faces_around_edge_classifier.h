@@ -165,6 +165,9 @@ class Faces_around_edge_classifier {
  private:
   struct Radial_less {
     bool operator()(const Face_around_edge& f1, const Face_around_edge& f2) const {
+      if (f1.vh_r == f2.vh_r) {
+        return false;
+      }
       if (f1.radial_bin != f2.radial_bin) {
         return f1.radial_bin < f2.radial_bin;
       }
