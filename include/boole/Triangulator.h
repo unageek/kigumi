@@ -72,6 +72,7 @@ class Triangulator {
 
  public:
   using Vertex_handle = typename Tds::Vertex_handle;
+  using Intersection_of_constraints_exception = typename CDT::Intersection_of_constraints_exception;
 
   explicit Triangulator(const Triangle_3& triangle) : projector_(triangle) {
     auto p = triangle.vertex(0);

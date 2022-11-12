@@ -79,20 +79,28 @@ class Corefine {
     }
     left_face_starts.push_back(infos.size());
 
+    bool caught = false;
 #pragma omp parallel for schedule(guided)
     for (std::size_t i = 0; i < left_face_starts.size() - 1; ++i) {
+      if (caught) {
+        continue;
+      }
+
       auto left_face = infos.at(left_face_starts.at(i)).left_face;
       auto& triangulator = left_triangulators_.at(left_face);
 
       for (auto j = left_face_starts.at(i); j < left_face_starts.at(i + 1); ++j) {
-        insert_intersection(triangulator, infos.at(j).intersection);
+        try {
+          insert_intersection(triangulator, infos.at(j).intersection);
+        } catch (typename Triangulator<K>::Intersection_of_constraints_exception) {
+          caught = true;
+          break;
+        }
       }
     }
 
-    for (auto& [_, t] : left_triangulators_) {
-      if (!t.is_valid()) {
-        throw std::runtime_error("invalid triangulation");
-      }
+    if (caught) {
+      throw std::runtime_error("the second mesh has self-intersections");
     }
 
     std::sort(infos.begin(), infos.end(),
@@ -108,18 +116,25 @@ class Corefine {
 
 #pragma omp parallel for schedule(guided)
     for (std::size_t i = 0; i < right_face_starts.size() - 1; ++i) {
+      if (caught) {
+        continue;
+      }
+
       auto right_face = infos.at(right_face_starts.at(i)).right_face;
       auto& triangulator = right_triangulators_.at(right_face);
 
       for (auto j = right_face_starts.at(i); j < right_face_starts.at(i + 1); ++j) {
-        insert_intersection(triangulator, infos.at(j).intersection);
+        try {
+          insert_intersection(triangulator, infos.at(j).intersection);
+        } catch (typename Triangulator<K>::Intersection_of_constraints_exception) {
+          caught = true;
+          break;
+        }
       }
     }
 
-    for (auto& [_, t] : right_triangulators_) {
-      if (!t.is_valid()) {
-        throw std::runtime_error("invalid triangulation");
-      }
+    if (caught) {
+      throw std::runtime_error("the first mesh has self-intersections");
     }
   }
 
