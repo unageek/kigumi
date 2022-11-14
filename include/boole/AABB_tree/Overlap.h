@@ -7,19 +7,20 @@
 
 namespace boole {
 
-template <class Kernel>
+template <class K>
 class Overlap {
   using Bbox = CGAL::Bbox_3;
-  using Ray = typename Kernel::Ray_3;
-  using Triangle = typename Kernel::Triangle_3;
+  using FT = typename K::FT;
+  using Ray = typename K::Ray_3;
+  using Triangle = typename K::Triangle_3;
 
  public:
   static bool do_intersect(const Bbox& bbox, const Ray& ray) {
     auto p = ray.source();
     auto d = ray.direction();
 
-    std::optional<typename Kernel::FT> t_min;
-    std::optional<typename Kernel::FT> t_max;
+    std::optional<FT> t_min;
+    std::optional<FT> t_max;
 
     for (int i = 0; i < 3; i++) {
       if (d.delta(i) == 0.0) {

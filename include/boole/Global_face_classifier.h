@@ -12,16 +12,17 @@
 
 namespace boole {
 
+template <class K>
 class Global_face_classifier {
-  using FT = K::FT;
-  using Leaf = Mixed_mesh::Leaf;
-  using Point = K::Point_3;
-  using Ray = K::Ray_3;
-  using Segment = K::Segment_3;
-  using Triangle = K::Triangle_3;
+  using FT = typename K::FT;
+  using Leaf = typename Mixed_mesh<K>::Leaf;
+  using Point = typename K::Point_3;
+  using Ray = typename K::Ray_3;
+  using Segment = typename K::Segment_3;
+  using Triangle = typename K::Triangle_3;
 
  public:
-  explicit Global_face_classifier(Mixed_mesh& m,
+  explicit Global_face_classifier(Mixed_mesh<K>& m,
                                   const std::vector<Face_handle>& representative_faces)
       : m_(m) {
     std::random_device rd;
@@ -59,7 +60,7 @@ class Global_face_classifier {
 
  private:
   struct Intersection {
-    K::FT distance;
+    FT distance;
     Face_handle fh;
   };
 
@@ -130,7 +131,7 @@ class Global_face_classifier {
     };
   }
 
-  Mixed_mesh& m_;
+  Mixed_mesh<K>& m_;
 };
 
 }  // namespace boole

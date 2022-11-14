@@ -5,11 +5,11 @@
 
 namespace boole {
 
-template <class Kernel>
+template <class K>
 class Point_projector {
-  using Point_2 = typename Kernel::Point_2;
-  using Point_3 = typename Kernel::Point_3;
-  using Triangle_3 = typename Kernel::Triangle_3;
+  using Point_2 = typename K::Point_2;
+  using Point_3 = typename K::Point_3;
+  using Triangle_3 = typename K::Triangle_3;
 
   enum class Projection_type {
     XY,
@@ -61,14 +61,14 @@ class Point_projector {
   Projection_type projection_type_;
 };
 
-template <class Kernel>
+template <class K>
 class Triangulator {
-  using Point_3 = typename Kernel::Point_3;
-  using Triangle_3 = typename Kernel::Triangle_3;
-  using Vb = CGAL::Triangulation_vertex_base_with_info_2<Point_3, Kernel>;
-  using Fb = CGAL::Constrained_triangulation_face_base_2<Kernel>;
+  using Point_3 = typename K::Point_3;
+  using Triangle_3 = typename K::Triangle_3;
+  using Vb = CGAL::Triangulation_vertex_base_with_info_2<Point_3, K>;
+  using Fb = CGAL::Constrained_triangulation_face_base_2<K>;
   using Tds = CGAL::Triangulation_data_structure_2<Vb, Fb>;
-  using CDT = CGAL::Constrained_Delaunay_triangulation_2<Kernel, Tds>;
+  using CDT = CGAL::Constrained_Delaunay_triangulation_2<K, Tds>;
 
  public:
   using Vertex_handle = typename Tds::Vertex_handle;
@@ -107,7 +107,7 @@ class Triangulator {
 
  private:
   CDT cdt_;
-  Point_projector<Kernel> projector_;
+  Point_projector<K> projector_;
 };
 
 }  // namespace boole

@@ -8,9 +8,9 @@
 
 namespace boole {
 
-template <class Kernel>
+template <class K>
 class Point_list {
-  using Point = typename Kernel::Point_3;
+  using Point = typename K::Point_3;
 
  public:
   const Point& at(std::size_t i) const { return points_.at(i); }

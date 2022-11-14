@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/intersection_3.h>
 #include <boole/Face_pair_finder.h>
 #include <boole/Polygon_soup.h>
@@ -14,9 +13,8 @@
 
 namespace boole {
 
-template <class Kernel>
+template <class K>
 class Corefine {
-  using K = Kernel;
   using Point = typename K::Point_3;
   using Segment = typename K::Segment_3;
   using Triangle = typename K::Triangle_3;
@@ -28,7 +26,7 @@ class Corefine {
   Corefine(const Polygon_soup<K>& left, const Polygon_soup<K>& right) : left_(left), right_(right) {
     std::cout << "Finding face pairs..." << std::endl;
 
-    Face_pair_finder<K> finder(left_, right_);
+    Face_pair_finder finder(left_, right_);
     auto pairs = finder.find_face_pairs();
 
     std::cout << "Finding intersections..." << std::endl;
@@ -92,7 +90,7 @@ class Corefine {
       for (auto j = left_face_starts.at(i); j < left_face_starts.at(i + 1); ++j) {
         try {
           insert_intersection(triangulator, infos.at(j).intersection);
-        } catch (typename Triangulator<K>::Intersection_of_constraints_exception) {
+        } catch (const typename Triangulator<K>::Intersection_of_constraints_exception&) {
           caught = true;
           break;
         }
@@ -126,7 +124,7 @@ class Corefine {
       for (auto j = right_face_starts.at(i); j < right_face_starts.at(i + 1); ++j) {
         try {
           insert_intersection(triangulator, infos.at(j).intersection);
-        } catch (typename Triangulator<K>::Intersection_of_constraints_exception) {
+        } catch (const typename Triangulator<K>::Intersection_of_constraints_exception&) {
           caught = true;
           break;
         }

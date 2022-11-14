@@ -7,8 +7,9 @@
 
 namespace boole {
 
-inline Polygon_soup<K> extract(const Mixed_mesh& m, Face_tag tag) {
-  std::vector<K::Point_3> points;
+template <class K>
+Polygon_soup<K> extract(const Mixed_mesh<K>& m, Face_tag tag) {
+  std::vector<typename K::Point_3> points;
   std::vector<std::array<std::size_t, 3>> faces;
   std::unordered_map<Vertex_handle, std::size_t> map;
 

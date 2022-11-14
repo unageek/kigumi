@@ -7,9 +7,10 @@
 
 namespace boole {
 
+template <class K>
 class Face_tag_propagator {
  public:
-  explicit Face_tag_propagator(Mixed_mesh& m) : m_(m) {
+  explicit Face_tag_propagator(Mixed_mesh<K>& m) : m_(m) {
     for (auto fh : m_.faces()) {
       auto tag = m_.data(fh).tag;
       if (tag == Face_tag::Intersection || tag == Face_tag::Union) {
@@ -20,7 +21,7 @@ class Face_tag_propagator {
     propagate();
   }
 
-  Face_tag_propagator(Mixed_mesh& m, Face_handle seed) : m_(m) {
+  Face_tag_propagator(Mixed_mesh<K>& m, Face_handle seed) : m_(m) {
     auto tag = m_.data(seed).tag;
     if (tag == Face_tag::Intersection || tag == Face_tag::Union) {
       queue_.push(seed);
@@ -47,7 +48,7 @@ class Face_tag_propagator {
     }
   }
 
-  Mixed_mesh& m_;
+  Mixed_mesh<K>& m_;
   std::queue<Face_handle> queue_;
 };
 

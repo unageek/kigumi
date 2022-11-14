@@ -14,11 +14,11 @@
 
 namespace boole {
 
-template <class Kernel>
+template <class K>
 class Polygon_soup {
-  using Point = typename Kernel::Point_3;
   using Face = std::array<std::size_t, 3>;
-  using Triangle = typename Kernel::Triangle_3;
+  using Point = typename K::Point_3;
+  using Triangle = typename K::Triangle_3;
 
  public:
   class Leaf : public AABB_leaf {
@@ -77,9 +77,9 @@ class Polygon_soup {
       : points_(std::move(points)), faces_(std::move(faces)) {}
 
   void save(const std::string& filename) {
-    using EPICK = CGAL::Exact_predicates_inexact_constructions_kernel;
+    using Epick = CGAL::Exact_predicates_inexact_constructions_kernel;
 
-    std::vector<EPICK::Point_3> points;
+    std::vector<Epick::Point_3> points;
     points.reserve(points_.size());
     for (const auto& p : points_) {
       points.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()), CGAL::to_double(p.z()));

@@ -10,9 +10,10 @@
 
 namespace boole {
 
+template <class K>
 class Shared_edge_finder {
  public:
-  explicit Shared_edge_finder(const Mixed_mesh& m) {
+  explicit Shared_edge_finder(const Mixed_mesh<K>& m) {
     std::unordered_set<Edge> left_edges;
     std::unordered_set<Edge> shared_edges;
 

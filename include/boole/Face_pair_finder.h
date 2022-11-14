@@ -9,11 +9,10 @@
 
 namespace boole {
 
-template <class Kernel>
+template <class K>
 class Face_pair_finder {
-  using K = Kernel;
-  using Leaf = typename Polygon_soup<K>::Leaf;
   using Face_pair = std::pair<std::size_t, std::size_t>;
+  using Leaf = typename Polygon_soup<K>::Leaf;
 
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)

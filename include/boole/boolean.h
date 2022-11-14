@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <boole/Corefine.h>
 #include <boole/Face_tag_propagator.h>
 #include <boole/Faces_around_edge_classifier.h>
@@ -17,23 +16,23 @@
 
 namespace boole {
 
-using K = CGAL::Exact_predicates_exact_constructions_kernel;
-
+template <class K>
 struct Boolean_result {
   Polygon_soup<K> the_intersection;
   Polygon_soup<K> the_union;
 };
 
-inline Boolean_result boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+template <class K>
+Boolean_result<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
   std::cout << "Corefining..." << std::endl;
 
-  Corefine<K> corefine(left, right);
+  Corefine corefine(left, right);
 
   std::cout << "Constructing mixed mesh..." << std::endl;
 
-  Mixed_mesh m;
+  Mixed_mesh<K> m;
 
-  std::vector<K::Triangle_3> tris;
+  std::vector<typename K::Triangle_3> tris;
   corefine.get_left_triangles(std::back_inserter(tris));
   for (const auto& tri : tris) {
     auto p = tri.vertex(0);
@@ -78,21 +77,25 @@ inline Boolean_result boolean(const Polygon_soup<K>& left, const Polygon_soup<K>
           .the_union = extract(m, Face_tag::Union)};
 }
 
-inline Polygon_soup<K> operator!(const Polygon_soup<K>& soup) {
+template <class K>
+Polygon_soup<K> operator!(const Polygon_soup<K>& soup) {
   Polygon_soup<K> inverse{soup};
   inverse.invert();
   return inverse;
 }
 
-inline Polygon_soup<K> operator+(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+template <class K>
+Polygon_soup<K> operator+(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
   return boolean(left, right).the_union;
 }
 
-inline Polygon_soup<K> operator*(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+template <class K>
+Polygon_soup<K> operator*(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
   return boolean(left, right).the_intersection;
 }
 
-inline Polygon_soup<K> operator-(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+template <class K>
+Polygon_soup<K> operator-(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
   return left * !right;
 }
 

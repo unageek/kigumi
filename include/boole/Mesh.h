@@ -33,11 +33,11 @@ namespace boole {
 using Edge = std::array<Vertex_handle, 2>;
 using Face = std::array<Vertex_handle, 3>;
 
-template <class Kernel, class FaceData = std::nullptr_t>
+template <class K, class FaceData = std::nullptr_t>
 class Mesh {
-  using Point = typename Kernel::Point_3;
-  using Triangle = typename Kernel::Triangle_3;
   using Face_data = FaceData;
+  using Point = typename K::Point_3;
+  using Triangle = typename K::Triangle_3;
 
  public:
   class Leaf : public AABB_leaf {
@@ -144,7 +144,7 @@ class Mesh {
   }
 
  private:
-  Point_list<Kernel> point_list_;
+  Point_list<K> point_list_;
   std::vector<Point> points_;
   std::vector<Face> faces_;
   std::vector<Face_data> face_data_;

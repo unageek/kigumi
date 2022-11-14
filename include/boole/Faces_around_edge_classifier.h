@@ -8,59 +8,16 @@
 
 namespace boole {
 
-struct Face_around_edge {
-  Face_handle fh;
-  Vertex_handle vh_r;
-  K::Vector_2 r;
-  int radial_bin;
-  CGAL::Orientation orientation;
-
-  Face_around_edge(Face_handle fh, Vertex_handle vh_r, const K::Vector_2& r,
-                   CGAL::Orientation orientation)
-      : fh(fh), vh_r(vh_r), r(r), radial_bin(classify_radial_bin(r)), orientation(orientation) {}
-
- private:
-  static int classify_radial_bin(const K::Vector_2& r) {
-    auto u = CGAL::sign(r.x());
-    auto v = CGAL::sign(r.y());
-
-    if (u > 0) {
-      if (v > 0) {
-        return 1;  // 1st quadrant
-      }
-      if (v < 0) {
-        return 7;  // 4th quadrant
-      }
-      return 0;  // +u
-    }
-
-    if (u < 0) {
-      if (v > 0) {
-        return 3;  // 2nd quadrant
-      }
-      if (v < 0) {
-        return 5;  // 3rd quadrant
-      }
-      return 4;  // -u
-    }
-
-    if (v > 0) {
-      return 2;  // +v
-    }
-    if (v < 0) {
-      return 6;  // -v
-    }
-
-    throw std::runtime_error("degenerated face");
-  }
-};
-
+template <class K>
 class Faces_around_edge_classifier {
+  using Plane_3 = typename K::Plane_3;
+  using Vector_2 = typename K::Vector_2;
+
  public:
-  Faces_around_edge_classifier(Mixed_mesh& m, const Edge& edge) {
+  Faces_around_edge_classifier(Mixed_mesh<K>& m, const Edge& edge) {
     const auto& p = m.point(edge[0]);
     const auto& q = m.point(edge[1]);
-    K::Plane_3 plane(p, q - p);
+    Plane_3 plane(p, q - p);
     auto u = plane.base1();
     auto v = plane.base2();
 
@@ -81,7 +38,7 @@ class Faces_around_edge_classifier {
 
       std::size_t k = 3 - (i + j);  // The index of the vertex r.
       const auto& r = m.point(f.at(k));
-      K::Vector_2 r_uv((r - p) * u, (r - p) * v);
+      Vector_2 r_uv((r - p) * u, (r - p) * v);
 
       auto orientation = j == (i + 1) % 3 ? CGAL::COUNTERCLOCKWISE  // The face is pqr.
                                           : CGAL::CLOCKWISE;        // The face is qpr.
@@ -163,6 +120,53 @@ class Faces_around_edge_classifier {
   }
 
  private:
+  struct Face_around_edge {
+    Face_handle fh;
+    Vertex_handle vh_r;
+    Vector_2 r;
+    int radial_bin;
+    CGAL::Orientation orientation;
+
+    Face_around_edge(Face_handle fh, Vertex_handle vh_r, const Vector_2& r,
+                     CGAL::Orientation orientation)
+        : fh(fh), vh_r(vh_r), r(r), radial_bin(classify_radial_bin(r)), orientation(orientation) {}
+
+   private:
+    static int classify_radial_bin(const Vector_2& r) {
+      auto u = CGAL::sign(r.x());
+      auto v = CGAL::sign(r.y());
+
+      if (u > 0) {
+        if (v > 0) {
+          return 1;  // 1st quadrant
+        }
+        if (v < 0) {
+          return 7;  // 4th quadrant
+        }
+        return 0;  // +u
+      }
+
+      if (u < 0) {
+        if (v > 0) {
+          return 3;  // 2nd quadrant
+        }
+        if (v < 0) {
+          return 5;  // 3rd quadrant
+        }
+        return 4;  // -u
+      }
+
+      if (v > 0) {
+        return 2;  // +v
+      }
+      if (v < 0) {
+        return 6;  // -v
+      }
+
+      throw std::runtime_error("degenerated face");
+    }
+  };
+
   struct Radial_less {
     bool operator()(const Face_around_edge& f1, const Face_around_edge& f2) const {
       if (f1.vh_r == f2.vh_r) {

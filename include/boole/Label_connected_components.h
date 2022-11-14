@@ -8,9 +8,10 @@
 
 namespace boole {
 
+template <class K>
 class Label_connected_components {
  public:
-  explicit Label_connected_components(Mixed_mesh& m) {
+  explicit Label_connected_components(Mixed_mesh<K>& m) {
     std::queue<Face_handle> queue;
     auto from_left = false;
     auto connected_component_id = 0;
