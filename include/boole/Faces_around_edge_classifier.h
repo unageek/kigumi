@@ -86,7 +86,9 @@ class Faces_around_edge_classifier {
           fi_data.tag = Face_tag::Union;
           fj_data.tag = Face_tag::Intersection;
         }
-        is_undefined_configuration = false;
+        if (fi.vh_r != fj.vh_r) {
+          is_undefined_configuration = false;
+        }
       }
     }
 
