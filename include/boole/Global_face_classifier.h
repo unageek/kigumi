@@ -2,13 +2,14 @@
 
 #include <CGAL/intersection_3.h>
 #include <boole/AABB_tree/Overlap.h>
-#include <boole/Connected_component_finder.h>
 #include <boole/Mixed_mesh.h>
 
 #include <algorithm>
 #include <iterator>
 #include <optional>
+#include <queue>
 #include <random>
+#include <unordered_set>
 #include <vector>
 
 namespace boole {
@@ -24,22 +25,18 @@ class Global_face_classifier {
 
  public:
   explicit Global_face_classifier(Mixed_mesh<K>& m, const std::unordered_set<Edge>& border)
-      : m_(m) {
+      : m_(m), border_(border) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> dist(0, m.num_faces() - 1);
 
-    Connected_component_finder cc_finder{m, border};
-    const auto& representative_faces = cc_finder.representative_faces();
+    auto representative_faces = find_unclassified_connected_components();
 
 #pragma omp parallel for schedule(dynamic)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (std::size_t i = 0; i < representative_faces.size(); ++i) {
       auto fh_src = representative_faces.at(i);
       auto& f_src = m.data(fh_src);
-      if (f_src.tag != Face_tag::Unknown) {
-        continue;
-      }
 
       while (true) {
         Face_handle fh_trg{dist(gen)};
@@ -112,6 +109,52 @@ class Global_face_classifier {
     return tri.supporting_plane().oriented_side(p_src);
   }
 
+  std::vector<Face_handle> find_unclassified_connected_components() {
+    std::vector<Face_handle> representative_faces;
+    std::vector<bool> visited(m_.num_faces(), false);
+    std::queue<Face_handle> queue;
+
+    auto begin = m_.faces_begin();
+    auto end = m_.faces_end();
+
+    while (true) {
+      for (auto it = begin; it != end; ++it) {
+        auto fh = *it;
+        if (visited.at(fh.i)) {
+          continue;
+        }
+
+        visited.at(fh.i) = true;
+        if (m_.data(fh).tag == Face_tag::Unknown) {
+          queue.push(fh);
+          representative_faces.push_back(fh);
+          begin = ++it;
+          break;
+        }
+      }
+
+      if (queue.empty()) {
+        break;
+      }
+
+      while (!queue.empty()) {
+        auto fh = queue.front();
+        queue.pop();
+
+        for (auto adj_fh : m_.faces_around_face(fh, border_)) {
+          if (visited.at(adj_fh.i)) {
+            continue;
+          }
+
+          visited.at(adj_fh.i) = true;
+          queue.push(adj_fh);
+        }
+      }
+    }
+
+    return representative_faces;
+  }
+
   // CGAL::Random_points_in_triangle_3 is inexact, so use this instead.
   static Point random_point_in_triangle(const Triangle& tri, std::mt19937& gen) {
     // Use float to get less number of bits.
@@ -135,6 +178,7 @@ class Global_face_classifier {
   }
 
   Mixed_mesh<K>& m_;
+  const std::unordered_set<Edge>& border_;
 };
 
 }  // namespace boole
