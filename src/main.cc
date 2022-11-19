@@ -27,10 +27,16 @@ int main(int argc, char** argv) {
       throw std::runtime_error("the second mesh is empty");
     }
 
-    auto result = boolean(left, right);
+    auto result = boolean(left, right,
+                          {
+                              boole::Operator::Intersection,
+                              boole::Operator::Subtraction,
+                              boole::Operator::Union,
+                          });
 
-    result.the_intersection.save("out_inter.obj");
-    result.the_union.save("out_union.obj");
+    result.at(0).save("out_int.obj");
+    result.at(1).save("out_sub.obj");
+    result.at(2).save("out_uni.obj");
 
     return 0;
   } catch (const std::exception& e) {

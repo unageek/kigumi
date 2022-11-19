@@ -5,6 +5,7 @@
 #include <boole/Faces_around_edge_classifier.h>
 #include <boole/Global_face_classifier.h>
 #include <boole/Mixed_mesh.h>
+#include <boole/Operator.h>
 #include <boole/Polygon_soup.h>
 #include <boole/Shared_edge_finder.h>
 #include <boole/extract.h>
@@ -16,13 +17,8 @@
 namespace boole {
 
 template <class K>
-struct Boolean_result {
-  Polygon_soup<K> the_intersection;
-  Polygon_soup<K> the_union;
-};
-
-template <class K>
-Boolean_result<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+std::vector<Polygon_soup<K>> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right,
+                                     const std::vector<Operator>& ops) {
   std::cout << "Corefining..." << std::endl;
 
   Corefine corefine(left, right);
@@ -69,30 +65,12 @@ Boolean_result<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& ri
 
   std::cout << "Extracting..." << std::endl;
 
-  return {.the_intersection = extract(m, Face_tag::Intersection),
-          .the_union = extract(m, Face_tag::Union)};
-}
-
-template <class K>
-Polygon_soup<K> operator!(const Polygon_soup<K>& soup) {
-  Polygon_soup<K> inverse{soup};
-  inverse.invert();
-  return inverse;
-}
-
-template <class K>
-Polygon_soup<K> operator+(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
-  return boolean(left, right).the_union;
-}
-
-template <class K>
-Polygon_soup<K> operator*(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
-  return boolean(left, right).the_intersection;
-}
-
-template <class K>
-Polygon_soup<K> operator-(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
-  return left * !right;
+  std::vector<Polygon_soup<K>> result;
+  result.reserve(ops.size());
+  for (auto op : ops) {
+    result.push_back(extract(m, op));
+  }
+  return result;
 }
 
 }  // namespace boole
