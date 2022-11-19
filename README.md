@@ -20,12 +20,15 @@ The following conditions must be satisfied so that Boolean operations work prope
    - An empty mesh can represent either the empty set or the whole space. Thus, the program refuses to handle such inputs.
 1. A mesh must only contain triangle faces.
 1. A mesh must not have degenerate (zero-area) faces.
-1. Mesh faces must be oriented consistently.
 1. For each pair of faces (f1, f2) (f1 ≠ f2), one of the following must be met:
    - f1 and f2 have an edge in common and do not intersect elsewhere than the edge,
    - f1 and f2 have a vertex in common and do not intersect elsewhere than the vertex,
    - f1 and f2 do not intersect.
-1. There must exist closed subsets $\mathcal{M}_1, \mathcal{M}_2 ⊂ ℝ^3$, and a closed convex subset $\mathcal{R} ⊂ ℝ^3$, such that $∀i ∈ \\{1, 2\\} : M_i = ∂\mathcal{M}_i ∩ \mathcal{R}$, where $M_1$ and $M_2$ are the input meshes.
+1. Let $M_1, M_2$ be the input meshes. There must exist closed sets $\mathcal{M}_1, \mathcal{M}_2 ⊂ ℝ^3$, and a closed convex set $\mathcal{R} ⊂ ℝ^3$ that satisfies the following conditions:
+   - $M_1 = ∂\mathcal{M}_1 ∩ \mathcal{R}$,
+   - $M_2 = ∂\mathcal{M}_2 ∩ \mathcal{R}$,
+   - each face of $M_1$ is oriented so that the normal points toward the exterior of $\mathcal{M}_1$,
+   - each face of $M_2$ is oriented so that the normal points toward the exterior of $\mathcal{M}_2$.
 
 ## TODO
 
