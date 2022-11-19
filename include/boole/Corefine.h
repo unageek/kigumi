@@ -188,7 +188,9 @@ class Corefine {
       return;
     }
 
-    if (const auto* s = boost::get<Segment>(&*intersection)) {
+    if (const auto* p = boost::get<Point>(&*intersection)) {
+      triangulator.insert(*p);
+    } else if (const auto* s = boost::get<Segment>(&*intersection)) {
       auto p = s->source();
       auto q = s->target();
       auto vh0 = triangulator.insert(p);
