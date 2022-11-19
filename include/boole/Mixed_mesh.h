@@ -4,7 +4,7 @@
 
 namespace boole {
 
-enum class Face_tag { Union, Intersection, Unknown, Deleted };
+enum class Face_tag { Union, Intersection, Coplanar, Opposite, Unknown };
 
 struct Face_data {
   bool from_left = false;

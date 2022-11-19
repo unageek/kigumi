@@ -48,35 +48,35 @@ class Faces_around_edge_classifier {
 
     std::sort(faces.begin(), faces.end(), Radial_less{});
 
-    for (std::size_t i = 0; i < faces.size();) {
-      auto j = (i + 1) % faces.size();
-      const auto& fi = faces.at(i);
-      auto& fi_data = m.data(fi.fh);
-      const auto& fj = faces.at(j);
-      auto& fj_data = m.data(fj.fh);
-
-      if (fi.orientation != fj.orientation && fi.vh_r == fj.vh_r) {
-        // The faces are opposite-overlapping, remove them.
-        fi_data.tag = Face_tag::Deleted;
-        fj_data.tag = Face_tag::Deleted;
-        faces.erase(faces.begin() + static_cast<std::ptrdiff_t>(std::max(i, j)));
-        faces.erase(faces.begin() + static_cast<std::ptrdiff_t>(std::min(i, j)));
-      } else {
-        ++i;
-      }
-    }
-
-    if (faces.empty()) {
-      return;
-    }
-
-    auto is_undefined_configuration = true;
     for (std::size_t i = 0; i < faces.size(); ++i) {
       auto j = (i + 1) % faces.size();
       const auto& fi = faces.at(i);
       auto& fi_data = m.data(fi.fh);
       const auto& fj = faces.at(j);
       auto& fj_data = m.data(fj.fh);
+
+      if (fi.vh_r == fj.vh_r) {
+        auto tag = fi.orientation == fj.orientation ? Face_tag::Coplanar : Face_tag::Opposite;
+        fi_data.tag = tag;
+        fj_data.tag = tag;
+      }
+    }
+
+    auto is_undefined_configuration = true;
+    // At the end of the loop, the kth face is tagged as union or intersection.
+    std::size_t k = 0;
+    for (std::size_t i = 0; i < faces.size(); ++i) {
+      auto j = (i + 1) % faces.size();
+      const auto& fi = faces.at(i);
+      auto& fi_data = m.data(fi.fh);
+      const auto& fj = faces.at(j);
+      auto& fj_data = m.data(fj.fh);
+
+      if (fi_data.tag != Face_tag::Unknown || fj_data.tag != Face_tag::Unknown) {
+        continue;
+      }
+
+      // Neither fi nor fj is overlapping with adjacent faces.
 
       if (fi.orientation == fj.orientation) {
         if (fi.orientation == CGAL::COUNTERCLOCKWISE) {
@@ -86,9 +86,8 @@ class Faces_around_edge_classifier {
           fi_data.tag = Face_tag::Union;
           fj_data.tag = Face_tag::Intersection;
         }
-        if (fi.vh_r != fj.vh_r) {
-          is_undefined_configuration = false;
-        }
+        is_undefined_configuration = false;
+        k = j;
       }
     }
 
@@ -96,27 +95,23 @@ class Faces_around_edge_classifier {
       return;
     }
 
-    bool new_faces_classified = true;
-    while (new_faces_classified) {
-      new_faces_classified = false;
-      for (std::size_t i = 0; i < faces.size(); ++i) {
-        auto j = (i + 1) % faces.size();
-        const auto& fi = faces.at(i);
-        auto& fi_data = m.data(fi.fh);
-        const auto& fj = faces.at(j);
-        auto& fj_data = m.data(fj.fh);
+    auto tag = m.data(faces.at(k).fh).tag;
+    auto orientation = faces.at(k).orientation;
+    // Go around and return to the starting point to check consistency.
+    for (std::size_t i = k + 1; i <= k + faces.size(); ++i) {
+      const auto& f = faces.at(i % faces.size());
+      auto& f_data = m.data(f.fh);
 
-        if (fi.orientation != fj.orientation) {
-          if (fi_data.tag == Face_tag::Unknown && fj_data.tag != Face_tag::Unknown) {
-            fi_data.tag = fj_data.tag;
-            new_faces_classified = true;
-          } else if (fi_data.tag != Face_tag::Unknown && fj_data.tag == Face_tag::Unknown) {
-            fj_data.tag = fi_data.tag;
-            new_faces_classified = true;
-          } else if (fi_data.tag != fj_data.tag) {
-            throw std::runtime_error("invalid input meshes");
-          }
-        }
+      if (f.orientation == orientation) {
+        tag = tag == Face_tag::Union ? Face_tag::Intersection : Face_tag::Union;
+      }
+      orientation = f.orientation;
+
+      if (f_data.tag == Face_tag::Unknown) {
+        f_data.tag = tag;
+      } else if ((f_data.tag == Face_tag::Union || f_data.tag == Face_tag::Intersection) &&
+                 f_data.tag != tag) {
+        throw std::runtime_error("invalid input meshes");
       }
     }
   }
