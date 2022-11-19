@@ -12,6 +12,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -32,6 +33,28 @@ namespace boole {
 
 using Edge = std::array<Vertex_handle, 2>;
 using Face = std::array<Vertex_handle, 3>;
+
+inline Edge make_edge(Vertex_handle first, Vertex_handle second) {
+  if (first.i > second.i) {
+    std::swap(first, second);
+  }
+
+  return {first, second};
+}
+
+}  // namespace boole
+
+template <>
+struct std::hash<boole::Edge> {
+  std::size_t operator()(const boole::Edge& edge) const noexcept {
+    std::size_t seed{};
+    boost::hash_combine(seed, std::hash<std::size_t>()(edge[0].i));
+    boost::hash_combine(seed, std::hash<std::size_t>()(edge[1].i));
+    return seed;
+  }
+};
+
+namespace boole {
 
 template <class K, class FaceData = std::nullptr_t>
 class Mesh {
@@ -86,6 +109,8 @@ class Mesh {
     indices_.push_back(index);
   }
 
+  std::size_t num_faces() const { return faces_.size(); }
+
   Face_iterator faces_begin() const { return Face_iterator(Face_handle{0}); }
 
   Face_iterator faces_end() const { return Face_iterator(Face_handle{faces_.size()}); }
@@ -101,14 +126,17 @@ class Mesh {
                                       Face_around_edge_iterator(i_end, i_end, j_end, j_end));
   }
 
-  auto faces_around_face(Face_handle fh) const {
+  auto faces_around_face(Face_handle fh, const std::unordered_set<Edge>& border) {
     const auto& f = face(fh);
-    auto it1 = faces_around_edge({f[0], f[1]}).begin();
-    auto end1 = faces_around_edge({f[0], f[1]}).end();
-    auto it2 = faces_around_edge({f[1], f[2]}).begin();
-    auto end2 = faces_around_edge({f[1], f[2]}).end();
-    auto it3 = faces_around_edge({f[2], f[0]}).begin();
-    auto end3 = faces_around_edge({f[2], f[0]}).end();
+    auto e1 = make_edge(f[0], f[1]);
+    auto e2 = make_edge(f[1], f[2]);
+    auto e3 = make_edge(f[2], f[0]);
+    auto end1 = faces_around_edge(e1).end();
+    auto it1 = border.contains(e1) ? end1 : faces_around_edge(e1).begin();
+    auto end2 = faces_around_edge(e2).end();
+    auto it2 = border.contains(e2) ? end2 : faces_around_edge(e2).begin();
+    auto end3 = faces_around_edge(e3).end();
+    auto it3 = border.contains(e3) ? end3 : faces_around_edge(e3).begin();
     return boost::make_iterator_range(
         Face_around_face_iterator(fh, it1, end1, it2, end2, it3, end3),
         Face_around_face_iterator(fh, end1, end1, end2, end2, end3, end3));
@@ -155,13 +183,3 @@ class Mesh {
 };
 
 }  // namespace boole
-
-template <>
-struct std::hash<boole::Edge> {
-  std::size_t operator()(const boole::Edge& edge) const noexcept {
-    std::size_t seed{};
-    boost::hash_combine(seed, std::hash<std::size_t>()(edge[0].i));
-    boost::hash_combine(seed, std::hash<std::size_t>()(edge[1].i));
-    return seed;
-  }
-};

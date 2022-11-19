@@ -2,6 +2,7 @@
 
 #include <CGAL/intersection_3.h>
 #include <boole/AABB_tree/Overlap.h>
+#include <boole/Connected_component_finder.h>
 #include <boole/Mixed_mesh.h>
 
 #include <algorithm>
@@ -22,12 +23,14 @@ class Global_face_classifier {
   using Triangle = typename K::Triangle_3;
 
  public:
-  explicit Global_face_classifier(Mixed_mesh<K>& m,
-                                  const std::vector<Face_handle>& representative_faces)
+  explicit Global_face_classifier(Mixed_mesh<K>& m, const std::unordered_set<Edge>& border)
       : m_(m) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<std::size_t> dist(0, m.n_faces() - 1);
+
+    Connected_component_finder cc_finder{m, border};
+    const auto& representative_faces = cc_finder.representative_faces();
 
 #pragma omp parallel for schedule(dynamic)
     // NOLINTNEXTLINE(modernize-loop-convert)
@@ -51,7 +54,7 @@ class Global_face_classifier {
         auto result = bounded_side(p_src, p_trg, f_src.from_left);
         if (result && *result != 0) {
           f_src.tag = *result == 1 ? Face_tag::Union : Face_tag::Intersection;
-          Face_tag_propagator{m, fh_src};
+          Face_tag_propagator{m, border, fh_src};
           break;
         }
       }

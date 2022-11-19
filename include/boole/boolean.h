@@ -4,7 +4,6 @@
 #include <boole/Face_tag_propagator.h>
 #include <boole/Faces_around_edge_classifier.h>
 #include <boole/Global_face_classifier.h>
-#include <boole/Label_connected_components.h>
 #include <boole/Mixed_mesh.h>
 #include <boole/Polygon_soup.h>
 #include <boole/Shared_edge_finder.h>
@@ -54,9 +53,6 @@ Boolean_result<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& ri
 
   m.finalize();
 
-  Label_connected_components label_connected_components{m};
-  const auto& representative_faces = label_connected_components.representative_faces();
-
   std::cout << "Local classification..." << std::endl;
 
   Shared_edge_finder shared_edge_finder(m);
@@ -65,11 +61,11 @@ Boolean_result<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& ri
     Faces_around_edge_classifier(m, edge);
   }
 
-  Face_tag_propagator{m};
+  Face_tag_propagator{m, shared_edges};
 
   std::cout << "Global classification..." << std::endl;
 
-  Global_face_classifier{m, representative_faces};
+  Global_face_classifier{m, shared_edges};
 
   std::cout << "Extracting..." << std::endl;
 

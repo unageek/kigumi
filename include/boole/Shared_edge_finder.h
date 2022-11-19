@@ -15,7 +15,6 @@ class Shared_edge_finder {
  public:
   explicit Shared_edge_finder(const Mixed_mesh<K>& m) {
     std::unordered_set<Edge> left_edges;
-    std::unordered_set<Edge> shared_edges;
 
     for (auto fh : m.faces()) {
       if (!m.data(fh).from_left) {
@@ -23,12 +22,12 @@ class Shared_edge_finder {
       }
 
       const auto& f = m.face(fh);
-      auto i = f[0];
-      auto j = f[1];
-      auto k = f[2];
-      left_edges.insert(make_edge(i, j));
-      left_edges.insert(make_edge(j, k));
-      left_edges.insert(make_edge(k, i));
+      auto e1 = make_edge(f[0], f[1]);
+      auto e2 = make_edge(f[1], f[2]);
+      auto e3 = make_edge(f[2], f[0]);
+      left_edges.insert(e1);
+      left_edges.insert(e2);
+      left_edges.insert(e3);
     }
 
     for (auto fh : m.faces()) {
@@ -37,35 +36,25 @@ class Shared_edge_finder {
       }
 
       const auto f = m.face(fh);
-      auto i = f[0];
-      auto j = f[1];
-      auto k = f[2];
-      if (left_edges.contains(make_edge(i, j))) {
-        shared_edges.insert(make_edge(i, j));
+      auto e1 = make_edge(f[0], f[1]);
+      auto e2 = make_edge(f[1], f[2]);
+      auto e3 = make_edge(f[2], f[0]);
+      if (left_edges.contains(e1)) {
+        shared_edges_.insert(e1);
       }
-      if (left_edges.contains(make_edge(j, k))) {
-        shared_edges.insert(make_edge(j, k));
+      if (left_edges.contains(e2)) {
+        shared_edges_.insert(e2);
       }
-      if (left_edges.contains(make_edge(k, i))) {
-        shared_edges.insert(make_edge(k, i));
+      if (left_edges.contains(e3)) {
+        shared_edges_.insert(e3);
       }
     }
-
-    shared_edges_ = std::vector<Edge>(shared_edges.begin(), shared_edges.end());
   }
 
-  const std::vector<Edge>& shared_edges() const { return shared_edges_; }
+  const std::unordered_set<Edge>& shared_edges() const { return shared_edges_; }
 
  private:
-  static Edge make_edge(Vertex_handle first, Vertex_handle second) {
-    if (first.i > second.i) {
-      std::swap(first, second);
-    }
-
-    return {first, second};
-  }
-
-  std::vector<Edge> shared_edges_;
+  std::unordered_set<Edge> shared_edges_;
 };
 
 }  // namespace boole

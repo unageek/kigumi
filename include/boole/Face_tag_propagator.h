@@ -10,7 +10,8 @@ namespace boole {
 template <class K>
 class Face_tag_propagator {
  public:
-  explicit Face_tag_propagator(Mixed_mesh<K>& m) : m_(m) {
+  explicit Face_tag_propagator(Mixed_mesh<K>& m, const std::unordered_set<Edge>& border)
+      : m_(m), border_(border) {
     for (auto fh : m_.faces()) {
       auto tag = m_.data(fh).tag;
       if (tag == Face_tag::Intersection || tag == Face_tag::Union) {
@@ -21,7 +22,8 @@ class Face_tag_propagator {
     propagate();
   }
 
-  Face_tag_propagator(Mixed_mesh<K>& m, Face_handle seed) : m_(m) {
+  Face_tag_propagator(Mixed_mesh<K>& m, const std::unordered_set<Edge>& border, Face_handle seed)
+      : m_(m), border_(border) {
     auto tag = m_.data(seed).tag;
     if (tag == Face_tag::Intersection || tag == Face_tag::Union) {
       queue_.push(seed);
@@ -39,7 +41,7 @@ class Face_tag_propagator {
       queue_.pop();
 
       auto tag = m_.data(fh).tag;
-      for (auto fh2 : m_.faces_around_face(fh)) {
+      for (auto fh2 : m_.faces_around_face(fh, border_)) {
         if (m_.data(fh2).tag == Face_tag::Unknown) {
           m_.data(fh2).tag = tag;
           queue_.push(fh2);
@@ -49,6 +51,7 @@ class Face_tag_propagator {
   }
 
   Mixed_mesh<K>& m_;
+  const std::unordered_set<Edge>& border_;
   std::queue<Face_handle> queue_;
 };
 
