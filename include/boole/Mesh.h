@@ -3,6 +3,7 @@
 #include <boole/AABB_tree/AABB_leaf.h>
 #include <boole/AABB_tree/AABB_tree.h>
 #include <boole/Mesh_handles.h>
+#include <boole/Mesh_iterators.h>
 #include <boole/Point_list.h>
 
 #include <algorithm>
