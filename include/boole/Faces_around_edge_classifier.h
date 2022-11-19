@@ -46,7 +46,11 @@ class Faces_around_edge_classifier {
       faces.emplace_back(fh, f.at(k), r_uv, orientation);
     }
 
+    // Sort the faces radially around the edge.
+
     std::sort(faces.begin(), faces.end(), Radial_less{});
+
+    // Tag coplanar/opposite faces first.
 
     for (std::size_t i = 0; i < faces.size(); ++i) {
       auto j = (i + 1) % faces.size();
@@ -61,6 +65,8 @@ class Faces_around_edge_classifier {
         fj_data.tag = tag;
       }
     }
+
+    // Find pairs of non-overlapping and non-orientable faces and tag them.
 
     auto is_undefined_configuration = true;
     // At the end of the loop, the kth face is tagged as union or intersection.
@@ -94,6 +100,8 @@ class Faces_around_edge_classifier {
     if (is_undefined_configuration) {
       return;
     }
+
+    // Tag rest of the faces, while checking consistency.
 
     auto tag = m.data(faces.at(k).fh).tag;
     auto orientation = faces.at(k).orientation;
