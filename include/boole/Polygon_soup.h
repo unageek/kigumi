@@ -88,6 +88,8 @@ class Polygon_soup {
     CGAL::IO::write_polygon_soup(filename, points, faces_);
   }
 
+  std::size_t num_faces() const { return faces_.size(); }
+
   const std::vector<Point>& points() const { return points_; }
 
   const std::vector<Face>& faces() const { return faces_; }

@@ -148,8 +148,6 @@ class Mesh {
 
   const Face& face(Face_handle handle) const { return faces_.at(handle.i); }
 
-  std::size_t n_faces() const { return faces_.size(); }
-
   const Point& point(Vertex_handle handle) const { return points_.at(handle.i); }
 
   Triangle triangle(Face_handle handle) const {

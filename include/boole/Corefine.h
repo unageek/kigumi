@@ -173,7 +173,7 @@ class Corefine {
   void get_triangles(const Polygon_soup<K>& soup,
                      const std::unordered_map<std::size_t, Triangulator<K>>& triangulators,
                      OutputIterator tris) const {
-    for (std::size_t i = 0; i < soup.faces().size(); ++i) {
+    for (std::size_t i = 0; i < soup.num_faces(); ++i) {
       auto it = triangulators.find(i);
       if (it == triangulators.end()) {
         *tris++ = soup.triangle(i);

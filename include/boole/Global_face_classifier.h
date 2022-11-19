@@ -27,7 +27,7 @@ class Global_face_classifier {
       : m_(m) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<std::size_t> dist(0, m.n_faces() - 1);
+    std::uniform_int_distribution<std::size_t> dist(0, m.num_faces() - 1);
 
     Connected_component_finder cc_finder{m, border};
     const auto& representative_faces = cc_finder.representative_faces();
