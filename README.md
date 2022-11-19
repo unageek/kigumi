@@ -12,7 +12,7 @@
 - Can handle open meshes
 - Can handle disjointness
 
-## Limitations
+## Preconditions
 
 The following conditions must be satisfied so that Boolean operations work properly. If some are not met, the result is undefined (operations can result in an error, crash or fail silently).
 
