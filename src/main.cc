@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     auto result = boolean(left, right,
                           {
                               boole::Operator::Intersection,
-                              boole::Operator::Subtraction,
+                              boole::Operator::Difference,
                               boole::Operator::Union,
                           });
 

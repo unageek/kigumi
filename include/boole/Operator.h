@@ -30,25 +30,26 @@ namespace boole {
 
 enum class Operator {
   // Bocheński notation
-  V,
-  A,
-  B,
-  C,
-  D,
-  E,
-  F,
-  G,
-  H,
-  I,
-  J,
-  K,
-  L,
-  M,
-  X,
-  O,
-  Intersection = K,
-  Subtraction = L,
+  V,  // The universe
+  A,  // A ∪ B
+  B,  // (B ⧵ A)ᶜ
+  C,  // (A ⧵ B)ᶜ
+  D,  // (A ∩ B)ᶜ
+  E,  // (A △ B)ᶜ
+  F,  // Aᶜ
+  G,  // Bᶜ
+  H,  // B
+  I,  // A
+  J,  // A △ B
+  K,  // A ∩ B
+  L,  // A ⧵ B
+  M,  // B ⧵ A
+  X,  // (A ∪ B)ᶜ
+  O,  // ∅
   Union = A,
+  SymmetricDifference = J,
+  Intersection = K,
+  Difference = L,
 };
 
 enum class Mask {
