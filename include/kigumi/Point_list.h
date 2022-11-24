@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Point_list {
@@ -47,4 +47,4 @@ class Point_list {
   std::unordered_map<Point, std::size_t, Point_hash> point_to_index_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <CGAL/intersection_3.h>
-#include <boole/Face_pair_finder.h>
-#include <boole/Polygon_soup.h>
-#include <boole/Triangulator.h>
+#include <kigumi/Face_pair_finder.h>
+#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangulator.h>
 
 #include <iterator>
 #include <stdexcept>
@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Corefine {
@@ -224,4 +224,4 @@ class Corefine {
   std::unordered_map<std::size_t, Triangulator<K>> right_triangulators_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

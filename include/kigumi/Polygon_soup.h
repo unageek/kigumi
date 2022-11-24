@@ -2,8 +2,8 @@
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/polygon_soup_io.h>
-#include <boole/AABB_tree/AABB_leaf.h>
-#include <boole/AABB_tree/AABB_tree.h>
+#include <kigumi/AABB_tree/AABB_leaf.h>
+#include <kigumi/AABB_tree/AABB_tree.h>
 
 #include <array>
 #include <memory>
@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Polygon_soup {
@@ -129,4 +129,4 @@ class Polygon_soup {
   mutable std::mutex aabb_tree_mutex_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

@@ -5,7 +5,7 @@
 #include <optional>
 #include <utility>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Overlap {
@@ -56,4 +56,4 @@ class Overlap {
   }
 };
 
-}  // namespace boole
+}  // namespace kigumi

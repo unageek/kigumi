@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CGAL/Bbox_3.h>
-#include <boole/AABB_tree/AABB_node.h>
+#include <kigumi/AABB_tree/AABB_node.h>
 #include <omp.h>
 
 #include <algorithm>
@@ -11,7 +11,7 @@
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class Leaf>
 class AABB_tree {
@@ -194,4 +194,4 @@ class AABB_tree {
   const void* root_{nullptr};
 };
 
-}  // namespace boole
+}  // namespace kigumi

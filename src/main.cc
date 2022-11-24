@@ -1,6 +1,6 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <boole/Polygon_soup.h>
-#include <boole/boolean.h>
+#include <kigumi/Polygon_soup.h>
+#include <kigumi/boolean.h>
 
 #include <iostream>
 #include <string>
@@ -17,21 +17,21 @@ int main(int argc, char** argv) {
       return 1;
     }
 
-    boole::Polygon_soup<K> left(args.at(1));
+    kigumi::Polygon_soup<K> left(args.at(1));
     if (left.faces().empty()) {
       throw std::runtime_error("the first mesh is empty");
     }
 
-    boole::Polygon_soup<K> right(args.at(2));
+    kigumi::Polygon_soup<K> right(args.at(2));
     if (right.faces().empty()) {
       throw std::runtime_error("the second mesh is empty");
     }
 
     auto result = boolean(left, right,
                           {
-                              boole::Operator::Intersection,
-                              boole::Operator::Difference,
-                              boole::Operator::Union,
+                              kigumi::Operator::Intersection,
+                              kigumi::Operator::Difference,
+                              kigumi::Operator::Union,
                           });
 
     result.at(0).save("out_int.obj");

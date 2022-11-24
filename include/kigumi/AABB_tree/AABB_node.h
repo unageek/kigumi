@@ -2,7 +2,7 @@
 
 #include <CGAL/Bbox_3.h>
 
-namespace boole {
+namespace kigumi {
 
 template <class Leaf>
 class AABB_node {
@@ -35,4 +35,4 @@ class AABB_node {
   const void* right_{nullptr};
 };
 
-}  // namespace boole
+}  // namespace kigumi

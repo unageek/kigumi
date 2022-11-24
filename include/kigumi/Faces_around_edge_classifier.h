@@ -1,12 +1,12 @@
 #pragma once
 
-#include <boole/Mixed_mesh.h>
+#include <kigumi/Mixed_mesh.h>
 
 #include <algorithm>
 #include <stdexcept>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Faces_around_edge_classifier {
@@ -189,4 +189,4 @@ class Faces_around_edge_classifier {
   };
 };
 
-}  // namespace boole
+}  // namespace kigumi

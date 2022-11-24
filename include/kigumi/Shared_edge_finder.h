@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boole/Mixed_mesh.h>
+#include <kigumi/Mixed_mesh.h>
 
 #include <boost/container_hash/hash.hpp>
 #include <functional>
@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Shared_edge_finder {
@@ -57,4 +57,4 @@ class Shared_edge_finder {
   std::unordered_set<Edge> shared_edges_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

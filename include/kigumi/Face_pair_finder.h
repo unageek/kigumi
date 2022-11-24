@@ -1,13 +1,13 @@
 #pragma once
 
-#include <boole/AABB_tree/Overlap.h>
-#include <boole/Polygon_soup.h>
+#include <kigumi/AABB_tree/Overlap.h>
+#include <kigumi/Polygon_soup.h>
 
 #include <iterator>
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Face_pair_finder {
@@ -65,4 +65,4 @@ class Face_pair_finder {
   const Polygon_soup<K>& right_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

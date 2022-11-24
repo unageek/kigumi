@@ -1,20 +1,20 @@
 #pragma once
 
-#include <boole/Corefine.h>
-#include <boole/Face_tag_propagator.h>
-#include <boole/Faces_around_edge_classifier.h>
-#include <boole/Global_face_classifier.h>
-#include <boole/Mixed_mesh.h>
-#include <boole/Operator.h>
-#include <boole/Polygon_soup.h>
-#include <boole/Shared_edge_finder.h>
-#include <boole/extract.h>
+#include <kigumi/Corefine.h>
+#include <kigumi/Face_tag_propagator.h>
+#include <kigumi/Faces_around_edge_classifier.h>
+#include <kigumi/Global_face_classifier.h>
+#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Operator.h>
+#include <kigumi/Polygon_soup.h>
+#include <kigumi/Shared_edge_finder.h>
+#include <kigumi/extract.h>
 
 #include <iostream>
 #include <iterator>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 std::vector<Polygon_soup<K>> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right,
@@ -73,4 +73,4 @@ std::vector<Polygon_soup<K>> boolean(const Polygon_soup<K>& left, const Polygon_
   return result;
 }
 
-}  // namespace boole
+}  // namespace kigumi

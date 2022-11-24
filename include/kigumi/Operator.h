@@ -1,6 +1,6 @@
 #pragma once
 
-namespace boole {
+namespace kigumi {
 
 // Face output table
 //
@@ -160,4 +160,4 @@ inline Mask opposite_mask(Operator op, bool prefer_a) {
   }
 }
 
-}  // namespace boole
+}  // namespace kigumi

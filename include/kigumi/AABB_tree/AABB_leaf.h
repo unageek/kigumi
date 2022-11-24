@@ -2,7 +2,7 @@
 
 #include <CGAL/Bbox_3.h>
 
-namespace boole {
+namespace kigumi {
 
 class AABB_leaf {
   using Bbox = CGAL::Bbox_3;
@@ -16,4 +16,4 @@ class AABB_leaf {
   const Bbox bbox_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

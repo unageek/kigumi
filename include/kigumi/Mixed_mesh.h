@@ -1,8 +1,8 @@
 #pragma once
 
-#include <boole/Mesh.h>
+#include <kigumi/Mesh.h>
 
-namespace boole {
+namespace kigumi {
 
 enum class Face_tag { Union, Intersection, Coplanar, Opposite, Unknown };
 
@@ -14,4 +14,4 @@ struct Face_data {
 template <class K>
 using Mixed_mesh = Mesh<K, Face_data>;
 
-}  // namespace boole
+}  // namespace kigumi

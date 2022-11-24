@@ -1,8 +1,8 @@
 #pragma once
 
 #include <CGAL/intersection_3.h>
-#include <boole/AABB_tree/Overlap.h>
-#include <boole/Mixed_mesh.h>
+#include <kigumi/AABB_tree/Overlap.h>
+#include <kigumi/Mixed_mesh.h>
 
 #include <algorithm>
 #include <iterator>
@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Global_face_classifier {
@@ -181,4 +181,4 @@ class Global_face_classifier {
   const std::unordered_set<Edge>& border_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <boole/AABB_tree/AABB_leaf.h>
-#include <boole/AABB_tree/AABB_tree.h>
-#include <boole/Mesh_handles.h>
-#include <boole/Mesh_iterators.h>
-#include <boole/Point_list.h>
+#include <kigumi/AABB_tree/AABB_leaf.h>
+#include <kigumi/AABB_tree/AABB_tree.h>
+#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_iterators.h>
+#include <kigumi/Point_list.h>
 
 #include <algorithm>
 #include <array>
@@ -17,7 +17,7 @@
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 //  indices_   face_indices_
 //        |        |
@@ -43,11 +43,11 @@ inline Edge make_edge(Vertex_handle first, Vertex_handle second) {
   return {first, second};
 }
 
-}  // namespace boole
+}  // namespace kigumi
 
 template <>
-struct std::hash<boole::Edge> {
-  std::size_t operator()(const boole::Edge& edge) const noexcept {
+struct std::hash<kigumi::Edge> {
+  std::size_t operator()(const kigumi::Edge& edge) const noexcept {
     std::size_t seed{};
     boost::hash_combine(seed, std::hash<std::size_t>()(edge[0].i));
     boost::hash_combine(seed, std::hash<std::size_t>()(edge[1].i));
@@ -55,7 +55,7 @@ struct std::hash<boole::Edge> {
   }
 };
 
-namespace boole {
+namespace kigumi {
 
 template <class K, class FaceData = std::nullptr_t>
 class Mesh {
@@ -181,4 +181,4 @@ class Mesh {
   mutable std::mutex aabb_tree_mutex_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

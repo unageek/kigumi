@@ -1,4 +1,4 @@
-# Building boole On Ubuntu 22.04
+# Building kigumi On Ubuntu 22.04
 
 ## Prerequisites
 
@@ -9,13 +9,13 @@ sudo apt install clang cmake libcgal-dev libomp-dev ninja-build zsh
 ## Clone
 
 ```
-git clone https://github.com/unageek/boole.git
+git clone https://github.com/unageek/kigumi.git
 ```
 
 ## Build
 
 ```
-cd boole
+cd kigumi
 ./run cmake
 ./run b
 ```

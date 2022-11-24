@@ -1,15 +1,15 @@
 #pragma once
 
-#include <boole/Mixed_mesh.h>
-#include <boole/Operator.h>
-#include <boole/Polygon_soup.h>
+#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Operator.h>
+#include <kigumi/Polygon_soup.h>
 
 #include <array>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 Polygon_soup<K> extract(const Mixed_mesh<K>& m, Operator op) {
@@ -67,4 +67,4 @@ Polygon_soup<K> extract(const Mixed_mesh<K>& m, Operator op) {
   return {std::move(points), std::move(faces)};
 }
 
-}  // namespace boole
+}  // namespace kigumi

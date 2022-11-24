@@ -1,11 +1,11 @@
 #pragma once
 
-#include <boole/Mesh_handles.h>
+#include <kigumi/Mesh_handles.h>
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <vector>
 
-namespace boole {
+namespace kigumi {
 
 class Face_around_edge_iterator
     : public boost::iterator_facade<Face_around_edge_iterator, Face_handle,
@@ -145,4 +145,4 @@ class Face_around_face_iterator
   Face_around_edge_iterator end3_;
 };
 
-}  // namespace boole
+}  // namespace kigumi

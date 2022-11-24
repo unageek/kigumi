@@ -1,4 +1,4 @@
-# Building boole on Windows
+# Building kigumi on Windows
 
 ## Prerequisites
 
@@ -21,13 +21,13 @@
 ## Clone
 
 ```
-git clone --recursive https://github.com/unageek/boole.git
+git clone --recursive https://github.com/unageek/kigumi.git
 ```
 
 ## Build
 
 ```
-cd boole
+cd kigumi
 ./run init-vcpkg
 ./run cmake
 ./run b

@@ -1,4 +1,4 @@
-# Building boole on macOS
+# Building kigumi on macOS
 
 ## Prerequisites
 
@@ -19,13 +19,13 @@
 ## Clone
 
 ```
-git clone https://github.com/unageek/boole.git
+git clone https://github.com/unageek/kigumi.git
 ```
 
 ## Build
 
 ```
-cd boole
+cd kigumi
 ./run cmake -- -DCMAKE_CXX_COMPILER=$(brew --prefix)/opt/llvm/bin/clang++
 ./run b
 ```

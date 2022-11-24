@@ -1,11 +1,11 @@
 #pragma once
 
-#include <boole/Mixed_mesh.h>
+#include <kigumi/Mixed_mesh.h>
 
 #include <queue>
 #include <stdexcept>
 
-namespace boole {
+namespace kigumi {
 
 template <class K>
 class Face_tag_propagator {
@@ -55,4 +55,4 @@ class Face_tag_propagator {
   std::queue<Face_handle> queue_;
 };
 
-}  // namespace boole
+}  // namespace kigumi
