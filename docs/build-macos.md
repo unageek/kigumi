@@ -13,7 +13,7 @@
 - Tools and libraries
 
   ```bash
-  brew install cgal cmake llvm ninja
+  brew install cgal cmake googletest llvm ninja
   ```
 
 ## Clone

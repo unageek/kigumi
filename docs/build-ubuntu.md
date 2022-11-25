@@ -3,7 +3,7 @@
 ## Prerequisites
 
 ```bash
-sudo apt install clang cmake libcgal-dev libomp-dev ninja-build zsh
+sudo apt install clang cmake libcgal-dev libgtest-dev libomp-dev ninja-build zsh
 ```
 
 ## Clone

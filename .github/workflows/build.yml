@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Prerequisites
-        run: sudo apt-get install -y libcgal-dev libomp-dev ninja-build zsh
+        run: sudo apt-get install -y libcgal-dev libgtest-dev libomp-dev ninja-build zsh
 
       - name: Configure
         run: ./run cmake -- -DCMAKE_CXX_COMPILER=clang++
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Prerequisites
-        run: brew install cgal ninja
+        run: brew install cgal googletest ninja
 
       - name: Configure
         run: ./run cmake -- -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@14)/bin/clang++
