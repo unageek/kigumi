@@ -24,6 +24,9 @@ jobs:
       - name: Build
         run: ./run build
 
+      - name: Test
+        run: ./run test
+
   build-macos:
     name: Build - macOS
     runs-on: macos-12
@@ -39,3 +42,6 @@ jobs:
 
       - name: Build
         run: ./run build
+
+      - name: Test
+        run: ./run test

@@ -8,6 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(CGAL CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 
 add_subdirectory(src)
+enable_testing()
+add_subdirectory(tests)
