@@ -39,16 +39,3 @@ jobs:
 
       - name: Build
         run: ./run build
-
-  build-windows:
-    name: Build - Windows
-    runs-on: windows-2022
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Configure
-        run: .\run cmake -- -DCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake"
-
-      - name: Build
-        run: .\run build
