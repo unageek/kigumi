@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-ubuntu:
+    name: Build - Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Prerequisites
+        run: apt-get install -y libcgal-dev
+
+      - name: Configure
+        run: ./run cmake
+
+      - name: Build
+        run: ./run build
