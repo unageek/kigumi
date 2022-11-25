@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get install -y libcgal-dev ninja-build zsh
 
       - name: Configure
-        run: ./run cmake
+        run: ./run cmake -- -DCMAKE_CXX_COMPILER=/usr/bin/clang++-14
 
       - name: Build
         run: ./run build
