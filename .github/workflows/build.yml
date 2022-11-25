@@ -19,7 +19,7 @@ jobs:
         run: sudo apt-get install -y libcgal-dev libomp-dev ninja-build zsh
 
       - name: Configure
-        run: ./run cmake -- -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+        run: ./run cmake -- -DCMAKE_CXX_COMPILER=clang++
 
       - name: Build
         run: ./run build
@@ -36,6 +36,19 @@ jobs:
 
       - name: Configure
         run: ./run cmake -- -DCMAKE_CXX_COMPILER=$(brew --prefix llvm@14)/bin/clang++
+
+      - name: Build
+        run: ./run build
+
+  build-windows:
+    name: Build - Windows
+    runs-on: windows-2022
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure
+        run: ./run cmake -- -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
         run: ./run build
