@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Prerequisites
-        run: sudo apt-get install -y libcgal-dev zsh
+        run: sudo apt-get install -y libcgal-dev ninja-build zsh
 
       - name: Configure
         run: ./run cmake
