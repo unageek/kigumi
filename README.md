@@ -1,4 +1,4 @@
-# ![kigumi](docs/logo.png#gh-light-mode-only)![kigumi](docs/logo_dark.png#gh-dark-mode-only)
+# ![kigumi](docs/logo.svg#gh-light-mode-only)![kigumi](docs/logo_dark.svg#gh-dark-mode-only)
 
 3D regularized Boolean set operations that just work! 🙌
 
