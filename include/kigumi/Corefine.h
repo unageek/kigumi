@@ -38,7 +38,7 @@ class Corefine {
       std::vector<Intersection_info> local_infos;
 
 #pragma omp for schedule(guided)
-      for (std::size_t i = 0; i < pairs.size(); ++i) {
+      for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(pairs.size()); ++i) {
         auto [left_face, right_face] = pairs.at(i);
         auto left_tri = left_.triangle(left_face);
         auto right_tri = right_.triangle(right_face);
@@ -79,7 +79,7 @@ class Corefine {
 
     bool caught = false;
 #pragma omp parallel for schedule(guided)
-    for (std::size_t i = 0; i < left_face_starts.size() - 1; ++i) {
+    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(left_face_starts.size() - 1); ++i) {
       if (caught) {
         continue;
       }
@@ -113,7 +113,7 @@ class Corefine {
     right_face_starts.push_back(infos.size());
 
 #pragma omp parallel for schedule(guided)
-    for (std::size_t i = 0; i < right_face_starts.size() - 1; ++i) {
+    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(right_face_starts.size() - 1); ++i) {
       if (caught) {
         continue;
       }

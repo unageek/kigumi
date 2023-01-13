@@ -33,8 +33,7 @@ class Global_face_classifier {
     auto representative_faces = find_unclassified_connected_components();
 
 #pragma omp parallel for schedule(dynamic)
-    // NOLINTNEXTLINE(modernize-loop-convert)
-    for (std::size_t i = 0; i < representative_faces.size(); ++i) {
+    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(representative_faces.size()); ++i) {
       auto fh_src = representative_faces.at(i);
       auto& f_src = m.data(fh_src);
 
