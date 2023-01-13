@@ -1,4 +1,4 @@
-# https://github.com/Pscx/Pscx/blob/master/Src/Pscx/Modules/Utility/Pscx.Utility.psm1
+# https://github.com/Pscx/Pscx/blob/698efdf0ba9cb29b326eb93e4a25ac841cc302dd/Src/Pscx/Modules/Utility/Pscx.Utility.psm1#L814
 
 <#
 .SYNOPSIS
@@ -18,7 +18,8 @@
 .NOTES
     Author: Lee Holmes
 #>
-function Invoke-BatchFile {
+function Invoke-BatchFile
+{
     param([string]$Path, [string]$Parameters)
 
     $tempFile = [IO.Path]::GetTempFileName()

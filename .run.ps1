@@ -1,6 +1,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+. .\tools\Exec.ps1
 . .\tools\Invoke-BatchFile.ps1
 
 function loadBuildEnvironment {
@@ -32,33 +33,33 @@ Set-Location $PSScriptRoot
 switch -regex ($args[0]) {
     '^init-vcpkg$' {
         Set-Location vcpkg
-        .\bootstrap-vcpkg.bat
-        .\vcpkg remove --outdated --recurse
-        .\vcpkg install cgal gtest --triplet=x64-windows
+        Exec { .\bootstrap-vcpkg.bat }
+        Exec { .\vcpkg remove --outdated --recurse }
+        Exec { .\vcpkg install cgal gtest --triplet=x64-windows }
         break
     }
     '^cmake$' {
         loadBuildEnvironment
         New-Item build -ItemType Directory -Force
         Set-Location build
-        cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" $externalArgs
+        Exec { cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" $externalArgs }
         break
     }
     '^b(uild)?$' {
         loadBuildEnvironment
         Set-Location build
-        ninja
+        Exec { ninja }
         break
     }
     '^r(un)?$' {
         $bin = $args[1]
-        & .\build\$bin $externalArgs
+        Exec { & .\build\$bin $externalArgs }
         break
     }
     '^t(est)?$' {
         loadBuildEnvironment
         Set-Location build
-        ctest -V
+        Exec { ctest -V }
         break
     }
     default {
