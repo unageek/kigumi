@@ -31,7 +31,7 @@ class Face_pair_finder {
         const auto& left_tree = left_.aabb_tree();
 
 #pragma omp for schedule(guided)
-        for (std::size_t i = 0; i < right_.num_faces(); ++i) {
+        for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(right_.num_faces()); ++i) {
           leaves.clear();
           left_tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves),
                                                                  right_.triangle(i));
@@ -43,7 +43,7 @@ class Face_pair_finder {
         const auto& right_tree = right_.aabb_tree();
 
 #pragma omp for schedule(guided)
-        for (std::size_t i = 0; i < left_.num_faces(); ++i) {
+        for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(left_.num_faces()); ++i) {
           leaves.clear();
           right_tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves),
                                                                   left_.triangle(i));

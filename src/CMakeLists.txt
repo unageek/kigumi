@@ -7,7 +7,7 @@ add_executable(${TARGET}
 if(UNIX)
     target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror -fsanitize=undefined)
 elseif(MSVC)
-    target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702 /openmp:llvm)
+    target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702)
 endif()
 
 target_include_directories(${TARGET} PRIVATE
@@ -16,11 +16,6 @@ target_include_directories(${TARGET} PRIVATE
 
 target_link_libraries(${TARGET} PRIVATE
     CGAL::CGAL
+    OpenMP::OpenMP_CXX
     -fsanitize=undefined
 )
-
-if(UNIX)
-    target_link_libraries(${TARGET} PRIVATE
-        OpenMP::OpenMP_CXX
-    )
-endif()
