@@ -12,17 +12,22 @@
 namespace kigumi {
 
 template <class K>
-Polygon_soup<K> extract(const Mixed_mesh<K>& m, Operator op) {
-  std::vector<typename K::Point_3> points;
-  std::vector<std::array<std::size_t, 3>> faces;
-  std::unordered_map<Vertex_handle, std::size_t> map;
+Polygon_soup<K> extract(const Mixed_polygon_soup<K>& m, Operator op, bool extract_first,
+                        bool extract_second, bool prefer_first) {
+  Polygon_soup<K> soup;
+  std::unordered_map<Vertex_handle, Vertex_handle> map;
 
   auto u_mask = union_mask(op);
   auto i_mask = intersection_mask(op);
-  auto c_mask = coplanar_mask(op, true);
-  auto o_mask = opposite_mask(op, true);
+  auto c_mask = coplanar_mask(op, prefer_first);
+  auto o_mask = opposite_mask(op, prefer_first);
 
   for (auto fh : m.faces()) {
+    auto from_left = m.data(fh).from_left;
+    if ((from_left && !extract_first) || (!from_left && !extract_second)) {
+      continue;
+    }
+
     auto mask = Mask::None;
     switch (m.data(fh).tag) {
       case Face_tag::Union:
@@ -41,10 +46,10 @@ Polygon_soup<K> extract(const Mixed_mesh<K>& m, Operator op) {
         break;
     }
 
-    auto output_id = m.data(fh).from_left ? (mask & Mask::A) != Mask::None  //
-                                          : (mask & Mask::B) != Mask::None;
-    auto output_inv = m.data(fh).from_left ? (mask & Mask::AInv) != Mask::None  //
-                                           : (mask & Mask::BInv) != Mask::None;
+    auto output_id = from_left ? (mask & Mask::A) != Mask::None  //
+                               : (mask & Mask::B) != Mask::None;
+    auto output_inv = from_left ? (mask & Mask::AInv) != Mask::None  //
+                                : (mask & Mask::BInv) != Mask::None;
     if (!output_id && !output_inv) {
       continue;
     }
@@ -53,18 +58,17 @@ Polygon_soup<K> extract(const Mixed_mesh<K>& m, Operator op) {
     for (auto vh : f) {
       const auto& p = m.point(vh);
       if (!map.contains(vh)) {
-        map.emplace(vh, points.size());
-        points.push_back(p);
+        map.emplace(vh, soup.add_vertex(p));
       }
     }
     if (output_inv) {
-      faces.push_back({map.at(f[0]), map.at(f[2]), map.at(f[1])});
+      soup.add_face({map.at(f[0]), map.at(f[2]), map.at(f[1])});
     } else {
-      faces.push_back({map.at(f[0]), map.at(f[1]), map.at(f[2])});
+      soup.add_face({map.at(f[0]), map.at(f[1]), map.at(f[2])});
     }
   }
 
-  return {std::move(points), std::move(faces)};
+  return soup;
 }
 
 }  // namespace kigumi

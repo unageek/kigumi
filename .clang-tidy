@@ -5,6 +5,7 @@ Checks: "-*,\
   clang-analyzer-*,\
   cppcoreguidelines-*,\
   -cppcoreguidelines-avoid-magic-numbers,\
+  -cppcoreguidelines-pro-type-reinterpret-cast,\
   google-*,\
   -google-runtime-references,\
   misc-*,\

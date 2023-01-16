@@ -24,6 +24,11 @@ inline bool operator!=(Vertex_handle a, Vertex_handle b) { return a.i != b.i; }
 }  // namespace kigumi
 
 template <>
+struct std::hash<kigumi::Face_handle> {
+  std::size_t operator()(kigumi::Face_handle fh) const { return fh.i; }
+};
+
+template <>
 struct std::hash<kigumi::Vertex_handle> {
   std::size_t operator()(kigumi::Vertex_handle vh) const { return vh.i; }
 };

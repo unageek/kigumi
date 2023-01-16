@@ -148,12 +148,12 @@ class Corefine {
 
  private:
   struct Intersection_info {
-    std::size_t left_face;
-    std::size_t right_face;
+    Face_handle left_face;
+    Face_handle right_face;
     Intersection intersection;
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-    Intersection_info(std::size_t left_face, std::size_t right_face, Intersection&& intersection)
+    Intersection_info(Face_handle left_face, Face_handle right_face, Intersection&& intersection)
         : left_face(left_face), right_face(right_face), intersection(std::move(intersection)) {}
 
     Intersection_info(Intersection_info&& other) noexcept
@@ -171,12 +171,12 @@ class Corefine {
 
   template <class OutputIterator>
   void get_triangles(const Polygon_soup<K>& soup,
-                     const std::unordered_map<std::size_t, Triangulator<K>>& triangulators,
+                     const std::unordered_map<Face_handle, Triangulator<K>>& triangulators,
                      OutputIterator tris) const {
-    for (std::size_t i = 0; i < soup.num_faces(); ++i) {
-      auto it = triangulators.find(i);
+    for (auto fh : soup.faces()) {
+      auto it = triangulators.find(fh);
       if (it == triangulators.end()) {
-        *tris++ = soup.triangle(i);
+        *tris++ = soup.triangle(fh);
       } else {
         it->second.get_triangles(tris);
       }
@@ -219,9 +219,9 @@ class Corefine {
   }
 
   const Polygon_soup<K>& left_;
-  std::unordered_map<std::size_t, Triangulator<K>> left_triangulators_;
+  std::unordered_map<Face_handle, Triangulator<K>> left_triangulators_;
   const Polygon_soup<K>& right_;
-  std::unordered_map<std::size_t, Triangulator<K>> right_triangulators_;
+  std::unordered_map<Face_handle, Triangulator<K>> right_triangulators_;
 };
 
 }  // namespace kigumi

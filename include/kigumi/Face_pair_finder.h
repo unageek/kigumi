@@ -11,7 +11,7 @@ namespace kigumi {
 
 template <class K>
 class Face_pair_finder {
-  using Face_pair = std::pair<std::size_t, std::size_t>;
+  using Face_pair = std::pair<Face_handle, Face_handle>;
   using Leaf = typename Polygon_soup<K>::Leaf;
 
  public:
@@ -32,11 +32,12 @@ class Face_pair_finder {
 
 #pragma omp for schedule(guided)
         for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(right_.num_faces()); ++i) {
+          Face_handle fh{static_cast<std::size_t>(i)};
           leaves.clear();
           left_tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves),
-                                                                 right_.triangle(i));
+                                                                 right_.triangle(fh));
           for (auto leaf : leaves) {
-            local_pairs.emplace_back(leaf->face_index(), i);
+            local_pairs.emplace_back(leaf->face_handle(), fh);
           }
         }
       } else {
@@ -44,11 +45,12 @@ class Face_pair_finder {
 
 #pragma omp for schedule(guided)
         for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(left_.num_faces()); ++i) {
+          Face_handle fh{static_cast<std::size_t>(i)};
           leaves.clear();
           right_tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves),
-                                                                  left_.triangle(i));
+                                                                  left_.triangle(fh));
           for (auto leaf : leaves) {
-            local_pairs.emplace_back(i, leaf->face_index());
+            local_pairs.emplace_back(fh, leaf->face_handle());
           }
         }
       }

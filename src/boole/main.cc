@@ -1,4 +1,5 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <kigumi/Mixed_mesh.h>
 #include <kigumi/Polygon_soup.h>
 #include <kigumi/boolean.h>
 
@@ -8,12 +9,12 @@
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 
-int main(int argc, char** argv) {
+int main(int argc, const char* argv[]) {
   try {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     std::vector<std::string> args(argv, argv + argc);
-    if (args.size() != 3) {
-      std::cerr << "Usage: " << args[0] << " <mesh1> <mesh2>" << std::endl;
+    if (args.size() != 4) {
+      std::cerr << "Usage: " << args[0] << " <mesh1> <mesh2> <out>" << std::endl;
       return 1;
     }
 
@@ -27,16 +28,8 @@ int main(int argc, char** argv) {
       throw std::runtime_error("the second mesh is empty");
     }
 
-    auto result = boolean(left, right,
-                          {
-                              kigumi::Operator::Intersection,
-                              kigumi::Operator::Difference,
-                              kigumi::Operator::Union,
-                          });
-
-    result.at(0).save("out_int.obj");
-    result.at(1).save("out_sub.obj");
-    result.at(2).save("out_uni.obj");
+    auto m = boolean(left, right);
+    kigumi::write_mixed_mesh(args.at(3), m);
 
     return 0;
   } catch (const std::exception& e) {
