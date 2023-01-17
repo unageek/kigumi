@@ -39,12 +39,12 @@ class Corefine {
 
 #pragma omp for schedule(guided)
       for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(pairs.size()); ++i) {
-        auto [left_face, right_face] = pairs.at(i);
-        auto left_tri = left_.triangle(left_face);
-        auto right_tri = right_.triangle(right_face);
+        auto [left_fh, right_fh] = pairs.at(i);
+        auto left_tri = left_.triangle(left_fh);
+        auto right_tri = right_.triangle(right_fh);
         auto result = CGAL::intersection(left_tri, right_tri);
         if (result) {
-          local_infos.emplace_back(left_face, right_face, std::move(result));
+          local_infos.emplace_back(left_fh, right_fh, std::move(result));
         }
       }
 
@@ -56,38 +56,38 @@ class Corefine {
     std::cout << "Triangulating..." << std::endl;
 
     for (const auto& info : infos) {
-      if (!left_triangulators_.contains(info.left_face)) {
-        auto tri = left_.triangle(info.left_face);
-        left_triangulators_.emplace(info.left_face, Triangulator<K>(tri));
+      if (!left_triangulators_.contains(info.left_fh)) {
+        auto tri = left_.triangle(info.left_fh);
+        left_triangulators_.emplace(info.left_fh, Triangulator<K>(tri));
       }
-      if (!right_triangulators_.contains(info.right_face)) {
-        auto tri = right_.triangle(info.right_face);
-        right_triangulators_.emplace(info.right_face, Triangulator<K>(tri));
+      if (!right_triangulators_.contains(info.right_fh)) {
+        auto tri = right_.triangle(info.right_fh);
+        right_triangulators_.emplace(info.right_fh, Triangulator<K>(tri));
       }
     }
 
     std::sort(infos.begin(), infos.end(),
-              [](const auto& a, const auto& b) { return a.left_face < b.left_face; });
+              [](const auto& a, const auto& b) { return a.left_fh < b.left_fh; });
 
-    std::vector<std::size_t> left_face_starts;
+    std::vector<std::size_t> left_fh_starts;
     for (std::size_t i = 0; i < infos.size(); ++i) {
-      if (i == 0 || infos.at(i).left_face != infos.at(i - 1).left_face) {
-        left_face_starts.push_back(i);
+      if (i == 0 || infos.at(i).left_fh != infos.at(i - 1).left_fh) {
+        left_fh_starts.push_back(i);
       }
     }
-    left_face_starts.push_back(infos.size());
+    left_fh_starts.push_back(infos.size());
 
     bool caught = false;
 #pragma omp parallel for schedule(guided)
-    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(left_face_starts.size() - 1); ++i) {
+    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(left_fh_starts.size() - 1); ++i) {
       if (caught) {
         continue;
       }
 
-      auto left_face = infos.at(left_face_starts.at(i)).left_face;
-      auto& triangulator = left_triangulators_.at(left_face);
+      auto left_fh = infos.at(left_fh_starts.at(i)).left_fh;
+      auto& triangulator = left_triangulators_.at(left_fh);
 
-      for (auto j = left_face_starts.at(i); j < left_face_starts.at(i + 1); ++j) {
+      for (auto j = left_fh_starts.at(i); j < left_fh_starts.at(i + 1); ++j) {
         try {
           insert_intersection(triangulator, infos.at(j).intersection);
         } catch (const typename Triangulator<K>::Intersection_of_constraints_exception&) {
@@ -102,26 +102,26 @@ class Corefine {
     }
 
     std::sort(infos.begin(), infos.end(),
-              [](const auto& a, const auto& b) { return a.right_face < b.right_face; });
+              [](const auto& a, const auto& b) { return a.right_fh < b.right_fh; });
 
-    std::vector<std::size_t> right_face_starts;
+    std::vector<std::size_t> right_fh_starts;
     for (std::size_t i = 0; i < infos.size(); ++i) {
-      if (i == 0 || infos.at(i).right_face != infos.at(i - 1).right_face) {
-        right_face_starts.push_back(i);
+      if (i == 0 || infos.at(i).right_fh != infos.at(i - 1).right_fh) {
+        right_fh_starts.push_back(i);
       }
     }
-    right_face_starts.push_back(infos.size());
+    right_fh_starts.push_back(infos.size());
 
 #pragma omp parallel for schedule(guided)
-    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(right_face_starts.size() - 1); ++i) {
+    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(right_fh_starts.size() - 1); ++i) {
       if (caught) {
         continue;
       }
 
-      auto right_face = infos.at(right_face_starts.at(i)).right_face;
-      auto& triangulator = right_triangulators_.at(right_face);
+      auto right_fh = infos.at(right_fh_starts.at(i)).right_fh;
+      auto& triangulator = right_triangulators_.at(right_fh);
 
-      for (auto j = right_face_starts.at(i); j < right_face_starts.at(i + 1); ++j) {
+      for (auto j = right_fh_starts.at(i); j < right_fh_starts.at(i + 1); ++j) {
         try {
           insert_intersection(triangulator, infos.at(j).intersection);
         } catch (const typename Triangulator<K>::Intersection_of_constraints_exception&) {
@@ -148,22 +148,22 @@ class Corefine {
 
  private:
   struct Intersection_info {
-    Face_handle left_face;
-    Face_handle right_face;
+    Face_handle left_fh;
+    Face_handle right_fh;
     Intersection intersection;
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-    Intersection_info(Face_handle left_face, Face_handle right_face, Intersection&& intersection)
-        : left_face(left_face), right_face(right_face), intersection(std::move(intersection)) {}
+    Intersection_info(Face_handle left_fh, Face_handle right_fh, Intersection&& intersection)
+        : left_fh(left_fh), right_fh(right_fh), intersection(std::move(intersection)) {}
 
     Intersection_info(Intersection_info&& other) noexcept
-        : left_face(other.left_face),
-          right_face(other.right_face),
+        : left_fh(other.left_fh),
+          right_fh(other.right_fh),
           intersection(std::move(other.intersection)) {}
 
     Intersection_info& operator=(Intersection_info&& other) noexcept {
-      left_face = other.left_face;
-      right_face = other.right_face;
+      left_fh = other.left_fh;
+      right_fh = other.right_fh;
       intersection = std::move(other.intersection);
       return *this;
     }
