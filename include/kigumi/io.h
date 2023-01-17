@@ -67,8 +67,7 @@ struct MyRead<std::nullptr_t> {
 template <>
 struct MyWrite<mpq_class> {
   static void my_write(std::ostream& out, const mpq_class& tt) {
-    auto neg = static_cast<std::uint8_t>(tt.get_num() < 0);
-    do_my_write(out, neg);
+    do_my_write(out, tt < 0);
 
     std::size_t count{};
     std::vector<std::uint8_t> buf;
@@ -88,7 +87,7 @@ struct MyWrite<mpq_class> {
 template <>
 struct MyRead<mpq_class> {
   static void my_read(std::istream& in, mpq_class& tt) {
-    std::uint8_t neg{};
+    bool neg{};
     do_my_read(in, neg);
 
     mpz_class num;
@@ -107,7 +106,7 @@ struct MyRead<mpq_class> {
     mpz_import(den.get_mpz_t(), count, 1, 1, 0, 0, buf.data());
 
     tt = mpq_class(num) / mpq_class(den);
-    if (static_cast<bool>(neg)) {
+    if (neg) {
       tt = -tt;
     }
   }

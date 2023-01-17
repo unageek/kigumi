@@ -199,7 +199,6 @@ struct MyRead<Polygon_soup<K, Face_data>> {
   static void my_read(std::istream& in, Polygon_soup<K, Face_data>& tt) {
     std::size_t num_vertices{};
     std::size_t num_faces{};
-
     do_my_read(in, num_vertices);
     do_my_read(in, num_faces);
 
