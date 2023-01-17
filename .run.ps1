@@ -35,7 +35,7 @@ switch -regex ($args[0]) {
         Set-Location vcpkg
         Exec { .\bootstrap-vcpkg.bat }
         Exec { .\vcpkg remove --outdated --recurse }
-        Exec { .\vcpkg install cgal gtest --triplet=x64-windows }
+        Exec { .\vcpkg install boost-program-options cgal gtest --triplet=x64-windows }
         break
     }
     '^cmake$' {

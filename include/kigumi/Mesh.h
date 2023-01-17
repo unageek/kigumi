@@ -2,15 +2,13 @@
 
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Point_list.h>
+#include <kigumi/Polygon_soup.h>
 
 #include <algorithm>
-#include <array>
-#include <boost/container_hash/hash.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <unordered_set>
@@ -32,31 +30,6 @@ namespace kigumi {
 //        8:  4 -> c
 //        9:  end
 
-using Edge = std::array<Vertex_handle, 2>;
-using Face = std::array<Vertex_handle, 3>;
-
-inline Edge make_edge(Vertex_handle first, Vertex_handle second) {
-  if (first.i > second.i) {
-    std::swap(first, second);
-  }
-
-  return {first, second};
-}
-
-}  // namespace kigumi
-
-template <>
-struct std::hash<kigumi::Edge> {
-  std::size_t operator()(const kigumi::Edge& edge) const noexcept {
-    std::size_t seed{};
-    boost::hash_combine(seed, std::hash<std::size_t>()(edge[0].i));
-    boost::hash_combine(seed, std::hash<std::size_t>()(edge[1].i));
-    return seed;
-  }
-};
-
-namespace kigumi {
-
 template <class K, class FaceData = std::nullptr_t>
 class Mesh {
   using Face_data = FaceData;
@@ -74,11 +47,56 @@ class Mesh {
     Face_handle fh_;
   };
 
+  Mesh() = default;
+
+  ~Mesh() = default;
+
+  Mesh(const Mesh& other)
+      : point_list_(other.point_list_),
+        points_(other.points_),
+        faces_(other.faces_),
+        face_data_(other.face_data_),
+        indices_(other.indices_),
+        face_indices_(other.face_indices_) {}
+
+  Mesh(Mesh&& other) noexcept
+      : point_list_(std::move(other.point_list_)),
+        points_(std::move(other.points_)),
+        faces_(std::move(other.faces_)),
+        face_data_(std::move(other.face_data_)),
+        indices_(std::move(other.indices_)),
+        face_indices_(std::move(other.face_indices_)),
+        aabb_tree_(std::move(other.aabb_tree_)) {}
+
+  Mesh& operator=(const Mesh& other) {
+    if (this != &other) {
+      point_list_ = other.point_list_;
+      points_ = other.points_;
+      faces_ = other.faces_;
+      face_data_ = other.face_data_;
+      indices_ = other.indices_;
+      face_indices_ = other.face_indices_;
+      aabb_tree_.reset();
+    }
+    return *this;
+  }
+
+  Mesh& operator=(Mesh&& other) noexcept {
+    point_list_ = std::move(other.point_list_);
+    points_ = std::move(other.points_);
+    faces_ = std::move(other.faces_);
+    face_data_ = std::move(other.face_data_);
+    indices_ = std::move(other.indices_);
+    face_indices_ = std::move(other.face_indices_);
+    aabb_tree_ = std::move(other.aabb_tree_);
+    return *this;
+  }
+
   Vertex_handle add_vertex(const Point& p) { return {point_list_.insert(p)}; }
 
   Face_handle add_face(const Face& face) {
     faces_.push_back(face);
-    face_data_.push_back(Face_data());
+    face_data_.push_back({});
     return {faces_.size() - 1};
   }
 
@@ -110,11 +128,13 @@ class Mesh {
     indices_.push_back(index);
   }
 
+  std::size_t num_vertices() const { return points_.size(); }
+
   std::size_t num_faces() const { return faces_.size(); }
 
-  Face_iterator faces_begin() const { return Face_iterator(Face_handle{0}); }
+  Face_iterator faces_begin() const { return Face_iterator({0}); }
 
-  Face_iterator faces_end() const { return Face_iterator(Face_handle{faces_.size()}); }
+  Face_iterator faces_end() const { return Face_iterator({faces_.size()}); }
 
   auto faces() const { return boost::make_iterator_range(faces_begin(), faces_end()); }
 
@@ -168,6 +188,10 @@ class Mesh {
     }
 
     return *aabb_tree_;
+  }
+
+  Polygon_soup<K, FaceData> into_polygon_soup() {
+    return {std::move(points_), std::move(faces_), std::move(face_data_)};
   }
 
  private:

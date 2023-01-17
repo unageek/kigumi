@@ -7,10 +7,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(Boost REQUIRED COMPONENTS program_options)
 find_package(CGAL CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 
-add_subdirectory(src)
+add_subdirectory(examples)
 enable_testing()
 add_subdirectory(tests)

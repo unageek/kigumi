@@ -5,10 +5,8 @@
 #include <kigumi/Faces_around_edge_classifier.h>
 #include <kigumi/Global_face_classifier.h>
 #include <kigumi/Mixed_mesh.h>
-#include <kigumi/Operator.h>
 #include <kigumi/Polygon_soup.h>
 #include <kigumi/Shared_edge_finder.h>
-#include <kigumi/extract.h>
 
 #include <iostream>
 #include <iterator>
@@ -17,8 +15,7 @@
 namespace kigumi {
 
 template <class K>
-std::vector<Polygon_soup<K>> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right,
-                                     const std::vector<Operator>& ops) {
+Mixed_polygon_soup<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
   std::cout << "Corefining..." << std::endl;
 
   Corefine corefine(left, right);
@@ -63,14 +60,7 @@ std::vector<Polygon_soup<K>> boolean(const Polygon_soup<K>& left, const Polygon_
 
   Global_face_classifier{m, shared_edges};
 
-  std::cout << "Extracting..." << std::endl;
-
-  std::vector<Polygon_soup<K>> result;
-  result.reserve(ops.size());
-  for (auto op : ops) {
-    result.push_back(extract(m, op));
-  }
-  return result;
+  return m.into_polygon_soup();
 }
 
 }  // namespace kigumi
