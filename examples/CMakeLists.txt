@@ -15,6 +15,7 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::program_options
     CGAL::CGAL
     OpenMP::OpenMP_CXX
     -fsanitize=undefined

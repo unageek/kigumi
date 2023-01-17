@@ -38,7 +38,7 @@ case $1 in
     ctest -V
     ;;
   'lint' )
-    clang-tidy -p build src/boole/main.cc src/extract/main.cc
+    clang-tidy -p build examples/boole/main.cc examples/extract/main.cc
     ;;
   * )
     echo "Unrecognized task: $1" >&2

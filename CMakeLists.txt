@@ -12,6 +12,6 @@ find_package(CGAL CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
 
-add_subdirectory(src)
+add_subdirectory(examples)
 enable_testing()
 add_subdirectory(tests)

@@ -33,10 +33,6 @@ cd kigumi
 ./run b
 ```
 
-### Run
+## Run
 
-```
-./run r src/boole -- a.obj b.obj
-```
-
-The output meshes are saved as out_inter.obj and out_union.obj.in the current directory.
+See [Running example programs](run.md).

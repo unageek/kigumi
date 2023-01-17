@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "cl.h"
+#include "parse_options.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 
@@ -15,7 +15,7 @@ int main(int argc, const char* argv[]) {
     auto m = kigumi::read_mixed_mesh<kigumi::Mixed_polygon_soup<K>>(opts.input_file);
 
     auto result =
-        kigumi::extract(m, opts.op, opts.extract_first, opts.extract_second, !opts.prefer_second);
+        kigumi::extract(m, opts.op, opts.extract_first, opts.extract_second, opts.prefer_first);
     result.save(opts.output_file);
 
     return 0;
