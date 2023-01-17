@@ -26,7 +26,7 @@ int main(int argc, const char* argv[]) {
     }
 
     auto m = boolean(first, second);
-    kigumi::write_mixed_mesh(opts.output_file, m);
+    kigumi::save(opts.output_file, m);
 
     return 0;
   } catch (const std::exception& e) {
