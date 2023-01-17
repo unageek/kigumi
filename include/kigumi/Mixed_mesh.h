@@ -7,7 +7,6 @@
 #include <array>
 #include <fstream>
 #include <stdexcept>
-#include <utility>
 
 namespace kigumi {
 
@@ -120,7 +119,7 @@ inline MixedMesh read_mixed_mesh(const std::string& filename) {
     f_data.tag = tag;
   }
 
-  return std::move(mesh);
+  return mesh;
 }
 
 }  // namespace kigumi
