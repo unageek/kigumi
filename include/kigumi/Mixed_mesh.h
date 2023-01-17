@@ -5,11 +5,9 @@
 #include <kigumi/io.h>
 
 #include <array>
-#include <boost/algorithm/string.hpp>
-#include <charconv>
-#include <iostream>
-#include <sstream>
-#include <string_view>
+#include <fstream>
+#include <stdexcept>
+#include <utility>
 
 namespace kigumi {
 
