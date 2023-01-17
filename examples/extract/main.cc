@@ -12,7 +12,8 @@ int main(int argc, const char* argv[]) {
   try {
     auto opts = parse_options(argc, argv);
 
-    auto m = kigumi::read_mixed_mesh<kigumi::Mixed_polygon_soup<K>>(opts.input_file);
+    kigumi::Mixed_polygon_soup<K> m;
+    kigumi::load(opts.input_file, m);
 
     auto result =
         kigumi::extract(m, opts.op, opts.extract_first, opts.extract_second, opts.prefer_first);

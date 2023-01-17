@@ -2,13 +2,16 @@
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/IO/polygon_soup_io.h>
+#include <CGAL/gmpxx.h>
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
+#include <kigumi/io.h>
 
 #include <array>
 #include <boost/range/iterator_range.hpp>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -156,6 +159,85 @@ class Polygon_soup {
   std::vector<Face_data> face_data_;
   mutable std::unique_ptr<AABB_tree<Leaf>> aabb_tree_;
   mutable std::mutex aabb_tree_mutex_;
+};
+
+template <class K, class Face_data>
+struct MyWrite<Polygon_soup<K, Face_data>> {
+  static void my_write(std::ostream& out, const Polygon_soup<K, Face_data>& tt) {
+    do_my_write(out, tt.num_vertices());
+    do_my_write(out, tt.num_faces());
+
+    for (std::size_t i = 0; i < tt.num_vertices(); ++i) {
+      const auto& p = tt.point({i});
+
+      if (p.approx().x().is_point() && p.approx().y().is_point() && p.approx().z().is_point()) {
+        do_my_write(out, false);
+        do_my_write(out, p.approx().x().inf());
+        do_my_write(out, p.approx().y().inf());
+        do_my_write(out, p.approx().z().inf());
+      } else {
+        do_my_write(out, true);
+        do_my_write(out, p.exact().x());
+        do_my_write(out, p.exact().y());
+        do_my_write(out, p.exact().z());
+      }
+    }
+
+    for (const auto& fh : tt.faces()) {
+      const auto& f = tt.face(fh);
+      const auto& f_data = tt.data(fh);
+      do_my_write(out, f[0]);
+      do_my_write(out, f[1]);
+      do_my_write(out, f[2]);
+      do_my_write(out, f_data);
+    }
+  }
+};
+
+template <class K, class Face_data>
+struct MyRead<Polygon_soup<K, Face_data>> {
+  static void my_read(std::istream& in, Polygon_soup<K, Face_data>& tt) {
+    std::size_t num_vertices{};
+    std::size_t num_faces{};
+
+    do_my_read(in, num_vertices);
+    do_my_read(in, num_faces);
+
+    for (std::size_t i = 0; i < num_vertices; ++i) {
+      bool is_exact{};
+      do_my_read(in, is_exact);
+
+      if (!is_exact) {
+        double x{};
+        double y{};
+        double z{};
+        do_my_read(in, x);
+        do_my_read(in, y);
+        do_my_read(in, z);
+        tt.add_vertex({x, y, z});
+      } else {
+        mpq_class x;
+        mpq_class y;
+        mpq_class z;
+        do_my_read(in, x);
+        do_my_read(in, y);
+        do_my_read(in, z);
+        tt.add_vertex({CGAL::Lazy_exact_nt<mpq_class>(x), CGAL::Lazy_exact_nt<mpq_class>(y),
+                       CGAL::Lazy_exact_nt<mpq_class>(z)});
+      }
+    }
+
+    for (std::size_t i = 0; i < num_faces; ++i) {
+      Face face{};
+      Face_data f_data{};
+      do_my_read(in, face[0]);
+      do_my_read(in, face[1]);
+      do_my_read(in, face[2]);
+      do_my_read(in, f_data);
+      auto fh = tt.add_face(face);
+      tt.data(fh) = f_data;
+    }
+  }
 };
 
 }  // namespace kigumi
