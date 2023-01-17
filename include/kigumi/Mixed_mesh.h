@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CGAL/Fraction_traits.h>
 #include <kigumi/Mesh.h>
 #include <kigumi/Polygon_soup.h>
 #include <kigumi/io.h>
