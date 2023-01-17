@@ -26,12 +26,12 @@ inline void my_write(std::ostream& out, const mpq_class& x) {
   std::vector<std::uint8_t> buf;
 
   buf.resize((mpz_sizeinbase(x.get_num().get_mpz_t(), 2) + 7) / 8);
-  auto* raw = mpz_export(buf.data(), &count, 1, 1, 0, 0, x.get_num().get_mpz_t());
+  mpz_export(buf.data(), &count, 1, 1, 0, 0, x.get_num().get_mpz_t());
   out.write(reinterpret_cast<const char*>(&count), sizeof(count));
   out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(count));
 
   buf.resize((mpz_sizeinbase(x.get_den().get_mpz_t(), 2) + 7) / 8);
-  raw = mpz_export(buf.data(), &count, 1, 1, 0, 0, x.get_den().get_mpz_t());
+  mpz_export(buf.data(), &count, 1, 1, 0, 0, x.get_den().get_mpz_t());
   out.write(reinterpret_cast<const char*>(&count), sizeof(count));
   out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(count));
 }
