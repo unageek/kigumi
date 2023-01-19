@@ -120,6 +120,10 @@ class Polygon_soup {
 
   std::size_t num_faces() const { return faces_.size(); }
 
+  Vertex_iterator vertices_begin() const { return Vertex_iterator({0}); }
+
+  Vertex_iterator vertices_end() const { return Vertex_iterator({points_.size()}); }
+
   Face_iterator faces_begin() const { return Face_iterator({0}); }
 
   Face_iterator faces_end() const { return Face_iterator({faces_.size()}); }
