@@ -11,17 +11,17 @@ namespace kigumi {
 enum class Face_tag { Unknown = 0, Union, Intersection, Coplanar, Opposite };
 
 template <>
-struct MyWrite<Face_tag> {
-  static void my_write(std::ostream& out, const Face_tag& tt) {
-    do_my_write(out, static_cast<std::uint8_t>(tt));
+struct Write<Face_tag> {
+  static void write(std::ostream& out, const Face_tag& tt) {
+    do_write(out, static_cast<std::uint8_t>(tt));
   }
 };
 
 template <>
-struct MyRead<Face_tag> {
-  static void my_read(std::istream& in, Face_tag& tt) {
+struct Read<Face_tag> {
+  static void read(std::istream& in, Face_tag& tt) {
     std::uint8_t x{};
-    do_my_read(in, x);
+    do_read(in, x);
     tt = static_cast<Face_tag>(x);
   }
 };
@@ -32,18 +32,18 @@ struct Face_data {
 };
 
 template <>
-struct MyWrite<Face_data> {
-  static void my_write(std::ostream& out, const Face_data& tt) {
-    do_my_write(out, tt.from_left);
-    do_my_write(out, tt.tag);
+struct Write<Face_data> {
+  static void write(std::ostream& out, const Face_data& tt) {
+    do_write(out, tt.from_left);
+    do_write(out, tt.tag);
   }
 };
 
 template <>
-struct MyRead<Face_data> {
-  static void my_read(std::istream& in, Face_data& tt) {
-    do_my_read(in, tt.from_left);
-    do_my_read(in, tt.tag);
+struct Read<Face_data> {
+  static void read(std::istream& in, Face_data& tt) {
+    do_read(in, tt.from_left);
+    do_read(in, tt.tag);
   }
 };
 

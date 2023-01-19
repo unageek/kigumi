@@ -11,63 +11,61 @@
 namespace kigumi {
 
 template <class T>
-struct MyWrite {
-  static void my_write(std::ostream& out, const T& tt) {
+struct Write {
+  static void write(std::ostream& out, const T& tt) {
     out.write(reinterpret_cast<const char*>(&tt), sizeof(tt));
   }
 };
 
 template <class T>
-struct MyRead {
-  static void my_read(std::istream& in, T& tt) {
-    in.read(reinterpret_cast<char*>(&tt), sizeof(tt));
-  }
+struct Read {
+  static void read(std::istream& in, T& tt) { in.read(reinterpret_cast<char*>(&tt), sizeof(tt)); }
 };
 
 template <class T>
-void do_my_write(std::ostream& out, const T& tt) {
-  MyWrite<T>::my_write(out, tt);
+void do_write(std::ostream& out, const T& tt) {
+  Write<T>::write(out, tt);
 }
 
 template <class T>
-void do_my_read(std::istream& in, T& tt) {
-  MyRead<T>::my_read(in, tt);
+void do_read(std::istream& in, T& tt) {
+  Read<T>::read(in, tt);
 }
 
 template <>
-struct MyWrite<bool> {
-  static void my_write(std::ostream& out, const bool& tt) {
-    do_my_write(out, static_cast<std::uint8_t>(tt));
+struct Write<bool> {
+  static void write(std::ostream& out, const bool& tt) {
+    do_write(out, static_cast<std::uint8_t>(tt));
   }
 };
 
 template <>
-struct MyRead<bool> {
-  static void my_read(std::istream& in, bool& tt) {
+struct Read<bool> {
+  static void read(std::istream& in, bool& tt) {
     std::uint8_t x{};
-    do_my_read(in, x);
+    do_read(in, x);
     tt = static_cast<bool>(x);
   }
 };
 
 template <>
-struct MyWrite<std::nullptr_t> {
-  static void my_write(std::ostream& /*out*/, const std::nullptr_t& /*tt*/) {
+struct Write<std::nullptr_t> {
+  static void write(std::ostream& /*out*/, const std::nullptr_t& /*tt*/) {
     // no-op
   }
 };
 
 template <>
-struct MyRead<std::nullptr_t> {
-  static void my_read(std::istream& /*in*/, std::nullptr_t& /*tt*/) {
+struct Read<std::nullptr_t> {
+  static void read(std::istream& /*in*/, std::nullptr_t& /*tt*/) {
     // no-op
   }
 };
 
 template <>
-struct MyWrite<mpq_class> {
-  static void my_write(std::ostream& out, const mpq_class& tt) {
-    do_my_write(out, tt < 0);
+struct Write<mpq_class> {
+  static void write(std::ostream& out, const mpq_class& tt) {
+    do_write(out, tt < 0);
 
     std::size_t count{};
     std::vector<std::uint8_t> buf;
@@ -85,10 +83,10 @@ struct MyWrite<mpq_class> {
 };
 
 template <>
-struct MyRead<mpq_class> {
-  static void my_read(std::istream& in, mpq_class& tt) {
+struct Read<mpq_class> {
+  static void read(std::istream& in, mpq_class& tt) {
     bool neg{};
-    do_my_read(in, neg);
+    do_read(in, neg);
 
     mpz_class num;
     mpz_class den;
@@ -119,7 +117,7 @@ void save(const std::string& filename, const T& tt) {
     throw std::runtime_error{"Failed to open file: " + filename};
   }
 
-  do_my_write(out, tt);
+  do_write(out, tt);
 }
 
 template <class T>
@@ -129,7 +127,7 @@ void load(const std::string& filename, T& tt) {
     throw std::runtime_error{"Failed to open file: " + filename};
   }
 
-  do_my_read(in, tt);
+  do_read(in, tt);
 }
 
 }  // namespace kigumi
