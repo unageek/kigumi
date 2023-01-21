@@ -26,31 +26,35 @@ struct Read<Face_tag> {
   }
 };
 
-struct Face_data {
+template <class FaceData>
+struct Mixed_face_data {
   bool from_left = false;
   Face_tag tag = Face_tag::Unknown;
+  FaceData data;
 };
 
-template <>
-struct Write<Face_data> {
-  static void write(std::ostream& out, const Face_data& tt) {
+template <class FaceData>
+struct Write<Mixed_face_data<FaceData>> {
+  static void write(std::ostream& out, const Mixed_face_data<FaceData>& tt) {
     do_write(out, tt.from_left);
     do_write(out, tt.tag);
+    do_write(out, tt.data);
   }
 };
 
-template <>
-struct Read<Face_data> {
-  static void read(std::istream& in, Face_data& tt) {
+template <class FaceData>
+struct Read<Mixed_face_data<FaceData>> {
+  static void read(std::istream& in, Mixed_face_data<FaceData>& tt) {
     do_read(in, tt.from_left);
     do_read(in, tt.tag);
+    do_read(in, tt.data);
   }
 };
 
-template <class K>
-using Mixed_mesh = Mesh<K, Face_data>;
+template <class K, class FaceData>
+using Mixed_mesh = Mesh<K, Mixed_face_data<FaceData>>;
 
-template <class K>
-using Mixed_polygon_soup = Polygon_soup<K, Face_data>;
+template <class K, class FaceData>
+using Mixed_polygon_soup = Polygon_soup<K, Mixed_face_data<FaceData>>;
 
 }  // namespace kigumi

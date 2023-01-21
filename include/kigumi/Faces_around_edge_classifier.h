@@ -8,13 +8,13 @@
 
 namespace kigumi {
 
-template <class K>
+template <class K, class FaceData>
 class Faces_around_edge_classifier {
   using Plane_3 = typename K::Plane_3;
   using Vector_2 = typename K::Vector_2;
 
  public:
-  Faces_around_edge_classifier(Mixed_mesh<K>& m, const Edge& edge) {
+  Faces_around_edge_classifier(Mixed_mesh<K, FaceData>& m, const Edge& edge) {
     const auto& p = m.point(edge[0]);
     const auto& q = m.point(edge[1]);
     Plane_3 plane(p, q - p);

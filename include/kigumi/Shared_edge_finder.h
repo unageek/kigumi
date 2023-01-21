@@ -10,10 +10,10 @@
 
 namespace kigumi {
 
-template <class K>
+template <class K, class FaceData>
 class Shared_edge_finder {
  public:
-  explicit Shared_edge_finder(const Mixed_mesh<K>& m) {
+  explicit Shared_edge_finder(const Mixed_mesh<K, FaceData>& m) {
     std::unordered_set<Edge> left_edges;
 
     for (auto fh : m.faces()) {

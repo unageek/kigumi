@@ -38,17 +38,18 @@ struct Read<Kigumi_mesh_kind> {
   }
 };
 
-template <class K>
+template <class K, class FaceData>
 class Boolean_operation;
 
-template <class K>
+template <class K, class FaceData = std::nullptr_t>
 class Kigumi_mesh {
+  using Face_data = FaceData;
   using Point = typename K::Point_3;
 
  public:
   Kigumi_mesh() = default;
 
-  Kigumi_mesh(Polygon_soup<K>&& soup)
+  Kigumi_mesh(Polygon_soup<K, Face_data>&& soup)
       : kind_{soup.num_faces() == 0 ? Kigumi_mesh_kind::Empty : Kigumi_mesh_kind::Normal},
         soup_{std::move(soup)} {}
 
@@ -56,7 +57,9 @@ class Kigumi_mesh {
 
   static Kigumi_mesh entire() { return {Kigumi_mesh_kind::Entire, {}}; }
 
-  static Kigumi_mesh import(const std::string& filename) { return {Polygon_soup<K>{filename}}; }
+  static Kigumi_mesh import(const std::string& filename) {
+    return {Polygon_soup<K, Face_data>{filename}};
+  }
 
   void save_lossy(const std::string& filename) { soup_.save(filename); }
 
@@ -66,9 +69,9 @@ class Kigumi_mesh {
 
   bool is_empty_or_entire() const { return is_empty() || is_entire(); }
 
-  const Polygon_soup<K>& soup() const { return soup_; }
+  const Polygon_soup<K, Face_data>& soup() const { return soup_; }
 
-  static Boolean_operation<K> boolean(const Kigumi_mesh& a, const Kigumi_mesh& b) {
+  static Boolean_operation<K, Face_data> boolean(const Kigumi_mesh& a, const Kigumi_mesh& b) {
     if (a.is_empty_or_entire() && b.is_empty_or_entire()) {
       return {a.kind_, b.kind_, {}};
     }
@@ -88,18 +91,20 @@ class Kigumi_mesh {
       std::transform(b.soup_.faces_begin(), b.soup_.faces_end(), std::back_inserter(faces),
                      [&](auto fh) { return b.soup_.face(fh); });
 
-      std::vector<Face_data> face_data;
+      std::vector<Mixed_face_data<Face_data>> face_data;
       face_data.reserve(faces.size());
       if (a.is_empty() || b.is_entire()) {
-        face_data.insert(face_data.end(), a.soup_.num_faces(),
-                         Face_data{.from_left = true, .tag = Face_tag::Intersection});
+        face_data.insert(
+            face_data.end(), a.soup_.num_faces(),
+            Mixed_face_data<Face_data>{.from_left = true, .tag = Face_tag::Intersection});
         face_data.insert(face_data.end(), b.soup_.num_faces(),
-                         Face_data{.from_left = false, .tag = Face_tag::Union});
+                         Mixed_face_data<Face_data>{.from_left = false, .tag = Face_tag::Union});
       } else {
         face_data.insert(face_data.end(), a.soup_.num_faces(),
-                         Face_data{.from_left = true, .tag = Face_tag::Union});
-        face_data.insert(face_data.end(), b.soup_.num_faces(),
-                         Face_data{.from_left = false, .tag = Face_tag::Intersection});
+                         Mixed_face_data<Face_data>{.from_left = true, .tag = Face_tag::Union});
+        face_data.insert(
+            face_data.end(), b.soup_.num_faces(),
+            Mixed_face_data<Face_data>{.from_left = false, .tag = Face_tag::Intersection});
       }
 
       return {a.kind_, b.kind_, {std::move(points), std::move(faces), std::move(face_data)}};
@@ -109,45 +114,45 @@ class Kigumi_mesh {
   }
 
  private:
-  friend class Boolean_operation<K>;
+  friend class Boolean_operation<K, Face_data>;
   friend struct Read<Kigumi_mesh>;
   friend struct Write<Kigumi_mesh>;
 
-  Kigumi_mesh(Kigumi_mesh_kind kind, Polygon_soup<K>&& soup)
+  Kigumi_mesh(Kigumi_mesh_kind kind, Polygon_soup<K, Face_data>&& soup)
       : kind_{kind}, soup_{std::move(soup)} {}
 
   Kigumi_mesh_kind kind_{Kigumi_mesh_kind::Normal};
-  Polygon_soup<K> soup_;
+  Polygon_soup<K, Face_data> soup_;
 };
 
-template <class K>
-struct Write<Kigumi_mesh<K>> {
-  static void write(std::ostream& out, const Kigumi_mesh<K>& tt) {
+template <class K, class FaceData>
+struct Write<Kigumi_mesh<K, FaceData>> {
+  static void write(std::ostream& out, const Kigumi_mesh<K, FaceData>& tt) {
     do_write(out, tt.kind_);
     do_write(out, tt.soup_);
   }
 };
 
-template <class K>
-struct Read<Kigumi_mesh<K>> {
-  static void read(std::istream& in, Kigumi_mesh<K>& tt) {
+template <class K, class FaceData>
+struct Read<Kigumi_mesh<K, FaceData>> {
+  static void read(std::istream& in, Kigumi_mesh<K, FaceData>& tt) {
     do_read(in, tt.kind_);
     do_read(in, tt.soup_);
   }
 };
 
-template <class K>
+template <class K, class FaceData>
 class Boolean_operation {
  public:
   Boolean_operation()
       : first_kind_(Kigumi_mesh_kind::Empty), second_kind_(Kigumi_mesh_kind::Empty), m_() {}
 
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
-                    Mixed_polygon_soup<K>&& m)
+                    Mixed_polygon_soup<K, FaceData>&& m)
       : first_kind_(first_kind), second_kind_(second_kind), m_(std::move(m)) {}
 
-  Kigumi_mesh<K> apply(Operator op, bool extract_first, bool extract_second,
-                       bool prefer_first) const {
+  Kigumi_mesh<K, FaceData> apply(Operator op, bool extract_first, bool extract_second,
+                                 bool prefer_first) const {
     auto soup = extract(m_, op, extract_first, extract_second, prefer_first);
     if (soup.num_faces() != 0) {
       return {Kigumi_mesh_kind::Normal, std::move(soup)};
@@ -227,21 +232,21 @@ class Boolean_operation {
 
   Kigumi_mesh_kind first_kind_;
   Kigumi_mesh_kind second_kind_;
-  Mixed_polygon_soup<K> m_;
+  Mixed_polygon_soup<K, FaceData> m_;
 };
 
-template <class K>
-struct Write<Boolean_operation<K>> {
-  static void write(std::ostream& out, const Boolean_operation<K>& tt) {
+template <class K, class FaceData>
+struct Write<Boolean_operation<K, FaceData>> {
+  static void write(std::ostream& out, const Boolean_operation<K, FaceData>& tt) {
     do_write(out, tt.first_kind_);
     do_write(out, tt.second_kind_);
     do_write(out, tt.m_);
   }
 };
 
-template <class K>
-struct Read<Boolean_operation<K>> {
-  static void read(std::istream& in, Boolean_operation<K>& tt) {
+template <class K, class FaceData>
+struct Read<Boolean_operation<K, FaceData>> {
+  static void read(std::istream& in, Boolean_operation<K, FaceData>& tt) {
     do_read(in, tt.first_kind_);
     do_read(in, tt.second_kind_);
     do_read(in, tt.m_);

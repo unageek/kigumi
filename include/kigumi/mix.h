@@ -14,34 +14,42 @@
 
 namespace kigumi {
 
-template <class K>
-Mixed_polygon_soup<K> mix(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+template <class K, class FaceData>
+Mixed_polygon_soup<K, FaceData> mix(const Polygon_soup<K, FaceData>& left,
+                                    const Polygon_soup<K, FaceData>& right) {
   std::cout << "Corefining..." << std::endl;
 
   Corefine corefine(left, right);
 
   std::cout << "Constructing mixed mesh..." << std::endl;
 
-  Mixed_mesh<K> m;
+  Mixed_mesh<K, FaceData> m;
 
   std::vector<typename K::Triangle_3> tris;
-  corefine.get_left_triangles(std::back_inserter(tris));
-  for (const auto& tri : tris) {
-    auto p = tri.vertex(0);
-    auto q = tri.vertex(1);
-    auto r = tri.vertex(2);
-    auto fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
-    m.data(fh).from_left = true;
+  for (auto fh : left.faces()) {
+    tris.clear();
+    corefine.get_left_triangles(fh, std::back_inserter(tris));
+    for (const auto& tri : tris) {
+      auto p = tri.vertex(0);
+      auto q = tri.vertex(1);
+      auto r = tri.vertex(2);
+      auto new_fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
+      m.data(new_fh).from_left = true;
+      m.data(new_fh).data = left.data(fh);
+    }
   }
 
-  tris.clear();
-  corefine.get_right_triangles(std::back_inserter(tris));
-  for (const auto& tri : tris) {
-    auto p = tri.vertex(0);
-    auto q = tri.vertex(1);
-    auto r = tri.vertex(2);
-    auto fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
-    m.data(fh).from_left = false;
+  for (auto fh : right.faces()) {
+    tris.clear();
+    corefine.get_right_triangles(fh, std::back_inserter(tris));
+    for (const auto& tri : tris) {
+      auto p = tri.vertex(0);
+      auto q = tri.vertex(1);
+      auto r = tri.vertex(2);
+      auto new_fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
+      m.data(new_fh).from_left = false;
+      m.data(new_fh).data = right.data(fh);
+    }
   }
 
   m.finalize();

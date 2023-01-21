@@ -1,6 +1,7 @@
 set(TARGET boole-test)
 
 add_executable(${TARGET}
+    face_data.cc
     Faces_around_edge_classifier_test.cc
     special.cc
 )

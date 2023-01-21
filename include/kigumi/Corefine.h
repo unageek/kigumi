@@ -13,7 +13,7 @@
 
 namespace kigumi {
 
-template <class K>
+template <class K, class FaceData>
 class Corefine {
   using Point = typename K::Point_3;
   using Segment = typename K::Segment_3;
@@ -23,7 +23,8 @@ class Corefine {
 
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  Corefine(const Polygon_soup<K>& left, const Polygon_soup<K>& right) : left_(left), right_(right) {
+  Corefine(const Polygon_soup<K, FaceData>& left, const Polygon_soup<K, FaceData>& right)
+      : left_(left), right_(right) {
     std::cout << "Finding face pairs..." << std::endl;
 
     Face_pair_finder finder(left_, right_);
@@ -137,13 +138,13 @@ class Corefine {
   }
 
   template <class OutputIterator>
-  void get_left_triangles(OutputIterator tris) const {
-    get_triangles(left_, left_triangulators_, tris);
+  void get_left_triangles(Face_handle fh, OutputIterator tris) const {
+    get_triangles(left_, fh, left_triangulators_, tris);
   }
 
   template <class OutputIterator>
-  void get_right_triangles(OutputIterator tris) const {
-    get_triangles(right_, right_triangulators_, tris);
+  void get_right_triangles(Face_handle fh, OutputIterator tris) const {
+    get_triangles(right_, fh, right_triangulators_, tris);
   }
 
  private:
@@ -170,16 +171,14 @@ class Corefine {
   };
 
   template <class OutputIterator>
-  void get_triangles(const Polygon_soup<K>& soup,
+  void get_triangles(const Polygon_soup<K, FaceData>& soup, Face_handle fh,
                      const std::unordered_map<Face_handle, Triangulator<K>>& triangulators,
                      OutputIterator tris) const {
-    for (auto fh : soup.faces()) {
-      auto it = triangulators.find(fh);
-      if (it == triangulators.end()) {
-        *tris++ = soup.triangle(fh);
-      } else {
-        it->second.get_triangles(tris);
-      }
+    auto it = triangulators.find(fh);
+    if (it == triangulators.end()) {
+      *tris++ = soup.triangle(fh);
+    } else {
+      it->second.get_triangles(tris);
     }
   }
 
@@ -218,9 +217,9 @@ class Corefine {
     }
   }
 
-  const Polygon_soup<K>& left_;
+  const Polygon_soup<K, FaceData>& left_;
   std::unordered_map<Face_handle, Triangulator<K>> left_triangulators_;
-  const Polygon_soup<K>& right_;
+  const Polygon_soup<K, FaceData>& right_;
   std::unordered_map<Face_handle, Triangulator<K>> right_triangulators_;
 };
 

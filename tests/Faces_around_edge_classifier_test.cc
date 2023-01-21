@@ -9,7 +9,7 @@ using Point = K::Point_3;
 TEST(FacesAroundEdgeClassfierTest, NonOverlapping) {
   using namespace kigumi;
 
-  Mixed_mesh<K> m;
+  Mixed_mesh<K, std::nullptr_t> m;
   auto p = m.add_vertex(Point(0, 0, 0));
   auto q = m.add_vertex(Point(0, 0, 1));
   auto r0 = m.add_vertex(Point(1, 0, 0));
@@ -25,7 +25,7 @@ TEST(FacesAroundEdgeClassfierTest, NonOverlapping) {
 TEST(FacesAroundEdgeClassfierTest, NonOverlappingUnknown) {
   using namespace kigumi;
 
-  Mixed_mesh<K> m;
+  Mixed_mesh<K, std::nullptr_t> m;
   auto p = m.add_vertex(Point(0, 0, 0));
   auto q = m.add_vertex(Point(0, 0, 1));
   auto r0 = m.add_vertex(Point(1, 0, 0));
@@ -41,7 +41,7 @@ TEST(FacesAroundEdgeClassfierTest, NonOverlappingUnknown) {
 TEST(FacesAroundEdgeClassfierTest, Coplanar) {
   using namespace kigumi;
 
-  Mixed_mesh<K> m;
+  Mixed_mesh<K, std::nullptr_t> m;
   auto p = m.add_vertex(Point(0, 0, 0));
   auto q = m.add_vertex(Point(0, 0, 1));
   auto r = m.add_vertex(Point(1, 0, 0));
@@ -56,7 +56,7 @@ TEST(FacesAroundEdgeClassfierTest, Coplanar) {
 TEST(FacesAroundEdgeClassfierTest, Opposite) {
   using namespace kigumi;
 
-  Mixed_mesh<K> m;
+  Mixed_mesh<K, std::nullptr_t> m;
   auto p = m.add_vertex(Point(0, 0, 0));
   auto q = m.add_vertex(Point(0, 0, 1));
   auto r = m.add_vertex(Point(1, 0, 0));

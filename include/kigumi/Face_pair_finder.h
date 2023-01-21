@@ -9,14 +9,14 @@
 
 namespace kigumi {
 
-template <class K>
+template <class K, class FaceData>
 class Face_pair_finder {
   using Face_pair = std::pair<Face_handle, Face_handle>;
-  using Leaf = typename Polygon_soup<K>::Leaf;
+  using Leaf = typename Polygon_soup<K, FaceData>::Leaf;
 
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  Face_pair_finder(const Polygon_soup<K>& left, const Polygon_soup<K>& right)
+  Face_pair_finder(const Polygon_soup<K, FaceData>& left, const Polygon_soup<K, FaceData>& right)
       : left_(left), right_(right) {}
 
   std::vector<Face_pair> find_face_pairs() const {
@@ -63,8 +63,8 @@ class Face_pair_finder {
   }
 
  private:
-  const Polygon_soup<K>& left_;
-  const Polygon_soup<K>& right_;
+  const Polygon_soup<K, FaceData>& left_;
+  const Polygon_soup<K, FaceData>& right_;
 };
 
 }  // namespace kigumi

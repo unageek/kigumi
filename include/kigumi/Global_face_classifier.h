@@ -14,17 +14,18 @@
 
 namespace kigumi {
 
-template <class K>
+template <class K, class FaceData>
 class Global_face_classifier {
   using FT = typename K::FT;
-  using Leaf = typename Mixed_mesh<K>::Leaf;
+  using Leaf = typename Mixed_mesh<K, FaceData>::Leaf;
   using Point = typename K::Point_3;
   using Ray = typename K::Ray_3;
   using Segment = typename K::Segment_3;
   using Triangle = typename K::Triangle_3;
 
  public:
-  explicit Global_face_classifier(Mixed_mesh<K>& m, const std::unordered_set<Edge>& border)
+  explicit Global_face_classifier(Mixed_mesh<K, FaceData>& m,
+                                  const std::unordered_set<Edge>& border)
       : m_(m), border_(border) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -176,7 +177,7 @@ class Global_face_classifier {
     };
   }
 
-  Mixed_mesh<K>& m_;
+  Mixed_mesh<K, FaceData>& m_;
   const std::unordered_set<Edge>& border_;
 };
 

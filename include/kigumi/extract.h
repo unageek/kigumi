@@ -11,10 +11,10 @@
 
 namespace kigumi {
 
-template <class K>
-Polygon_soup<K> extract(const Mixed_polygon_soup<K>& m, Operator op, bool extract_first,
-                        bool extract_second, bool prefer_first) {
-  Polygon_soup<K> soup;
+template <class K, class FaceData>
+Polygon_soup<K, FaceData> extract(const Mixed_polygon_soup<K, FaceData>& m, Operator op,
+                                  bool extract_first, bool extract_second, bool prefer_first) {
+  Polygon_soup<K, FaceData> soup;
   std::unordered_map<Vertex_handle, Vertex_handle> map;
 
   auto u_mask = union_mask(op);
@@ -61,11 +61,10 @@ Polygon_soup<K> extract(const Mixed_polygon_soup<K>& m, Operator op, bool extrac
         map.emplace(vh, soup.add_vertex(p));
       }
     }
-    if (output_inv) {
-      soup.add_face({map.at(f[0]), map.at(f[2]), map.at(f[1])});
-    } else {
-      soup.add_face({map.at(f[0]), map.at(f[1]), map.at(f[2])});
-    }
+
+    auto new_fh = output_inv ? soup.add_face({map.at(f[0]), map.at(f[2]), map.at(f[1])})
+                             : soup.add_face({map.at(f[0]), map.at(f[1]), map.at(f[2])});
+    soup.data(new_fh) = m.data(fh).data;
   }
 
   return soup;
