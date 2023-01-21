@@ -148,12 +148,6 @@ class Boolean_operation {
 
   Kigumi_mesh<K> apply(Operator op, bool extract_first, bool extract_second,
                        bool prefer_first) const {
-    if (first_kind_ != Kigumi_mesh_kind::Normal && second_kind_ != Kigumi_mesh_kind::Normal) {
-      auto a = first_kind_ == Kigumi_mesh_kind::Entire;
-      auto b = second_kind_ == Kigumi_mesh_kind::Entire;
-      return apply(op, a, b) ? Kigumi_mesh<K>::entire() : Kigumi_mesh<K>::empty();
-    }
-
     auto soup = extract(m_, op, extract_first, extract_second, prefer_first);
     if (soup.num_faces() != 0) {
       return {Kigumi_mesh_kind::Normal, std::move(soup)};
@@ -166,12 +160,26 @@ class Boolean_operation {
               std::move(soup)};
     }
 
-    {
+    if (first_kind_ == Kigumi_mesh_kind::Entire || second_kind_ == Kigumi_mesh_kind::Entire) {
       auto a = first_kind_ == Kigumi_mesh_kind::Entire;
       auto b = second_kind_ == Kigumi_mesh_kind::Entire;
       return {apply(op, a, b) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
               std::move(soup)};
     }
+
+    if (std::all_of(m_.faces_begin(), m_.faces_end(),
+                    [&](auto fh) { return m_.data(fh).tag == Face_tag::Coplanar; })) {
+      return {apply(op, false, false) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
+              std::move(soup)};
+    }
+
+    if (std::all_of(m_.faces_begin(), m_.faces_end(),
+                    [&](auto fh) { return m_.data(fh).tag == Face_tag::Opposite; })) {
+      return {apply(op, false, true) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
+              std::move(soup)};
+    }
+
+    throw std::runtime_error("Bug");
   }
 
  private:

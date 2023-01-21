@@ -264,7 +264,7 @@ TEST(SpwcialMeshTest, NormalEntire) {
   ASSERT_EMPTY(f(Operator::O));
 }
 
-TEST(SpwcialMeshTest, Coplanar) {
+TEST(SpwcialMeshTest, Equivalent) {
   using kigumi::Operator;
   using kigumi::Polygon_soup;
 
@@ -321,19 +321,19 @@ TEST(SpwcialMeshTest, Complementary) {
   auto f = [&](Operator op) { return b.apply(op, true, true, true); };
 
   ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));  // FAILS
+  ASSERT_ENTIRE(f(Operator::A));
   ASSERT_NORMAL(f(Operator::B));
   ASSERT_INVERSE(f(Operator::C));
   ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_EMPTY(f(Operator::E));  // FAILS
+  ASSERT_EMPTY(f(Operator::E));
   ASSERT_INVERSE(f(Operator::F));
   ASSERT_NORMAL(f(Operator::G));
   ASSERT_INVERSE(f(Operator::H));
   ASSERT_NORMAL(f(Operator::I));
-  ASSERT_ENTIRE(f(Operator::J));  // FAILS
+  ASSERT_ENTIRE(f(Operator::J));
   ASSERT_EMPTY(f(Operator::K));
   ASSERT_NORMAL(f(Operator::L));
   ASSERT_INVERSE(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));  // FAILS
+  ASSERT_EMPTY(f(Operator::X));
   ASSERT_EMPTY(f(Operator::O));
 }
