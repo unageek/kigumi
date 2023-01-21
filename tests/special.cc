@@ -7,6 +7,7 @@
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point = K::Point_3;
+using Triangle = K::Triangle_3;
 using M = kigumi::Kigumi_mesh<K>;
 
 #define ASSERT_EMPTY(X) ASSERT_TRUE(X.is_empty())
@@ -110,23 +111,29 @@ TEST(SpecialMeshTest, EntireEntire) {
 
 bool is_normal(const M& m) {
   const auto& soup = m.soup();
-  for (auto fh : soup.faces()) {
-    if (soup.face(fh) == kigumi::Face{{kigumi::Vertex_handle{0}, kigumi::Vertex_handle{1},
-                                       kigumi::Vertex_handle{2}}}) {
-      return true;
-    }
+  if (soup.num_faces() != 1) {
+    return false;
   }
+
+  Triangle t{Point{0, 0, 0}, Point{1, 0, 0}, Point{0, 1, 0}};
+  for (auto fh : soup.faces()) {
+    return soup.triangle(fh) == t;
+  }
+
   return false;
 }
 
 bool is_inverse(const M& m) {
   const auto& soup = m.soup();
-  for (auto fh : soup.faces()) {
-    if (soup.face(fh) == kigumi::Face{{kigumi::Vertex_handle{0}, kigumi::Vertex_handle{2},
-                                       kigumi::Vertex_handle{1}}}) {
-      return true;
-    }
+  if (soup.num_faces() != 1) {
+    return false;
   }
+
+  Triangle t{Point{0, 0, 0}, Point{0, 1, 0}, Point{1, 0, 0}};
+  for (auto fh : soup.faces()) {
+    return soup.triangle(fh) == t;
+  }
+
   return false;
 }
 
@@ -254,5 +261,79 @@ TEST(SpwcialMeshTest, NormalEntire) {
   ASSERT_EMPTY(f(Operator::L));
   ASSERT_INVERSE(f(Operator::M));
   ASSERT_EMPTY(f(Operator::X));
+  ASSERT_EMPTY(f(Operator::O));
+}
+
+TEST(SpwcialMeshTest, Coplanar) {
+  using kigumi::Operator;
+  using kigumi::Polygon_soup;
+
+  Polygon_soup<K> soup;
+  auto vh1 = soup.add_vertex({0, 0, 0});
+  auto vh2 = soup.add_vertex({1, 0, 0});
+  auto vh3 = soup.add_vertex({0, 1, 0});
+  soup.add_face({vh1, vh2, vh3});
+
+  Polygon_soup<K> soup2{soup};
+
+  auto b = M::boolean(M{std::move(soup)}, M{std::move(soup2)});
+  auto f = [&](Operator op) { return b.apply(op, true, true, true); };
+
+  ASSERT_ENTIRE(f(Operator::V));
+  ASSERT_NORMAL(f(Operator::A));
+  ASSERT_ENTIRE(f(Operator::B));
+  ASSERT_ENTIRE(f(Operator::C));
+  ASSERT_INVERSE(f(Operator::D));
+  ASSERT_ENTIRE(f(Operator::E));
+  ASSERT_INVERSE(f(Operator::F));
+  ASSERT_INVERSE(f(Operator::G));
+  ASSERT_NORMAL(f(Operator::H));
+  ASSERT_NORMAL(f(Operator::I));
+  ASSERT_EMPTY(f(Operator::J));
+  ASSERT_NORMAL(f(Operator::K));
+  ASSERT_EMPTY(f(Operator::L));
+  ASSERT_EMPTY(f(Operator::M));
+  ASSERT_INVERSE(f(Operator::X));
+  ASSERT_EMPTY(f(Operator::O));
+}
+
+TEST(SpwcialMeshTest, Complementary) {
+  using kigumi::Operator;
+  using kigumi::Polygon_soup;
+
+  Polygon_soup<K> soup;
+  {
+    auto vh1 = soup.add_vertex({0, 0, 0});
+    auto vh2 = soup.add_vertex({1, 0, 0});
+    auto vh3 = soup.add_vertex({0, 1, 0});
+    soup.add_face({vh1, vh2, vh3});
+  }
+
+  Polygon_soup<K> soup2;
+  {
+    auto vh1 = soup2.add_vertex({0, 0, 0});
+    auto vh2 = soup2.add_vertex({1, 0, 0});
+    auto vh3 = soup2.add_vertex({0, 1, 0});
+    soup2.add_face({vh1, vh3, vh2});
+  }
+
+  auto b = M::boolean(M{std::move(soup)}, M{std::move(soup2)});
+  auto f = [&](Operator op) { return b.apply(op, true, true, true); };
+
+  ASSERT_ENTIRE(f(Operator::V));
+  ASSERT_ENTIRE(f(Operator::A));  // FAILS
+  ASSERT_NORMAL(f(Operator::B));
+  ASSERT_INVERSE(f(Operator::C));
+  ASSERT_ENTIRE(f(Operator::D));
+  ASSERT_EMPTY(f(Operator::E));  // FAILS
+  ASSERT_INVERSE(f(Operator::F));
+  ASSERT_NORMAL(f(Operator::G));
+  ASSERT_INVERSE(f(Operator::H));
+  ASSERT_NORMAL(f(Operator::I));
+  ASSERT_ENTIRE(f(Operator::J));  // FAILS
+  ASSERT_EMPTY(f(Operator::K));
+  ASSERT_NORMAL(f(Operator::L));
+  ASSERT_INVERSE(f(Operator::M));
+  ASSERT_EMPTY(f(Operator::X));  // FAILS
   ASSERT_EMPTY(f(Operator::O));
 }
