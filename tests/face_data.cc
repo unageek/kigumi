@@ -36,7 +36,7 @@ TEST(FaceDataTest, Intersecting) {
   }
   Kigumi_mesh<K, Face_data> m2(std::move(s2));
 
-  auto m = Kigumi_mesh<K, Face_data>::boolean(m1, m2).apply(Operator::Union, true, true, true);
+  auto m = Kigumi_mesh<K, Face_data>::boolean(m1, m2).apply(Operator::Union);
   const auto& soup = m.soup();
   ASSERT_EQ(std::count_if(soup.faces_begin(), soup.faces_end(),
                           [&](auto fh) { return soup.data(fh).i == 1; }),
@@ -69,7 +69,7 @@ TEST(FaceDataTest, NonIntersecting) {
   }
   Kigumi_mesh<K, Face_data> m2(std::move(s2));
 
-  auto m = Kigumi_mesh<K, Face_data>::boolean(m1, m2).apply(Operator::Union, true, true, true);
+  auto m = Kigumi_mesh<K, Face_data>::boolean(m1, m2).apply(Operator::Union);
   const auto& soup = m.soup();
   ASSERT_EQ(std::count_if(soup.faces_begin(), soup.faces_end(),
                           [&](auto fh) { return soup.data(fh).i == 1; }),

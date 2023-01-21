@@ -11,9 +11,6 @@ struct options {
   std::string input_file;
   std::string output_file;
   kigumi::Operator op;
-  bool extract_first{};
-  bool extract_second{};
-  bool prefer_first{};
 };
 
 inline options parse_options(int argc, const char* argv[]) {
@@ -35,13 +32,7 @@ inline options parse_options(int argc, const char* argv[]) {
        "  uni  Union\n"                                           //
        "  int  Intersection\n"                                    //
        "  dif  Difference\n"                                      //
-       "  sym  Symmetric difference")                             //
-      ("extract", po::value(&extract)->default_value("both"),     //
-       "(first|second|both)\n"                                    //
-       "Which mesh faces should be extracted?")                   //
-      ("prefer", po::value(&prefer)->default_value("first"),      //
-       "(first|second)\n"                                         //
-       "Which mesh should coplanar faces belong to?");
+       "  sym  Symmetric difference");
 
   po::variables_map vm;
   try {
@@ -64,25 +55,6 @@ inline options parse_options(int argc, const char* argv[]) {
     opts.op = kigumi::Operator::Union;
   } else {
     throw std::runtime_error("Invalid value to the option --op.");
-  }
-
-  if (extract == "first") {
-    opts.extract_first = true;
-  } else if (extract == "second") {
-    opts.extract_second = true;
-  } else if (extract == "both") {
-    opts.extract_first = true;
-    opts.extract_second = true;
-  } else {
-    throw std::runtime_error("Invalid value to the option --extract.");
-  }
-
-  if (prefer == "first") {
-    opts.prefer_first = true;
-  } else if (prefer == "second") {
-    // no-op
-  } else {
-    throw std::runtime_error("Invalid value to the option --prefer.");
   }
 
   return opts;

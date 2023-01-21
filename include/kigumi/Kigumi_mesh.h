@@ -151,9 +151,8 @@ class Boolean_operation {
                     Mixed_polygon_soup<K, FaceData>&& m)
       : first_kind_(first_kind), second_kind_(second_kind), m_(std::move(m)) {}
 
-  Kigumi_mesh<K, FaceData> apply(Operator op, bool extract_first, bool extract_second,
-                                 bool prefer_first) const {
-    auto soup = extract(m_, op, extract_first, extract_second, prefer_first);
+  Kigumi_mesh<K, FaceData> apply(Operator op, bool prefer_first = true) const {
+    auto soup = extract(m_, op, prefer_first);
     if (soup.num_faces() != 0) {
       return {Kigumi_mesh_kind::Normal, std::move(soup)};
     }

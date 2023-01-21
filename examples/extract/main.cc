@@ -16,8 +16,7 @@ int main(int argc, const char* argv[]) {
     kigumi::Boolean_operation<K, std::nullptr_t> boolean;
     kigumi::load(opts.input_file, boolean);
 
-    auto result =
-        boolean.apply(opts.op, opts.extract_first, opts.extract_second, opts.prefer_first);
+    auto result = boolean.apply(opts.op);
     result.save_lossy(opts.output_file);
 
     return 0;
