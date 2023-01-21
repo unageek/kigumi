@@ -15,7 +15,7 @@
 namespace kigumi {
 
 template <class K>
-Mixed_polygon_soup<K> boolean(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
+Mixed_polygon_soup<K> mix(const Polygon_soup<K>& left, const Polygon_soup<K>& right) {
   std::cout << "Corefining..." << std::endl;
 
   Corefine corefine(left, right);
