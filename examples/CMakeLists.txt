@@ -1,7 +1,7 @@
-set(TARGET boole)
+set(TARGET mix)
 
 add_executable(${TARGET}
-    boole/main.cc
+    mix/main.cc
 )
 
 if(UNIX)

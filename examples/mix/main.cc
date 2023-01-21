@@ -1,11 +1,9 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <kigumi/Mixed_mesh.h>
-#include <kigumi/Polygon_soup.h>
-#include <kigumi/boolean.h>
+#include <kigumi/Kigumi_mesh.h>
+#include <kigumi/io.h>
 
 #include <iostream>
-#include <string>
-#include <vector>
+#include <stdexcept>
 
 #include "parse_options.h"
 
@@ -15,18 +13,18 @@ int main(int argc, const char* argv[]) {
   try {
     auto opts = parse_options(argc, argv);
 
-    kigumi::Polygon_soup<K> first(opts.first);
-    if (first.faces().empty()) {
+    auto first = kigumi::Kigumi_mesh<K>::import(opts.first);
+    if (first.is_empty()) {
       throw std::runtime_error("the first mesh is empty");
     }
 
-    kigumi::Polygon_soup<K> second(opts.second);
-    if (second.faces().empty()) {
+    auto second = kigumi::Kigumi_mesh<K>::import(opts.second);
+    if (second.is_empty()) {
       throw std::runtime_error("the second mesh is empty");
     }
 
-    auto m = boolean(first, second);
-    kigumi::save(opts.output_file, m);
+    auto boolean = kigumi::Kigumi_mesh<K>::boolean(first, second);
+    kigumi::save(opts.output_file, boolean);
 
     return 0;
   } catch (const std::exception& e) {

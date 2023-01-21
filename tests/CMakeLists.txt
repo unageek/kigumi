@@ -2,6 +2,7 @@ set(TARGET boole-test)
 
 add_executable(${TARGET}
     Faces_around_edge_classifier_test.cc
+    special.cc
 )
 
 if(UNIX)

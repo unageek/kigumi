@@ -46,6 +46,8 @@ enum class Operator {
   M,  // B ⧵ A
   X,  // (A ∪ B)ᶜ
   O,  // ∅
+
+  // Aliases
   Union = A,
   SymmetricDifference = J,
   Intersection = K,

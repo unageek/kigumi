@@ -1,8 +1,9 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <kigumi/Mixed_mesh.h>
-#include <kigumi/extract.h>
+#include <kigumi/Kigumi_mesh.h>
+#include <kigumi/io.h>
 
 #include <iostream>
+#include <stdexcept>
 
 #include "parse_options.h"
 
@@ -12,12 +13,12 @@ int main(int argc, const char* argv[]) {
   try {
     auto opts = parse_options(argc, argv);
 
-    kigumi::Mixed_polygon_soup<K> m;
-    kigumi::load(opts.input_file, m);
+    kigumi::Boolean_operation<K> boolean;
+    kigumi::load(opts.input_file, boolean);
 
     auto result =
-        kigumi::extract(m, opts.op, opts.extract_first, opts.extract_second, opts.prefer_first);
-    result.save(opts.output_file);
+        boolean.apply(opts.op, opts.extract_first, opts.extract_second, opts.prefer_first);
+    result.save_lossy(opts.output_file);
 
     return 0;
   } catch (const std::exception& e) {
