@@ -179,7 +179,7 @@ class Boolean_operation {
               std::move(soup)};
     }
 
-    throw std::runtime_error("Bug");
+    throw std::runtime_error("Input meshes are inconsistently oriented");
   }
 
  private:
