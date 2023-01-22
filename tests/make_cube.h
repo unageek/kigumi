@@ -38,5 +38,5 @@ inline kigumi::Kigumi_mesh<K, FaceData> make_cube(const typename K::Point_3& min
     soup.data(fh) = data;
   }
 
-  return {std::move(soup)};
+  return kigumi::Kigumi_mesh<K, FaceData>{std::move(soup)};
 }

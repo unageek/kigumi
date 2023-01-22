@@ -50,7 +50,7 @@ class Kigumi_mesh {
  public:
   Kigumi_mesh() = default;
 
-  Kigumi_mesh(Polygon_soup<K, Face_data>&& soup)
+  explicit Kigumi_mesh(Polygon_soup<K, Face_data>&& soup)
       : kind_{soup.num_faces() == 0 ? Kigumi_mesh_kind::Empty : Kigumi_mesh_kind::Normal},
         soup_{std::move(soup)} {}
 
@@ -59,7 +59,7 @@ class Kigumi_mesh {
   static Kigumi_mesh entire() { return {Kigumi_mesh_kind::Entire, {}}; }
 
   static Kigumi_mesh import(const std::string& filename) {
-    return {Polygon_soup<K, Face_data>{filename}};
+    return Kigumi_mesh{Polygon_soup<K, Face_data>{filename}};
   }
 
   void save_lossy(const std::string& filename) { soup_.save(filename); }
@@ -150,6 +150,7 @@ class Boolean_operation {
   Boolean_operation()
       : first_kind_(Kigumi_mesh_kind::Empty), second_kind_(Kigumi_mesh_kind::Empty), m_() {}
 
+  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
                     Mixed_polygon_soup<K, FaceData>&& m)
       : first_kind_(first_kind), second_kind_(second_kind), m_(std::move(m)) {}
@@ -200,11 +201,11 @@ class Boolean_operation {
       case Operator::A:  // A ∪ B
         return a || b;
       case Operator::B:  // (B ⧵ A)ᶜ
-        return !(b && !a);
+        return a || !b;
       case Operator::C:  // (A ⧵ B)ᶜ
-        return !(a && !b);
+        return !a || b;
       case Operator::D:  // (A ∩ B)ᶜ
-        return !(a && b);
+        return !a || !b;
       case Operator::E:  // (A △ B)ᶜ
         return a == b;
       case Operator::F:  // Aᶜ
@@ -222,9 +223,9 @@ class Boolean_operation {
       case Operator::L:  // A ⧵ B
         return a && !b;
       case Operator::M:  // B ⧵ A
-        return b && !a;
+        return !a && b;
       case Operator::X:  // (A ∪ B)ᶜ
-        return !(a || b);
+        return !a && !b;
       case Operator::O:  // ∅
         return false;
       default:
