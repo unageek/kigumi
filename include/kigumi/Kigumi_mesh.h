@@ -11,6 +11,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -78,34 +79,36 @@ class Kigumi_mesh {
 
     if (a.is_empty_or_entire() || b.is_empty_or_entire()) {
       std::vector<Point> points;
-      points.reserve(a.soup_.num_vertices() + b.soup_.num_vertices());
-      std::transform(a.soup_.vertices_begin(), a.soup_.vertices_end(), std::back_inserter(points),
+      points.reserve(a.soup().num_vertices() + b.soup().num_vertices());
+      std::transform(a.soup().vertices_begin(), a.soup().vertices_end(), std::back_inserter(points),
                      [&](auto vh) { return a.soup_.point(vh); });
-      std::transform(b.soup_.vertices_begin(), b.soup_.vertices_end(), std::back_inserter(points),
+      std::transform(b.soup().vertices_begin(), b.soup().vertices_end(), std::back_inserter(points),
                      [&](auto vh) { return b.soup_.point(vh); });
 
       std::vector<Face> faces;
-      faces.reserve(a.soup_.num_faces() + b.soup_.num_faces());
-      std::transform(a.soup_.faces_begin(), a.soup_.faces_end(), std::back_inserter(faces),
+      faces.reserve(a.soup().num_faces() + b.soup().num_faces());
+      std::transform(a.soup().faces_begin(), a.soup().faces_end(), std::back_inserter(faces),
                      [&](auto fh) { return a.soup_.face(fh); });
-      std::transform(b.soup_.faces_begin(), b.soup_.faces_end(), std::back_inserter(faces),
+      std::transform(b.soup().faces_begin(), b.soup().faces_end(), std::back_inserter(faces),
                      [&](auto fh) { return b.soup_.face(fh); });
+
+      // std::tie is used since structured bindings cannot be captured by lambda expressions.
+      Face_tag first_tag{};
+      Face_tag second_tag{};
+      std::tie(first_tag, second_tag) =
+          a.is_empty() || b.is_entire() ? std::make_pair(Face_tag::Intersection, Face_tag::Union)
+                                        : std::make_pair(Face_tag::Union, Face_tag::Intersection);
 
       std::vector<Mixed_face_data<Face_data>> face_data;
       face_data.reserve(faces.size());
-      if (a.is_empty() || b.is_entire()) {
-        face_data.insert(
-            face_data.end(), a.soup_.num_faces(),
-            Mixed_face_data<Face_data>{.from_left = true, .tag = Face_tag::Intersection});
-        face_data.insert(face_data.end(), b.soup_.num_faces(),
-                         Mixed_face_data<Face_data>{.from_left = false, .tag = Face_tag::Union});
-      } else {
-        face_data.insert(face_data.end(), a.soup_.num_faces(),
-                         Mixed_face_data<Face_data>{.from_left = true, .tag = Face_tag::Union});
-        face_data.insert(
-            face_data.end(), b.soup_.num_faces(),
-            Mixed_face_data<Face_data>{.from_left = false, .tag = Face_tag::Intersection});
-      }
+      std::transform(a.soup().faces_begin(), a.soup().faces_end(), std::back_inserter(face_data),
+                     [&, first_tag](auto fh) -> Mixed_face_data<Face_data> {
+                       return {.from_left = true, .tag = first_tag, .data = a.soup().data(fh)};
+                     });
+      std::transform(b.soup().faces_begin(), b.soup().faces_end(), std::back_inserter(face_data),
+                     [&, second_tag](auto fh) -> Mixed_face_data<Face_data> {
+                       return {.from_left = false, .tag = second_tag, .data = b.soup().data(fh)};
+                     });
 
       return {a.kind_, b.kind_, {std::move(points), std::move(faces), std::move(face_data)}};
     }
