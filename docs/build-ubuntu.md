@@ -1,4 +1,4 @@
-# Building kigumi On Ubuntu 22.04
+# Building on Ubuntu 22.04
 
 ## Prerequisites
 

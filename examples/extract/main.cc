@@ -17,7 +17,7 @@ int main(int argc, const char* argv[]) {
     kigumi::load(opts.input_file, boolean);
 
     auto result = boolean.apply(opts.op);
-    result.save_lossy(opts.output_file);
+    result.export_lossy(opts.output_file);
 
     return 0;
   } catch (const std::exception& e) {

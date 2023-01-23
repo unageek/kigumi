@@ -16,7 +16,9 @@ using M = kigumi::Kigumi_mesh<K>;
 TEST(SpecialMeshTest, EmptyEmpty) {
   using kigumi::Operator;
 
-  auto b = M::boolean(M::empty(), M::empty());
+  auto m1 = M::empty();
+  auto m2 = M::empty();
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -40,7 +42,9 @@ TEST(SpecialMeshTest, EmptyEmpty) {
 TEST(SpecialMeshTest, EmptyEntire) {
   using kigumi::Operator;
 
-  auto b = M::boolean(M::empty(), M::entire());
+  auto m1 = M::empty();
+  auto m2 = M::entire();
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -64,7 +68,9 @@ TEST(SpecialMeshTest, EmptyEntire) {
 TEST(SpecialMeshTest, EntireEmpty) {
   using kigumi::Operator;
 
-  auto b = M::boolean(M::entire(), M::empty());
+  auto m1 = M::entire();
+  auto m2 = M::empty();
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -88,7 +94,9 @@ TEST(SpecialMeshTest, EntireEmpty) {
 TEST(SpecialMeshTest, EntireEntire) {
   using kigumi::Operator;
 
-  auto b = M::boolean(M::entire(), M::entire());
+  auto m1 = M::entire();
+  auto m2 = M::entire();
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -150,7 +158,9 @@ TEST(SpwcialMeshTest, EmptyNormal) {
   auto vh3 = soup.add_vertex({0, 1, 0});
   soup.add_face({vh1, vh2, vh3});
 
-  auto b = M::boolean(M::empty(), M{std::move(soup)});
+  auto m1 = M::empty();
+  M m2{std::move(soup)};
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -181,7 +191,9 @@ TEST(SpwcialMeshTest, NormalEmpty) {
   auto vh3 = soup.add_vertex({0, 1, 0});
   soup.add_face({vh1, vh2, vh3});
 
-  auto b = M::boolean(M{std::move(soup)}, M::empty());
+  M m1{std::move(soup)};
+  auto m2 = M::empty();
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -212,7 +224,9 @@ TEST(SpwcialMeshTest, EntireNormal) {
   auto vh3 = soup.add_vertex({0, 1, 0});
   soup.add_face({vh1, vh2, vh3});
 
-  auto b = M::boolean(M::entire(), M{std::move(soup)});
+  auto m1 = M::entire();
+  M m2{std::move(soup)};
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -243,7 +257,9 @@ TEST(SpwcialMeshTest, NormalEntire) {
   auto vh3 = soup.add_vertex({0, 1, 0});
   soup.add_face({vh1, vh2, vh3});
 
-  auto b = M::boolean(M{std::move(soup)}, M::entire());
+  M m1{std::move(soup)};
+  auto m2 = M::entire();
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -276,7 +292,9 @@ TEST(SpwcialMeshTest, Equivalent) {
 
   Polygon_soup<K> soup2{soup};
 
-  auto b = M::boolean(M{std::move(soup)}, M{std::move(soup2)});
+  M m1{std::move(soup)};
+  M m2{std::move(soup2)};
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -317,7 +335,9 @@ TEST(SpwcialMeshTest, Complementary) {
     soup2.add_face({vh1, vh3, vh2});
   }
 
-  auto b = M::boolean(M{std::move(soup)}, M{std::move(soup2)});
+  M m1{std::move(soup)};
+  M m2{std::move(soup2)};
+  auto b = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));

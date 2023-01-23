@@ -23,7 +23,7 @@ int main(int argc, const char* argv[]) {
       throw std::runtime_error("the second mesh is empty");
     }
 
-    auto boolean = kigumi::Kigumi_mesh<K>::boolean(first, second);
+    auto boolean = first.boolean(second);
     kigumi::save(opts.output_file, boolean);
 
     return 0;

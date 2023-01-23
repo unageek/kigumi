@@ -11,6 +11,13 @@
 - Can handle non-manifold meshes
 - Can handle open meshes
 - Can handle disjointness
+- Distinguish between the empty and the entire meshes
+- Apply multiple Boolean operators simultaneously
+- Attach custom data to faces that propagate through Boolean operations
+- Save/load exact mesh data
+  - The format is non-portable at the moment!
+
+For details of the API, see [Kigumi_mesh.h](include/kigumi/Kigumi_mesh.h).
 
 ## Preconditions
 
@@ -36,10 +43,6 @@ The following conditions must be satisfied so that Boolean operations work prope
 
 ## TODO
 
-- Unit testing
-- Load/save exact meshes
-- Attach custom data to faces
-- Optimization for equivalent/complementary inputs
 - Mesh repairing
 
 ## Algorithm

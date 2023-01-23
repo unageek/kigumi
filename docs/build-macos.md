@@ -1,4 +1,4 @@
-# Building kigumi on macOS
+# Building on macOS
 
 ## Prerequisites
 

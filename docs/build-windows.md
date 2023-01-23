@@ -1,4 +1,4 @@
-# Building kigumi on Windows
+# Building on Windows
 
 ## Prerequisites
 
