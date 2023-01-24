@@ -178,16 +178,34 @@ class Boolean_operation {
               std::move(soup)};
     }
 
-    if (std::all_of(m_.faces_begin(), m_.faces_end(),
-                    [&](auto fh) { return m_.data(fh).tag == Face_tag::Coplanar; })) {
-      return {apply(op, false, false) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
-              std::move(soup)};
+    switch (op) {
+      case Operator::V:
+      case Operator::A:
+      case Operator::B:
+      case Operator::C:
+      case Operator::D:
+        return {Kigumi_mesh_kind::Entire, std::move(soup)};
+
+      case Operator::K:
+      case Operator::L:
+      case Operator::M:
+      case Operator::X:
+      case Operator::O:
+        return {Kigumi_mesh_kind::Empty, std::move(soup)};
     }
 
-    if (std::all_of(m_.faces_begin(), m_.faces_end(),
-                    [&](auto fh) { return m_.data(fh).tag == Face_tag::Opposite; })) {
-      return {apply(op, false, true) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
-              std::move(soup)};
+    if (op == Operator::E || op == Operator::J) {
+      if (std::all_of(m_.faces_begin(), m_.faces_end(),
+                      [&](auto fh) { return m_.data(fh).tag == Face_tag::Coplanar; })) {
+        return {apply(op, false, false) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
+                std::move(soup)};
+      }
+
+      if (std::all_of(m_.faces_begin(), m_.faces_end(),
+                      [&](auto fh) { return m_.data(fh).tag == Face_tag::Opposite; })) {
+        return {apply(op, false, true) ? Kigumi_mesh_kind::Entire : Kigumi_mesh_kind::Empty,
+                std::move(soup)};
+      }
     }
 
     throw std::runtime_error("Input meshes are inconsistently oriented");
