@@ -62,7 +62,7 @@ class Kigumi_mesh {
     return Kigumi_mesh{Polygon_soup<K, Face_data>{filename}};
   }
 
-  void export_lossy(const std::string& filename) { soup_.save(filename); }
+  void export_lossy(const std::string& filename) const { soup_.save(filename); }
 
   bool is_empty() const { return kind_ == Kigumi_mesh_kind::Empty; }
 
@@ -72,7 +72,7 @@ class Kigumi_mesh {
 
   const Polygon_soup<K, Face_data>& soup() const { return soup_; }
 
-  Boolean_operation<K, Face_data> boolean(const Kigumi_mesh& other) {
+  Boolean_operation<K, Face_data> boolean(const Kigumi_mesh& other) const {
     const auto& a = *this;
     const auto& b = other;
 

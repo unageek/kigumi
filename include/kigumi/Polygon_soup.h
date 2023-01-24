@@ -98,7 +98,7 @@ class Polygon_soup {
     return {faces_.size() - 1};
   }
 
-  void save(const std::string& filename) {
+  void save(const std::string& filename) const {
     using Epick = CGAL::Exact_predicates_inexact_constructions_kernel;
 
     std::vector<Epick::Point_3> points;
