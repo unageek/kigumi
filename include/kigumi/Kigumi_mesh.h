@@ -192,6 +192,9 @@ class Boolean_operation {
       case Operator::X:
       case Operator::O:
         return {Kigumi_mesh_kind::Empty, std::move(soup)};
+
+      default:
+        break;
     }
 
     if (op == Operator::E || op == Operator::J) {
