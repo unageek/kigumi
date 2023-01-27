@@ -24,10 +24,10 @@ class Corefine {
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Corefine(const Polygon_soup<K, FaceData>& left, const Polygon_soup<K, FaceData>& right)
-      : left_(left), right_(right) {
+      : left_{left}, right_{right} {
     std::cout << "Finding face pairs..." << std::endl;
 
-    Face_pair_finder finder(left_, right_);
+    Face_pair_finder finder{left_, right_};
     auto pairs = finder.find_face_pairs();
 
     std::cout << "Finding intersections..." << std::endl;
@@ -78,7 +78,7 @@ class Corefine {
     }
     left_fh_starts.push_back(infos.size());
 
-    bool caught = false;
+    bool caught{};
 #pragma omp parallel for schedule(guided)
     for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(left_fh_starts.size() - 1); ++i) {
       if (caught) {
@@ -155,12 +155,12 @@ class Corefine {
 
     // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     Intersection_info(Face_handle left_fh, Face_handle right_fh, Intersection&& intersection)
-        : left_fh(left_fh), right_fh(right_fh), intersection(std::move(intersection)) {}
+        : left_fh{left_fh}, right_fh{right_fh}, intersection{std::move(intersection)} {}
 
     Intersection_info(Intersection_info&& other) noexcept
-        : left_fh(other.left_fh),
-          right_fh(other.right_fh),
-          intersection(std::move(other.intersection)) {}
+        : left_fh{other.left_fh},
+          right_fh{other.right_fh},
+          intersection{std::move(other.intersection)} {}
 
     Intersection_info& operator=(Intersection_info&& other) noexcept {
       left_fh = other.left_fh;

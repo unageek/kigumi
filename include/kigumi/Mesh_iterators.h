@@ -12,7 +12,7 @@ class Vertex_iterator : public boost::iterator_facade<Vertex_iterator, Vertex_ha
  public:
   Vertex_iterator() = default;
 
-  explicit Vertex_iterator(Vertex_handle vh) : vh_(vh) {}
+  explicit Vertex_iterator(Vertex_handle vh) : vh_{vh} {}
 
  private:
   friend class boost::iterator_core_access;
@@ -36,7 +36,7 @@ class Face_around_edge_iterator
 
   Face_around_edge_iterator(Index_iterator i_it, Index_iterator i_end, Index_iterator j_it,
                             Index_iterator j_end)
-      : i_it_(i_it), i_end_(i_end), j_it_(j_it), j_end_(j_end) {
+      : i_it_{i_it}, i_end_{i_end}, j_it_{j_it}, j_end_{j_end} {
     while (i_it_ != i_end_ && j_it_ != j_end_ && *i_it_ != *j_it_) {
       if (*i_it_ < *j_it_) {
         ++i_it_;
@@ -91,7 +91,7 @@ class Face_iterator : public boost::iterator_facade<Face_iterator, Face_handle,
  public:
   Face_iterator() = default;
 
-  explicit Face_iterator(Face_handle fh) : fh_(fh) {}
+  explicit Face_iterator(Face_handle fh) : fh_{fh} {}
 
  private:
   friend class boost::iterator_core_access;
@@ -115,7 +115,7 @@ class Face_around_face_iterator
                             Face_around_edge_iterator end1, Face_around_edge_iterator it2,
                             Face_around_edge_iterator end2, Face_around_edge_iterator it3,
                             Face_around_edge_iterator end3)
-      : fh_(fh), it1_(it1), end1_(end1), it2_(it2), end2_(end2), it3_(it3), end3_(end3) {}
+      : fh_{fh}, it1_{it1}, end1_{end1}, it2_{it2}, end2_{end2}, it3_{it3}, end3_{end3} {}
 
  private:
   friend class boost::iterator_core_access;

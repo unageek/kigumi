@@ -29,7 +29,7 @@ class Polygon_soup {
  public:
   class Leaf : public AABB_leaf {
    public:
-    Leaf(const Triangle& tri, Face_handle fh) : AABB_leaf(tri.bbox()), fh_(fh) {}
+    Leaf(const Triangle& tri, Face_handle fh) : AABB_leaf{tri.bbox()}, fh_{fh} {}
 
     Face_handle face_handle() const { return fh_; }
 
@@ -42,13 +42,13 @@ class Polygon_soup {
   ~Polygon_soup() = default;
 
   Polygon_soup(const Polygon_soup& other)
-      : points_(other.points_), faces_(other.faces_), face_data_(other.face_data_) {}
+      : points_{other.points_}, faces_{other.faces_}, face_data_{other.face_data_} {}
 
   Polygon_soup(Polygon_soup&& other) noexcept
-      : points_(std::move(other.points_)),
-        faces_(std::move(other.faces_)),
-        face_data_(std::move(other.face_data_)),
-        aabb_tree_(std::move(other.aabb_tree_)) {}
+      : points_{std::move(other.points_)},
+        faces_{std::move(other.faces_)},
+        face_data_{std::move(other.face_data_)},
+        aabb_tree_{std::move(other.aabb_tree_)} {}
 
   Polygon_soup& operator=(const Polygon_soup& other) {
     if (this != &other) {
@@ -85,7 +85,7 @@ class Polygon_soup {
 
   Polygon_soup(std::vector<Point>&& points, std::vector<Face>&& faces,
                std::vector<FaceData>&& face_data)
-      : points_(std::move(points)), faces_(std::move(faces)), face_data_(std::move(face_data)) {}
+      : points_{std::move(points)}, faces_{std::move(faces)}, face_data_{std::move(face_data)} {}
 
   Vertex_handle add_vertex(const Point& p) {
     points_.push_back(p);
@@ -144,7 +144,7 @@ class Polygon_soup {
   }
 
   const AABB_tree<Leaf>& aabb_tree() const {
-    std::lock_guard<std::mutex> lk(aabb_tree_mutex_);
+    std::lock_guard<std::mutex> lk{aabb_tree_mutex_};
 
     if (!aabb_tree_) {
       std::vector<Leaf> leaves;
@@ -225,8 +225,8 @@ struct Read<Polygon_soup<K, Face_data>> {
         do_read(in, x);
         do_read(in, y);
         do_read(in, z);
-        tt.add_vertex({CGAL::Lazy_exact_nt<mpq_class>(x), CGAL::Lazy_exact_nt<mpq_class>(y),
-                       CGAL::Lazy_exact_nt<mpq_class>(z)});
+        tt.add_vertex({CGAL::Lazy_exact_nt<mpq_class>{x}, CGAL::Lazy_exact_nt<mpq_class>{y},
+                       CGAL::Lazy_exact_nt<mpq_class>{z}});
       }
     }
 

@@ -151,12 +151,12 @@ template <class K, class FaceData>
 class Boolean_operation {
  public:
   Boolean_operation()
-      : first_kind_(Kigumi_mesh_kind::Empty), second_kind_(Kigumi_mesh_kind::Empty), m_() {}
+      : first_kind_{Kigumi_mesh_kind::Empty}, second_kind_{Kigumi_mesh_kind::Empty} {}
 
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
                     Mixed_polygon_soup<K, FaceData>&& m)
-      : first_kind_(first_kind), second_kind_(second_kind), m_(std::move(m)) {}
+      : first_kind_{first_kind}, second_kind_{second_kind}, m_{std::move(m)} {}
 
   Kigumi_mesh<K, FaceData> apply(Operator op, bool prefer_first = true) const {
     auto soup = extract(m_, op, prefer_first);

@@ -17,7 +17,7 @@ class Face_pair_finder {
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Face_pair_finder(const Polygon_soup<K, FaceData>& left, const Polygon_soup<K, FaceData>& right)
-      : left_(left), right_(right) {}
+      : left_{left}, right_{right} {}
 
   std::vector<Face_pair> find_face_pairs() const {
     std::vector<Face_pair> pairs;

@@ -17,7 +17,7 @@ class Faces_around_edge_classifier {
   Faces_around_edge_classifier(Mixed_mesh<K, FaceData>& m, const Edge& edge) {
     const auto& p = m.point(edge[0]);
     const auto& q = m.point(edge[1]);
-    Plane_3 plane(p, q - p);
+    Plane_3 plane{p, q - p};
     auto u = plane.base1();
     auto v = plane.base2();
 
@@ -27,8 +27,8 @@ class Faces_around_edge_classifier {
       // The face is either pqr or qpr.
       const auto& f = m.face(fh);
 
-      std::size_t i = 0;  // The index of the vertex p.
-      std::size_t j = 0;  // The index of the vertex q.
+      std::size_t i{};  // The index of the vertex p.
+      std::size_t j{};  // The index of the vertex q.
       while (f.at(i) != edge[0]) {
         ++i;
       }
@@ -36,7 +36,7 @@ class Faces_around_edge_classifier {
         ++j;
       }
 
-      std::size_t k = 3 - (i + j);  // The index of the vertex r.
+      std::size_t k{3 - (i + j)};  // The index of the vertex r.
       const auto& r = m.point(f.at(k));
       Vector_2 r_uv((r - p) * u, (r - p) * v);
 
@@ -70,7 +70,7 @@ class Faces_around_edge_classifier {
 
     auto is_undefined_configuration = true;
     // At the end of the loop, the kth face is tagged as union or intersection.
-    std::size_t k = 0;
+    std::size_t k{};
     for (std::size_t i = 0; i < faces.size(); ++i) {
       auto j = (i + 1) % faces.size();
       const auto& fi = faces.at(i);
@@ -134,7 +134,7 @@ class Faces_around_edge_classifier {
 
     Face_around_edge(Face_handle fh, Vertex_handle vh_r, const Vector_2& r,
                      CGAL::Orientation orientation)
-        : fh(fh), vh_r(vh_r), r(r), radial_bin(classify_radial_bin(r)), orientation(orientation) {}
+        : fh{fh}, vh_r{vh_r}, r{r}, radial_bin{classify_radial_bin(r)}, orientation{orientation} {}
 
    private:
     static int classify_radial_bin(const Vector_2& r) {

@@ -26,10 +26,10 @@ class Global_face_classifier {
  public:
   explicit Global_face_classifier(Mixed_mesh<K, FaceData>& m,
                                   const std::unordered_set<Edge>& border)
-      : m_(m), border_(border) {
+      : m_{m}, border_{border} {
     std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<std::size_t> dist(0, m.num_faces() - 1);
+    std::mt19937 gen{rd()};
+    std::uniform_int_distribution<std::size_t> dist{0, m.num_faces() - 1};
 
     auto representative_faces = find_unclassified_connected_components();
 
@@ -70,7 +70,7 @@ class Global_face_classifier {
       return CGAL::ZERO;
     }
 
-    auto ray = Ray(p_src, p_trg);
+    Ray ray{p_src, p_trg};
     const auto& tree = m_.aabb_tree();
     std::vector<const Leaf*> leaves;
     tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves), ray);
@@ -158,7 +158,7 @@ class Global_face_classifier {
   // CGAL::Random_points_in_triangle_3 is inexact, so use this instead.
   static Point random_point_in_triangle(const Triangle& tri, std::mt19937& gen) {
     // Use float to get less number of bits.
-    std::uniform_real_distribution<float> dist(0.0, 1.0);
+    std::uniform_real_distribution<float> dist{0.0, 1.0};
     const auto& p = tri[0];
     const auto& q = tri[1];
     const auto& r = tri[2];

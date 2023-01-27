@@ -28,8 +28,8 @@ struct Read<Face_tag> {
 
 template <class FaceData>
 struct Mixed_face_data {
-  bool from_left = false;
-  Face_tag tag = Face_tag::Unknown;
+  bool from_left{};
+  Face_tag tag{};
   FaceData data;
 };
 

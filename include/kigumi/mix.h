@@ -19,7 +19,7 @@ Mixed_polygon_soup<K, FaceData> mix(const Polygon_soup<K, FaceData>& left,
                                     const Polygon_soup<K, FaceData>& right) {
   std::cout << "Corefining..." << std::endl;
 
-  Corefine corefine(left, right);
+  Corefine corefine{left, right};
 
   std::cout << "Constructing mixed mesh..." << std::endl;
 
@@ -56,7 +56,7 @@ Mixed_polygon_soup<K, FaceData> mix(const Polygon_soup<K, FaceData>& left,
 
   std::cout << "Local classification..." << std::endl;
 
-  Shared_edge_finder shared_edge_finder(m);
+  Shared_edge_finder shared_edge_finder{m};
   const auto& shared_edges = shared_edge_finder.shared_edges();
   for (const auto& edge : shared_edges) {
     Faces_around_edge_classifier(m, edge);

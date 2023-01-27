@@ -39,7 +39,7 @@ class Mesh {
  public:
   class Leaf : public AABB_leaf {
    public:
-    Leaf(const Triangle& tri, Face_handle fh) : AABB_leaf(tri.bbox()), fh_(fh) {}
+    Leaf(const Triangle& tri, Face_handle fh) : AABB_leaf{tri.bbox()}, fh_{fh} {}
 
     Face_handle face_handle() const { return fh_; }
 
@@ -52,21 +52,21 @@ class Mesh {
   ~Mesh() = default;
 
   Mesh(const Mesh& other)
-      : point_list_(other.point_list_),
-        points_(other.points_),
-        faces_(other.faces_),
-        face_data_(other.face_data_),
-        indices_(other.indices_),
-        face_indices_(other.face_indices_) {}
+      : point_list_{other.point_list_},
+        points_{other.points_},
+        faces_{other.faces_},
+        face_data_{other.face_data_},
+        indices_{other.indices_},
+        face_indices_{other.face_indices_} {}
 
   Mesh(Mesh&& other) noexcept
-      : point_list_(std::move(other.point_list_)),
-        points_(std::move(other.points_)),
-        faces_(std::move(other.faces_)),
-        face_data_(std::move(other.face_data_)),
-        indices_(std::move(other.indices_)),
-        face_indices_(std::move(other.face_indices_)),
-        aabb_tree_(std::move(other.aabb_tree_)) {}
+      : point_list_{std::move(other.point_list_)},
+        points_{std::move(other.points_)},
+        faces_{std::move(other.faces_)},
+        face_data_{std::move(other.face_data_)},
+        indices_{std::move(other.indices_)},
+        face_indices_{std::move(other.face_indices_)},
+        aabb_tree_{std::move(other.aabb_tree_)} {}
 
   Mesh& operator=(const Mesh& other) {
     if (this != &other) {
@@ -96,7 +96,7 @@ class Mesh {
 
   Face_handle add_face(const Face& face) {
     faces_.push_back(face);
-    face_data_.push_back({});
+    face_data_.emplace_back();
     return {faces_.size() - 1};
   }
 
@@ -104,9 +104,9 @@ class Mesh {
     points_ = point_list_.into_vector();
 
     std::vector<std::pair<Vertex_handle, Face_handle>> map;
-    std::size_t face_index = 0;
+    std::size_t face_index{};
     for (const auto& face : faces_) {
-      Face_handle fh = {face_index};
+      Face_handle fh{face_index};
       map.emplace_back(face[0], fh);
       map.emplace_back(face[1], fh);
       map.emplace_back(face[2], fh);
@@ -115,7 +115,7 @@ class Mesh {
 
     std::sort(map.begin(), map.end());
 
-    std::size_t index = 0;
+    std::size_t index{};
     Vertex_handle prev_vh;
     for (const auto& [vh, fh] : map) {
       face_indices_.push_back(fh);
@@ -181,7 +181,7 @@ class Mesh {
   }
 
   const AABB_tree<Leaf>& aabb_tree() const {
-    std::lock_guard<std::mutex> lk(aabb_tree_mutex_);
+    std::lock_guard<std::mutex> lk{aabb_tree_mutex_};
 
     if (!aabb_tree_) {
       std::vector<Leaf> leaves;

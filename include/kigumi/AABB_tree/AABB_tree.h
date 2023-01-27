@@ -23,7 +23,7 @@ class AABB_tree {
   using Leaf_ptr_iterator = typename std::vector<Leaf_ptr>::iterator;
 
  public:
-  explicit AABB_tree(std::vector<Leaf>&& leaves) : leaves_(std::move(leaves)) {
+  explicit AABB_tree(std::vector<Leaf>&& leaves) : leaves_{std::move(leaves)} {
     auto num_leaves = leaves_.size();
     if (num_leaves == 0) {
       return;
