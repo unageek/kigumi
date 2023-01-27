@@ -2,11 +2,12 @@
 
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Kigumi_mesh.h>
+#include <kigumi/Null_data.h>
 #include <kigumi/Polygon_soup.h>
 
 #include <utility>
 
-template <class K, class FaceData>
+template <class K, class FaceData = kigumi::Null_data>
 inline kigumi::Kigumi_mesh<K, FaceData> make_cube(const typename K::Point_3& min,
                                                   const typename K::Point_3& max,
                                                   const FaceData& data, bool invert = false) {

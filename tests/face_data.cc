@@ -9,12 +9,11 @@
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point = K::Point_3;
-using kigumi::Operator;
-
 struct Face_data {
   int i{};
 };
 using M = kigumi::Kigumi_mesh<K, Face_data>;
+using kigumi::Operator;
 
 std::pair<double, double> get_areas(const M& m) {
   const auto& soup = m.soup();

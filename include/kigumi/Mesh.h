@@ -4,6 +4,7 @@
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
+#include <kigumi/Null_data.h>
 #include <kigumi/Point_list.h>
 #include <kigumi/Polygon_soup.h>
 
@@ -30,7 +31,7 @@ namespace kigumi {
 //        8:  4 -> c
 //        9:  end
 
-template <class K, class FaceData = std::nullptr_t>
+template <class K, class FaceData = Null_data>
 class Mesh {
   using Face_data = FaceData;
   using Point = typename K::Point_3;

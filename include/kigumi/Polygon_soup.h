@@ -7,6 +7,7 @@
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
+#include <kigumi/Null_data.h>
 #include <kigumi/io.h>
 
 #include <array>
@@ -20,7 +21,7 @@
 
 namespace kigumi {
 
-template <class K, class FaceData = std::nullptr_t>
+template <class K, class FaceData = Null_data>
 class Polygon_soup {
   using Face_data = FaceData;
   using Point = typename K::Point_3;
@@ -79,7 +80,7 @@ class Polygon_soup {
         throw std::runtime_error("not a triangle mesh");
       }
       faces_.push_back({Vertex_handle{face[0]}, Vertex_handle{face[1]}, Vertex_handle{face[2]}});
-      face_data_.push_back({});
+      face_data_.emplace_back();
     }
   }
 
@@ -94,7 +95,7 @@ class Polygon_soup {
 
   Face_handle add_face(const Face& face) {
     faces_.push_back(face);
-    face_data_.push_back({});
+    face_data_.emplace_back();
     return {faces_.size() - 1};
   }
 
@@ -165,9 +166,9 @@ class Polygon_soup {
   mutable std::mutex aabb_tree_mutex_;
 };
 
-template <class K, class Face_data>
-struct Write<Polygon_soup<K, Face_data>> {
-  static void write(std::ostream& out, const Polygon_soup<K, Face_data>& tt) {
+template <class K, class FaceData>
+struct Write<Polygon_soup<K, FaceData>> {
+  static void write(std::ostream& out, const Polygon_soup<K, FaceData>& tt) {
     do_write(out, tt.num_vertices());
     do_write(out, tt.num_faces());
 
@@ -198,9 +199,9 @@ struct Write<Polygon_soup<K, Face_data>> {
   }
 };
 
-template <class K, class Face_data>
-struct Read<Polygon_soup<K, Face_data>> {
-  static void read(std::istream& in, Polygon_soup<K, Face_data>& tt) {
+template <class K, class FaceData>
+struct Read<Polygon_soup<K, FaceData>> {
+  static void read(std::istream& in, Polygon_soup<K, FaceData>& tt) {
     std::size_t num_vertices{};
     std::size_t num_faces{};
     do_read(in, num_vertices);
@@ -232,7 +233,7 @@ struct Read<Polygon_soup<K, Face_data>> {
 
     for (std::size_t i = 0; i < num_faces; ++i) {
       Face face{};
-      Face_data f_data{};
+      FaceData f_data{};
       do_read(in, face[0]);
       do_read(in, face[1]);
       do_read(in, face[2]);

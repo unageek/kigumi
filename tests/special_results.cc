@@ -4,13 +4,12 @@
 #include "make_cube.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
-using Face_data = std::nullptr_t;
 using kigumi::Operator;
 
 auto mk_cube(double length, bool invert = false) {
   auto min = -length / 2.0;
   auto max = length / 2.0;
-  return make_cube<K, Face_data>({min, min, min}, {max, max, max}, nullptr, invert);
+  return make_cube<K>({min, min, min}, {max, max, max}, {}, invert);
 }
 
 TEST(SpecialResultTest, A) {

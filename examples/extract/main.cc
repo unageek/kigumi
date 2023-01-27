@@ -13,7 +13,7 @@ int main(int argc, const char* argv[]) {
   try {
     auto opts = parse_options(argc, argv);
 
-    kigumi::Boolean_operation<K, std::nullptr_t> boolean;
+    kigumi::Boolean_operation<K> boolean;
     kigumi::load(opts.input_file, boolean);
 
     auto result = boolean.apply(opts.op);

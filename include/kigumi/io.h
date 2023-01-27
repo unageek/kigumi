@@ -49,20 +49,6 @@ struct Read<bool> {
 };
 
 template <>
-struct Write<std::nullptr_t> {
-  static void write(std::ostream& /*out*/, const std::nullptr_t& /*tt*/) {
-    // no-op
-  }
-};
-
-template <>
-struct Read<std::nullptr_t> {
-  static void read(std::istream& /*in*/, std::nullptr_t& /*tt*/) {
-    // no-op
-  }
-};
-
-template <>
 struct Write<mpq_class> {
   static void write(std::ostream& out, const mpq_class& tt) {
     do_write(out, tt < 0);

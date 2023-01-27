@@ -9,13 +9,13 @@ using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point = K::Point_3;
 using Triangle = K::Triangle_3;
 using M = kigumi::Kigumi_mesh<K>;
+using kigumi::Operator;
+using kigumi::Polygon_soup;
 
 #define ASSERT_EMPTY(X) ASSERT_TRUE(X.is_empty())
 #define ASSERT_ENTIRE(X) ASSERT_TRUE(X.is_entire())
 
 TEST(SpecialMeshTest, EmptyEmpty) {
-  using kigumi::Operator;
-
   auto m1 = M::empty();
   auto m2 = M::empty();
   auto b = m1.boolean(m2);
@@ -40,8 +40,6 @@ TEST(SpecialMeshTest, EmptyEmpty) {
 }
 
 TEST(SpecialMeshTest, EmptyEntire) {
-  using kigumi::Operator;
-
   auto m1 = M::empty();
   auto m2 = M::entire();
   auto b = m1.boolean(m2);
@@ -66,8 +64,6 @@ TEST(SpecialMeshTest, EmptyEntire) {
 }
 
 TEST(SpecialMeshTest, EntireEmpty) {
-  using kigumi::Operator;
-
   auto m1 = M::entire();
   auto m2 = M::empty();
   auto b = m1.boolean(m2);
@@ -92,8 +88,6 @@ TEST(SpecialMeshTest, EntireEmpty) {
 }
 
 TEST(SpecialMeshTest, EntireEntire) {
-  using kigumi::Operator;
-
   auto m1 = M::entire();
   auto m2 = M::entire();
   auto b = m1.boolean(m2);
@@ -149,9 +143,6 @@ bool is_inverse(const M& m) {
 #define ASSERT_INVERSE(X) ASSERT_TRUE(is_inverse(X))
 
 TEST(SpwcialMeshTest, EmptyNormal) {
-  using kigumi::Operator;
-  using kigumi::Polygon_soup;
-
   Polygon_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -182,9 +173,6 @@ TEST(SpwcialMeshTest, EmptyNormal) {
 }
 
 TEST(SpwcialMeshTest, NormalEmpty) {
-  using kigumi::Operator;
-  using kigumi::Polygon_soup;
-
   Polygon_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -215,9 +203,6 @@ TEST(SpwcialMeshTest, NormalEmpty) {
 }
 
 TEST(SpwcialMeshTest, EntireNormal) {
-  using kigumi::Operator;
-  using kigumi::Polygon_soup;
-
   Polygon_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -248,9 +233,6 @@ TEST(SpwcialMeshTest, EntireNormal) {
 }
 
 TEST(SpwcialMeshTest, NormalEntire) {
-  using kigumi::Operator;
-  using kigumi::Polygon_soup;
-
   Polygon_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -281,9 +263,6 @@ TEST(SpwcialMeshTest, NormalEntire) {
 }
 
 TEST(SpwcialMeshTest, Equivalent) {
-  using kigumi::Operator;
-  using kigumi::Polygon_soup;
-
   Polygon_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -316,9 +295,6 @@ TEST(SpwcialMeshTest, Equivalent) {
 }
 
 TEST(SpwcialMeshTest, Complementary) {
-  using kigumi::Operator;
-  using kigumi::Polygon_soup;
-
   Polygon_soup<K> soup;
   {
     auto vh1 = soup.add_vertex({0, 0, 0});

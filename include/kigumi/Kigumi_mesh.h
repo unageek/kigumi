@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kigumi/Mixed_mesh.h>
+#include <kigumi/Null_data.h>
 #include <kigumi/Operator.h>
 #include <kigumi/Polygon_soup.h>
 #include <kigumi/extract.h>
@@ -42,7 +43,7 @@ struct Read<Kigumi_mesh_kind> {
 template <class K, class FaceData>
 class Boolean_operation;
 
-template <class K, class FaceData = std::nullptr_t>
+template <class K, class FaceData = Null_data>
 class Kigumi_mesh {
   using Face_data = FaceData;
   using Point = typename K::Point_3;
@@ -147,7 +148,7 @@ struct Read<Kigumi_mesh<K, FaceData>> {
   }
 };
 
-template <class K, class FaceData>
+template <class K, class FaceData = Null_data>
 class Boolean_operation {
  public:
   Boolean_operation()
