@@ -72,7 +72,7 @@ class Kigumi_mesh {
 
   bool is_empty_or_entire() const { return is_empty() || is_entire(); }
 
-  CGAL::Oriented_side side_of_mesh(const Point& p) {
+  CGAL::Oriented_side side_of_mesh(const Point& p) const {
     if (is_empty()) {
       return CGAL::ON_POSITIVE_SIDE;
     }
