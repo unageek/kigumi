@@ -71,6 +71,9 @@ class Kigumi_mesh {
 
   bool is_empty_or_entire() const { return is_empty() || is_entire(); }
 
+  // TODO: Prevent inconsistent modification of the polygon soup.
+  Polygon_soup<K, Face_data>& soup() { return soup_; }
+
   const Polygon_soup<K, Face_data>& soup() const { return soup_; }
 
   Boolean_operation<K, Face_data> boolean(const Kigumi_mesh& other) const {
