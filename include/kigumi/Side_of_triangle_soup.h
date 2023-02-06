@@ -44,7 +44,7 @@ class Side_of_triangle_soup {
       auto p_trg = random_point_in_triangle<K>(soup.triangle(fh_trg), gen);
 
       Ray ray{p, p_trg};
-      tree.get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves), ray);
+      tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves), ray);
 
       bool retry{};
       for (const auto* leaf : leaves) {
