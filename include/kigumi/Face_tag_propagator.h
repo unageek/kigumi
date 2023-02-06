@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Mixed.h>
 
 #include <queue>
 #include <stdexcept>
@@ -10,7 +10,8 @@ namespace kigumi {
 template <class K, class FaceData>
 class Face_tag_propagator {
  public:
-  explicit Face_tag_propagator(Mixed_mesh<K, FaceData>& m, const std::unordered_set<Edge>& border)
+  explicit Face_tag_propagator(Mixed_triangle_mesh<K, FaceData>& m,
+                               const std::unordered_set<Edge>& border)
       : m_{m}, border_{border} {
     for (auto fh : m_.faces()) {
       auto tag = m_.data(fh).tag;
@@ -22,7 +23,7 @@ class Face_tag_propagator {
     propagate();
   }
 
-  Face_tag_propagator(Mixed_mesh<K, FaceData>& m, const std::unordered_set<Edge>& border,
+  Face_tag_propagator(Mixed_triangle_mesh<K, FaceData>& m, const std::unordered_set<Edge>& border,
                       Face_handle seed)
       : m_{m}, border_{border} {
     auto tag = m_.data(seed).tag;
@@ -51,7 +52,7 @@ class Face_tag_propagator {
     }
   }
 
-  Mixed_mesh<K, FaceData>& m_;
+  Mixed_triangle_mesh<K, FaceData>& m_;
   const std::unordered_set<Edge>& border_;
   std::queue<Face_handle> queue_;
 };

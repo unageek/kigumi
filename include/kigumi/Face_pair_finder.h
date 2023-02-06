@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kigumi/AABB_tree/Overlap.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_soup.h>
 
 #include <iterator>
 #include <utility>
@@ -12,11 +12,11 @@ namespace kigumi {
 template <class K, class FaceData>
 class Face_pair_finder {
   using Face_pair = std::pair<Face_handle, Face_handle>;
-  using Leaf = typename Polygon_soup<K, FaceData>::Leaf;
+  using Leaf = typename Triangle_soup<K, FaceData>::Leaf;
 
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  Face_pair_finder(const Polygon_soup<K, FaceData>& left, const Polygon_soup<K, FaceData>& right)
+  Face_pair_finder(const Triangle_soup<K, FaceData>& left, const Triangle_soup<K, FaceData>& right)
       : left_{left}, right_{right} {}
 
   std::vector<Face_pair> find_face_pairs() const {
@@ -63,8 +63,8 @@ class Face_pair_finder {
   }
 
  private:
-  const Polygon_soup<K, FaceData>& left_;
-  const Polygon_soup<K, FaceData>& right_;
+  const Triangle_soup<K, FaceData>& left_;
+  const Triangle_soup<K, FaceData>& right_;
 };
 
 }  // namespace kigumi

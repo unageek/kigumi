@@ -1,7 +1,7 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <gtest/gtest.h>
 #include <kigumi/Kigumi_mesh.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_soup.h>
 
 #include <utility>
 
@@ -10,7 +10,7 @@ using Point = K::Point_3;
 using Triangle = K::Triangle_3;
 using M = kigumi::Kigumi_mesh<K>;
 using kigumi::Operator;
-using kigumi::Polygon_soup;
+using kigumi::Triangle_soup;
 
 #define ASSERT_EMPTY(X) ASSERT_TRUE(X.is_empty())
 #define ASSERT_ENTIRE(X) ASSERT_TRUE(X.is_entire())
@@ -143,7 +143,7 @@ bool is_inverse(const M& m) {
 #define ASSERT_INVERSE(X) ASSERT_TRUE(is_inverse(X))
 
 TEST(SpwcialMeshTest, EmptyNormal) {
-  Polygon_soup<K> soup;
+  Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
   auto vh3 = soup.add_vertex({0, 1, 0});
@@ -173,7 +173,7 @@ TEST(SpwcialMeshTest, EmptyNormal) {
 }
 
 TEST(SpwcialMeshTest, NormalEmpty) {
-  Polygon_soup<K> soup;
+  Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
   auto vh3 = soup.add_vertex({0, 1, 0});
@@ -203,7 +203,7 @@ TEST(SpwcialMeshTest, NormalEmpty) {
 }
 
 TEST(SpwcialMeshTest, EntireNormal) {
-  Polygon_soup<K> soup;
+  Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
   auto vh3 = soup.add_vertex({0, 1, 0});
@@ -233,7 +233,7 @@ TEST(SpwcialMeshTest, EntireNormal) {
 }
 
 TEST(SpwcialMeshTest, NormalEntire) {
-  Polygon_soup<K> soup;
+  Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
   auto vh3 = soup.add_vertex({0, 1, 0});
@@ -263,13 +263,13 @@ TEST(SpwcialMeshTest, NormalEntire) {
 }
 
 TEST(SpwcialMeshTest, Equivalent) {
-  Polygon_soup<K> soup;
+  Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
   auto vh3 = soup.add_vertex({0, 1, 0});
   soup.add_face({vh1, vh2, vh3});
 
-  Polygon_soup<K> soup2{soup};
+  Triangle_soup<K> soup2{soup};
 
   M m1{std::move(soup)};
   M m2{std::move(soup2)};
@@ -295,7 +295,7 @@ TEST(SpwcialMeshTest, Equivalent) {
 }
 
 TEST(SpwcialMeshTest, Complementary) {
-  Polygon_soup<K> soup;
+  Triangle_soup<K> soup;
   {
     auto vh1 = soup.add_vertex({0, 0, 0});
     auto vh2 = soup.add_vertex({1, 0, 0});
@@ -303,7 +303,7 @@ TEST(SpwcialMeshTest, Complementary) {
     soup.add_face({vh1, vh2, vh3});
   }
 
-  Polygon_soup<K> soup2;
+  Triangle_soup<K> soup2;
   {
     auto vh1 = soup2.add_vertex({0, 0, 0});
     auto vh2 = soup2.add_vertex({1, 0, 0});

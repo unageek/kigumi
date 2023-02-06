@@ -23,7 +23,7 @@
 namespace kigumi {
 
 template <class K, class FaceData = Null_data>
-class Polygon_soup {
+class Triangle_soup {
   using Bbox = CGAL::Bbox_3;
   using Face_data = FaceData;
   using Point = typename K::Point_3;
@@ -40,20 +40,20 @@ class Polygon_soup {
     Face_handle fh_;
   };
 
-  Polygon_soup() = default;
+  Triangle_soup() = default;
 
-  ~Polygon_soup() = default;
+  ~Triangle_soup() = default;
 
-  Polygon_soup(const Polygon_soup& other)
+  Triangle_soup(const Triangle_soup& other)
       : points_{other.points_}, faces_{other.faces_}, face_data_{other.face_data_} {}
 
-  Polygon_soup(Polygon_soup&& other) noexcept
+  Triangle_soup(Triangle_soup&& other) noexcept
       : points_{std::move(other.points_)},
         faces_{std::move(other.faces_)},
         face_data_{std::move(other.face_data_)},
         aabb_tree_{std::move(other.aabb_tree_)} {}
 
-  Polygon_soup& operator=(const Polygon_soup& other) {
+  Triangle_soup& operator=(const Triangle_soup& other) {
     if (this != &other) {
       points_ = other.points_;
       faces_ = other.faces_;
@@ -63,7 +63,7 @@ class Polygon_soup {
     return *this;
   }
 
-  Polygon_soup& operator=(Polygon_soup&& other) noexcept {
+  Triangle_soup& operator=(Triangle_soup&& other) noexcept {
     points_ = std::move(other.points_);
     faces_ = std::move(other.faces_);
     face_data_ = std::move(other.face_data_);
@@ -71,7 +71,7 @@ class Polygon_soup {
     return *this;
   }
 
-  explicit Polygon_soup(const std::string& filename) {
+  explicit Triangle_soup(const std::string& filename) {
     // CGAL::IO::read_OBJ does not support std::vector<std::array<...>>.
     std::vector<std::vector<std::size_t>> faces;
     CGAL::IO::read_polygon_soup(filename, points_, faces);
@@ -86,8 +86,8 @@ class Polygon_soup {
     }
   }
 
-  Polygon_soup(std::vector<Point>&& points, std::vector<Face>&& faces,
-               std::vector<FaceData>&& face_data)
+  Triangle_soup(std::vector<Point>&& points, std::vector<Face>&& faces,
+                std::vector<FaceData>&& face_data)
       : points_{std::move(points)}, faces_{std::move(faces)}, face_data_{std::move(face_data)} {}
 
   Vertex_handle add_vertex(const Point& p) {
@@ -173,8 +173,8 @@ class Polygon_soup {
 };
 
 template <class K, class FaceData>
-struct Write<Polygon_soup<K, FaceData>> {
-  static void write(std::ostream& out, const Polygon_soup<K, FaceData>& tt) {
+struct Write<Triangle_soup<K, FaceData>> {
+  static void write(std::ostream& out, const Triangle_soup<K, FaceData>& tt) {
     do_write(out, tt.num_vertices());
     do_write(out, tt.num_faces());
 
@@ -206,8 +206,8 @@ struct Write<Polygon_soup<K, FaceData>> {
 };
 
 template <class K, class FaceData>
-struct Read<Polygon_soup<K, FaceData>> {
-  static void read(std::istream& in, Polygon_soup<K, FaceData>& tt) {
+struct Read<Triangle_soup<K, FaceData>> {
+  static void read(std::istream& in, Triangle_soup<K, FaceData>& tt) {
     std::size_t num_vertices{};
     std::size_t num_faces{};
     do_read(in, num_vertices);

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Mixed.h>
 #include <kigumi/Operator.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_soup.h>
 
 #include <array>
 #include <unordered_map>
@@ -12,9 +12,9 @@
 namespace kigumi {
 
 template <class K, class FaceData>
-Polygon_soup<K, FaceData> extract(const Mixed_polygon_soup<K, FaceData>& m, Operator op,
-                                  bool prefer_first) {
-  Polygon_soup<K, FaceData> soup;
+Triangle_soup<K, FaceData> extract(const Mixed_triangle_soup<K, FaceData>& m, Operator op,
+                                   bool prefer_first) {
+  Triangle_soup<K, FaceData> soup;
   std::unordered_map<Vertex_handle, Vertex_handle> map;
 
   auto u_mask = union_mask(op);

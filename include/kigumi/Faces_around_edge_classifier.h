@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Mixed.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -14,7 +14,7 @@ class Faces_around_edge_classifier {
   using Vector_2 = typename K::Vector_2;
 
  public:
-  Faces_around_edge_classifier(Mixed_mesh<K, FaceData>& m, const Edge& edge) {
+  Faces_around_edge_classifier(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge) {
     const auto& p = m.point(edge[0]);
     const auto& q = m.point(edge[1]);
     Plane_3 plane{p, q - p};

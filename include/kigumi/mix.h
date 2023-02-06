@@ -4,9 +4,9 @@
 #include <kigumi/Face_tag_propagator.h>
 #include <kigumi/Faces_around_edge_classifier.h>
 #include <kigumi/Global_face_classifier.h>
-#include <kigumi/Mixed_mesh.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Mixed.h>
 #include <kigumi/Shared_edge_finder.h>
+#include <kigumi/Triangle_soup.h>
 
 #include <iostream>
 #include <iterator>
@@ -15,15 +15,15 @@
 namespace kigumi {
 
 template <class K, class FaceData>
-Mixed_polygon_soup<K, FaceData> mix(const Polygon_soup<K, FaceData>& left,
-                                    const Polygon_soup<K, FaceData>& right) {
+Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
+                                     const Triangle_soup<K, FaceData>& right) {
   std::cout << "Corefining..." << std::endl;
 
   Corefine corefine{left, right};
 
   std::cout << "Constructing mixed mesh..." << std::endl;
 
-  Mixed_mesh<K, FaceData> m;
+  Mixed_triangle_mesh<K, FaceData> m;
 
   std::vector<typename K::Triangle_3> tris;
   for (auto fh : left.faces()) {
@@ -68,7 +68,7 @@ Mixed_polygon_soup<K, FaceData> mix(const Polygon_soup<K, FaceData>& left,
 
   Global_face_classifier{m, shared_edges};
 
-  return m.into_polygon_soup();
+  return m.into_Triangle_soup();
 }
 
 }  // namespace kigumi

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <kigumi/Mesh.h>
 #include <kigumi/Null_data.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_mesh.h>
+#include <kigumi/Triangle_soup.h>
 #include <kigumi/io.h>
 
 #include <iostream>
@@ -53,9 +53,9 @@ struct Read<Mixed_face_data<FaceData>> {
 };
 
 template <class K, class FaceData = Null_data>
-using Mixed_mesh = Mesh<K, Mixed_face_data<FaceData>>;
+using Mixed_triangle_mesh = Triangle_mesh<K, Mixed_face_data<FaceData>>;
 
 template <class K, class FaceData = Null_data>
-using Mixed_polygon_soup = Polygon_soup<K, Mixed_face_data<FaceData>>;
+using Mixed_triangle_soup = Triangle_soup<K, Mixed_face_data<FaceData>>;
 
 }  // namespace kigumi

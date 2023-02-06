@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Mixed.h>
 
 #include <boost/container_hash/hash.hpp>
 #include <functional>
@@ -13,7 +13,7 @@ namespace kigumi {
 template <class K, class FaceData>
 class Shared_edge_finder {
  public:
-  explicit Shared_edge_finder(const Mixed_mesh<K, FaceData>& m) {
+  explicit Shared_edge_finder(const Mixed_triangle_mesh<K, FaceData>& m) {
     std::unordered_set<Edge> left_edges;
 
     for (auto fh : m.faces()) {

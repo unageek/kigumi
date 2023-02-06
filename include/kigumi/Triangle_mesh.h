@@ -7,7 +7,7 @@
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Point_list.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_soup.h>
 
 #include <algorithm>
 #include <boost/range/iterator_range.hpp>
@@ -33,7 +33,7 @@ namespace kigumi {
 //        9:  end
 
 template <class K, class FaceData = Null_data>
-class Mesh {
+class Triangle_mesh {
   using Bbox = CGAL::Bbox_3;
   using Face_data = FaceData;
   using Point = typename K::Point_3;
@@ -50,11 +50,11 @@ class Mesh {
     Face_handle fh_;
   };
 
-  Mesh() = default;
+  Triangle_mesh() = default;
 
-  ~Mesh() = default;
+  ~Triangle_mesh() = default;
 
-  Mesh(const Mesh& other)
+  Triangle_mesh(const Triangle_mesh& other)
       : point_list_{other.point_list_},
         points_{other.points_},
         faces_{other.faces_},
@@ -62,7 +62,7 @@ class Mesh {
         indices_{other.indices_},
         face_indices_{other.face_indices_} {}
 
-  Mesh(Mesh&& other) noexcept
+  Triangle_mesh(Triangle_mesh&& other) noexcept
       : point_list_{std::move(other.point_list_)},
         points_{std::move(other.points_)},
         faces_{std::move(other.faces_)},
@@ -71,7 +71,7 @@ class Mesh {
         face_indices_{std::move(other.face_indices_)},
         aabb_tree_{std::move(other.aabb_tree_)} {}
 
-  Mesh& operator=(const Mesh& other) {
+  Triangle_mesh& operator=(const Triangle_mesh& other) {
     if (this != &other) {
       point_list_ = other.point_list_;
       points_ = other.points_;
@@ -84,7 +84,7 @@ class Mesh {
     return *this;
   }
 
-  Mesh& operator=(Mesh&& other) noexcept {
+  Triangle_mesh& operator=(Triangle_mesh&& other) noexcept {
     point_list_ = std::move(other.point_list_);
     points_ = std::move(other.points_);
     faces_ = std::move(other.faces_);
@@ -201,7 +201,7 @@ class Mesh {
     return *aabb_tree_;
   }
 
-  Polygon_soup<K, FaceData> into_polygon_soup() {
+  Triangle_soup<K, FaceData> into_Triangle_soup() {
     return {std::move(points_), std::move(faces_), std::move(face_data_)};
   }
 

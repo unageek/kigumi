@@ -2,7 +2,7 @@
 
 #include <CGAL/Intersections_3/Triangle_3_Triangle_3.h>
 #include <kigumi/Face_pair_finder.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangulator.h>
 
 #include <iterator>
@@ -23,7 +23,7 @@ class Corefine {
 
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-  Corefine(const Polygon_soup<K, FaceData>& left, const Polygon_soup<K, FaceData>& right)
+  Corefine(const Triangle_soup<K, FaceData>& left, const Triangle_soup<K, FaceData>& right)
       : left_{left}, right_{right} {
     std::cout << "Finding face pairs..." << std::endl;
 
@@ -171,7 +171,7 @@ class Corefine {
   };
 
   template <class OutputIterator>
-  void get_triangles(const Polygon_soup<K, FaceData>& soup, Face_handle fh,
+  void get_triangles(const Triangle_soup<K, FaceData>& soup, Face_handle fh,
                      const std::unordered_map<Face_handle, Triangulator<K>>& triangulators,
                      OutputIterator tris) const {
     auto it = triangulators.find(fh);
@@ -217,9 +217,9 @@ class Corefine {
     }
   }
 
-  const Polygon_soup<K, FaceData>& left_;
+  const Triangle_soup<K, FaceData>& left_;
   std::unordered_map<Face_handle, Triangulator<K>> left_triangulators_;
-  const Polygon_soup<K, FaceData>& right_;
+  const Triangle_soup<K, FaceData>& right_;
   std::unordered_map<Face_handle, Triangulator<K>> right_triangulators_;
 };
 

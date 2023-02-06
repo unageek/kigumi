@@ -1,16 +1,16 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <gtest/gtest.h>
 #include <kigumi/Faces_around_edge_classifier.h>
-#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Mixed.h>
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point = K::Point_3;
 using kigumi::Face_tag;
 using kigumi::Faces_around_edge_classifier;
-using kigumi::Mixed_mesh;
+using kigumi::Mixed_triangle_mesh;
 
 TEST(FacesAroundEdgeClassfierTest, NonOverlapping) {
-  Mixed_mesh<K> m;
+  Mixed_triangle_mesh<K> m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -24,7 +24,7 @@ TEST(FacesAroundEdgeClassfierTest, NonOverlapping) {
 }
 
 TEST(FacesAroundEdgeClassfierTest, NonOverlappingUnknown) {
-  Mixed_mesh<K> m;
+  Mixed_triangle_mesh<K> m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -38,7 +38,7 @@ TEST(FacesAroundEdgeClassfierTest, NonOverlappingUnknown) {
 }
 
 TEST(FacesAroundEdgeClassfierTest, Coplanar) {
-  Mixed_mesh<K> m;
+  Mixed_triangle_mesh<K> m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r = m.add_vertex({1, 0, 0});
@@ -51,7 +51,7 @@ TEST(FacesAroundEdgeClassfierTest, Coplanar) {
 }
 
 TEST(FacesAroundEdgeClassfierTest, Opposite) {
-  Mixed_mesh<K> m;
+  Mixed_triangle_mesh<K> m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r = m.add_vertex({1, 0, 0});

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <kigumi/Mixed_mesh.h>
+#include <kigumi/Mixed.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Operator.h>
-#include <kigumi/Polygon_soup.h>
+#include <kigumi/Triangle_soup.h>
 #include <kigumi/extract.h>
 #include <kigumi/io.h>
 #include <kigumi/mix.h>
@@ -51,7 +51,7 @@ class Kigumi_mesh {
  public:
   Kigumi_mesh() = default;
 
-  explicit Kigumi_mesh(Polygon_soup<K, Face_data>&& soup)
+  explicit Kigumi_mesh(Triangle_soup<K, Face_data>&& soup)
       : kind_{soup.num_faces() == 0 ? Kigumi_mesh_kind::Empty : Kigumi_mesh_kind::Normal},
         soup_{std::move(soup)} {}
 
@@ -60,7 +60,7 @@ class Kigumi_mesh {
   static Kigumi_mesh entire() { return {Kigumi_mesh_kind::Entire, {}}; }
 
   static Kigumi_mesh import(const std::string& filename) {
-    return Kigumi_mesh{Polygon_soup<K, Face_data>{filename}};
+    return Kigumi_mesh{Triangle_soup<K, Face_data>{filename}};
   }
 
   void export_lossy(const std::string& filename) const { soup_.save(filename); }
@@ -72,9 +72,9 @@ class Kigumi_mesh {
   bool is_empty_or_entire() const { return is_empty() || is_entire(); }
 
   // TODO: Prevent inconsistent modification of the polygon soup.
-  Polygon_soup<K, Face_data>& soup() { return soup_; }
+  Triangle_soup<K, Face_data>& soup() { return soup_; }
 
-  const Polygon_soup<K, Face_data>& soup() const { return soup_; }
+  const Triangle_soup<K, Face_data>& soup() const { return soup_; }
 
   Boolean_operation<K, Face_data> boolean(const Kigumi_mesh& other) const {
     const auto& a = *this;
@@ -128,11 +128,11 @@ class Kigumi_mesh {
   friend struct Read<Kigumi_mesh>;
   friend struct Write<Kigumi_mesh>;
 
-  Kigumi_mesh(Kigumi_mesh_kind kind, Polygon_soup<K, Face_data>&& soup)
+  Kigumi_mesh(Kigumi_mesh_kind kind, Triangle_soup<K, Face_data>&& soup)
       : kind_{kind}, soup_{std::move(soup)} {}
 
   Kigumi_mesh_kind kind_{Kigumi_mesh_kind::Normal};
-  Polygon_soup<K, Face_data> soup_;
+  Triangle_soup<K, Face_data> soup_;
 };
 
 template <class K, class FaceData>
@@ -159,7 +159,7 @@ class Boolean_operation {
 
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
-                    Mixed_polygon_soup<K, FaceData>&& m)
+                    Mixed_triangle_soup<K, FaceData>&& m)
       : first_kind_{first_kind}, second_kind_{second_kind}, m_{std::move(m)} {}
 
   Kigumi_mesh<K, FaceData> apply(Operator op, bool prefer_first = true) const {
@@ -263,7 +263,7 @@ class Boolean_operation {
 
   Kigumi_mesh_kind first_kind_;
   Kigumi_mesh_kind second_kind_;
-  Mixed_polygon_soup<K, FaceData> m_;
+  Mixed_triangle_soup<K, FaceData> m_;
 };
 
 template <class K, class FaceData>
