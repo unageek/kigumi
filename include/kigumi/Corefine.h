@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CGAL/intersection_3.h>
+#include <CGAL/Intersections_3/Triangle_3_Triangle_3.h>
 #include <kigumi/Face_pair_finder.h>
 #include <kigumi/Polygon_soup.h>
 #include <kigumi/Triangulator.h>

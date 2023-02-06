@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CGAL/intersection_3.h>
+#include <CGAL/Intersections_3/Ray_3_Triangle_3.h>
 #include <kigumi/AABB_tree/Overlap.h>
 #include <kigumi/Mixed_mesh.h>
 
