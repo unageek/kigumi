@@ -3,6 +3,7 @@
 #include <CGAL/Intersections_3/Ray_3_Triangle_3.h>
 #include <kigumi/AABB_tree/Overlap.h>
 #include <kigumi/Mixed.h>
+#include <kigumi/random_point_in_triangle.h>
 
 #include <algorithm>
 #include <iterator>
@@ -45,8 +46,8 @@ class Global_face_classifier {
           continue;
         }
 
-        auto p_src = random_point_in_triangle(m.triangle(fh_src), gen);
-        auto p_trg = random_point_in_triangle(m.triangle(fh_trg), gen);
+        auto p_src = random_point_in_triangle<K>(m.triangle(fh_src), gen);
+        auto p_trg = random_point_in_triangle<K>(m.triangle(fh_trg), gen);
 
         auto result = bounded_side(p_src, p_trg, f_src.from_left);
         if (result && *result != 0) {
@@ -153,28 +154,6 @@ class Global_face_classifier {
     }
 
     return representative_faces;
-  }
-
-  // CGAL::Random_points_in_triangle_3 is inexact, so use this instead.
-  static Point random_point_in_triangle(const Triangle& tri, std::mt19937& gen) {
-    // Use float to get less number of bits.
-    std::uniform_real_distribution<float> dist{0.0, 1.0};
-    const auto& p = tri[0];
-    const auto& q = tri[1];
-    const auto& r = tri[2];
-    FT a1{dist(gen)};
-    FT a2{dist(gen)};
-    if (a1 > a2) {
-      std::swap(a1, a2);
-    }
-    auto b1 = a1;
-    auto b2 = a2 - a1;
-    auto b3 = 1.0 - a2;
-    return {
-        b1 * p.x() + b2 * q.x() + b3 * r.x(),
-        b1 * p.y() + b2 * q.y() + b3 * r.y(),
-        b1 * p.z() + b2 * q.z() + b3 * r.z(),
-    };
   }
 
   Mixed_triangle_mesh<K, FaceData>& m_;
