@@ -137,6 +137,8 @@ class Mesh {
 
   Vertex_iterator vertices_end() const { return Vertex_iterator({points_.size()}); }
 
+  auto vertices() const { return boost::make_iterator_range(vertices_begin(), vertices_end()); }
+
   Face_iterator faces_begin() const { return Face_iterator({0}); }
 
   Face_iterator faces_end() const { return Face_iterator({faces_.size()}); }
