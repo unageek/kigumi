@@ -1,5 +1,6 @@
 #pragma once
 
+#include <CGAL/Bbox_3.h>
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_items.h>
@@ -33,6 +34,7 @@ namespace kigumi {
 
 template <class K, class FaceData = Null_data>
 class Mesh {
+  using Bbox = CGAL::Bbox_3;
   using Face_data = FaceData;
   using Point = typename K::Point_3;
   using Triangle = typename K::Triangle_3;
@@ -182,6 +184,8 @@ class Mesh {
     const auto& f = face(handle);
     return {point(f[0]), point(f[1]), point(f[2])};
   }
+
+  Bbox bbox() const { return CGAL::bbox_3(points_.begin(), points_.end()); }
 
   const AABB_tree<Leaf>& aabb_tree() const {
     std::lock_guard<std::mutex> lk{aabb_tree_mutex_};
