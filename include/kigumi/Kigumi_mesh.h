@@ -3,6 +3,7 @@
 #include <kigumi/Mixed.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Operator.h>
+#include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/extract.h>
 #include <kigumi/io.h>
@@ -70,6 +71,16 @@ class Kigumi_mesh {
   bool is_entire() const { return kind_ == Kigumi_mesh_kind::Entire; }
 
   bool is_empty_or_entire() const { return is_empty() || is_entire(); }
+
+  CGAL::Oriented_side side_of_mesh(const Point& p) {
+    if (is_empty()) {
+      return CGAL::ON_POSITIVE_SIDE;
+    }
+    if (is_entire()) {
+      return CGAL::ON_NEGATIVE_SIDE;
+    }
+    return Side_of_triangle_soup<K, FaceData>{}(soup(), p);
+  }
 
   // TODO: Prevent inconsistent modification of the polygon soup.
   Triangle_soup<K, Face_data>& soup() { return soup_; }
@@ -215,7 +226,7 @@ class Boolean_operation {
       }
     }
 
-    throw std::runtime_error("Input meshes are inconsistently oriented");
+    throw std::runtime_error("input meshes are inconsistently oriented");
   }
 
  private:
@@ -257,7 +268,7 @@ class Boolean_operation {
       case Operator::O:  // ∅
         return false;
       default:
-        throw std::runtime_error("Unknown operator");
+        throw std::runtime_error("invalid operator");
     }
   }
 
