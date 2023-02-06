@@ -19,6 +19,7 @@ class Side_of_triangle_soup {
   using FT = typename K::FT;
   using Leaf = typename Triangle_soup<K, FaceData>::Leaf;
   using Point = typename K::Point_3;
+  using Segment = typename K::Segment_3;
   using Ray = typename K::Ray_3;
 
  public:
@@ -50,36 +51,24 @@ class Side_of_triangle_soup {
       for (const auto* leaf : leaves) {
         auto fh = leaf->face_handle();
         auto tri = soup.triangle(fh);
-        CGAL::Intersections::internal::r3t3_do_intersect_endpoint_position_visitor visitor;
-        auto res = CGAL::Intersections::internal::do_intersect(tri, ray, K(), visitor);
-        if (!res.first) {
+
+        auto result = CGAL::intersection(tri, ray);
+        if (!result) {
           continue;
         }
 
-        switch (res.second) {
-          case CGAL::Intersections::internal::R3T3_intersection::ENDPOINT_IN_TRIANGLE:
+        if (const auto* point = boost::get<Point>(&*result)) {
+          if (*point == p) {
             return CGAL::ON_ORIENTED_BOUNDARY;
-
-          case CGAL::Intersections::internal::R3T3_intersection::COPLANAR_RAY:
-          case CGAL::Intersections::internal::R3T3_intersection::CROSS_SEGMENT:
-          case CGAL::Intersections::internal::R3T3_intersection::CROSS_VERTEX:
-            retry = true;
-            break;
-
-          case CGAL::Intersections::internal::R3T3_intersection::CROSS_FACET: {
-            auto result = CGAL::intersection(tri, ray);
-            if (result) {
-              if (const auto* point = boost::get<Point>(&*result)) {
-                auto d = CGAL::squared_distance(p, *point);
-                intersections.push_back({d, fh});
-              }
-            }
-            break;
           }
-
-          default:
-            assert(false);
+          auto d = CGAL::squared_distance(p, *point);
+          intersections.push_back({d, fh});
+        } else if (const auto* segment = boost::get<Segment>(&*result)) {
+          if (segment->source() == p || segment->target() == p) {
             return CGAL::ON_ORIENTED_BOUNDARY;
+          }
+          retry = true;
+          break;
         }
       }
 
@@ -87,18 +76,23 @@ class Side_of_triangle_soup {
         continue;
       }
 
-      auto it = std::min_element(
-          intersections.begin(), intersections.end(),
-          [](const auto& a, const auto& b) { return a.squared_distance < b.squared_distance; });
+      if (intersections.size() >= 2) {
+        std::partial_sort(intersections.begin(), intersections.begin() + 2, intersections.end(),
+                          [](const auto& a, const auto& b) { return a.distance < b.distance; });
 
-      auto tri = soup.triangle(it->fh);
+        if (intersections.at(0).distance == intersections.at(1).distance) {
+          continue;
+        }
+      }
+
+      auto tri = soup.triangle(intersections.at(0).fh);
       return tri.supporting_plane().oriented_side(p);
     }
   }
 
  private:
   struct Intersection {
-    FT squared_distance;
+    FT distance;
     Face_handle fh;
   };
 };
