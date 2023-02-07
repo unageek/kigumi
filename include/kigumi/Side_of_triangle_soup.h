@@ -44,6 +44,10 @@ class Side_of_triangle_soup {
       Face_handle fh_trg{dist(gen)};
       auto p_trg = random_point_in_triangle<K>(soup.triangle(fh_trg), gen);
 
+      if (p == p_trg) {
+        return CGAL::ON_ORIENTED_BOUNDARY;
+      }
+
       Ray ray{p, p_trg};
       tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves), ray);
 
