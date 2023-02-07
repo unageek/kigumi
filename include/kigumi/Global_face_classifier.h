@@ -49,9 +49,9 @@ class Global_face_classifier {
         auto p_src = random_point_in_triangle<K>(m.triangle(fh_src), gen);
         auto p_trg = random_point_in_triangle<K>(m.triangle(fh_trg), gen);
 
-        auto result = bounded_side(p_src, p_trg, f_src.from_left);
-        if (result && *result != 0) {
-          f_src.tag = *result == 1 ? Face_tag::Union : Face_tag::Intersection;
+        auto result = oriented_side(p_src, p_trg, f_src.from_left);
+        if (result && *result != CGAL::ON_ORIENTED_BOUNDARY) {
+          f_src.tag = *result == CGAL::ON_POSITIVE_SIDE ? Face_tag::Union : Face_tag::Intersection;
           Face_tag_propagator{m, border, fh_src};
           break;
         }
@@ -65,10 +65,10 @@ class Global_face_classifier {
     Face_handle fh;
   };
 
-  std::optional<CGAL::Sign> bounded_side(const Point& p_src, const Point& p_trg,
-                                         bool src_from_left) const {
+  std::optional<CGAL::Oriented_side> oriented_side(const Point& p_src, const Point& p_trg,
+                                                   bool src_from_left) const {
     if (p_src == p_trg) {
-      return CGAL::ZERO;
+      return CGAL::ON_ORIENTED_BOUNDARY;
     }
 
     Ray ray{p_src, p_trg};
@@ -90,9 +90,15 @@ class Global_face_classifier {
       }
 
       if (const auto* p = boost::get<Point>(&*result)) {
+        if (*p == p_src) {
+          return CGAL::ON_ORIENTED_BOUNDARY;
+        }
         auto d = CGAL::squared_distance(p_src, *p);
         intersections.push_back({d, fh});
       } else if (const auto* s = boost::get<Segment>(&*result)) {
+        if (s->source() == p_src && s->target() == p_src) {
+          return CGAL::ON_ORIENTED_BOUNDARY;
+        }
         return {};
       }
     }
