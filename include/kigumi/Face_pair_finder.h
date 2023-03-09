@@ -15,6 +15,7 @@ template <class K, class FaceData>
 class Face_pair_finder {
   using Face_pair = std::pair<Face_handle, Face_handle>;
   using Leaf = typename Triangle_soup<K, FaceData>::Leaf;
+  using Triangle = typename K::Triangle_3;
 
  public:
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -22,6 +23,8 @@ class Face_pair_finder {
       : left_{left}, right_{right} {}
 
   std::vector<Face_pair> find_face_pairs() const {
+    // Optimization: skip corefinement involving coincident (coplanar or opposite) faces.
+
     std::unordered_set<Face_handle> left_fhs_to_skip;
     std::unordered_set<Face_handle> right_fhs_to_skip;
     {
@@ -44,9 +47,7 @@ class Face_pair_finder {
                                                                     right_.triangle(fh));
             for (const auto* leaf : leaves) {
               auto left_tri = left_.triangle(leaf->face_handle());
-              if (left_tri[0] == right_tri[0] &&
-                  ((left_tri[1] == right_tri[1] && left_tri[2] == right_tri[2]) ||
-                   (left_tri[1] == right_tri[2] && left_tri[2] == right_tri[1]))) {
+              if (coincide(left_tri, right_tri)) {
                 local_pairs.emplace_back(leaf->face_handle(), fh);
               }
             }
@@ -63,9 +64,7 @@ class Face_pair_finder {
                                                                      left_.triangle(fh));
             for (const auto* leaf : leaves) {
               auto right_tri = right_.triangle(leaf->face_handle());
-              if (left_tri[0] == right_tri[0] &&
-                  ((left_tri[1] == right_tri[1] && left_tri[2] == right_tri[2]) ||
-                   (left_tri[1] == right_tri[2] && left_tri[2] == right_tri[1]))) {
+              if (coincide(left_tri, right_tri)) {
                 local_pairs.emplace_back(fh, leaf->face_handle());
               }
             }
@@ -143,6 +142,12 @@ class Face_pair_finder {
   }
 
  private:
+  static bool coincide(const Triangle& a, const Triangle& b) {
+    // Swapping the last two vertices is what `extract` does to invert a triangle.
+    // We do not check other combinations at the moment.
+    return a[0] == b[0] && ((a[1] == b[1] && a[2] == b[2]) || (a[1] == b[2] && a[2] == b[1]));
+  }
+
   const Triangle_soup<K, FaceData>& left_;
   const Triangle_soup<K, FaceData>& right_;
 };
