@@ -5,7 +5,6 @@
 template <class K>
 class Coincide {
   using Bbox = CGAL::Bbox_3;
-  using FT = typename K::FT;
   using Triangle = typename K::Triangle_3;
 
  public:
