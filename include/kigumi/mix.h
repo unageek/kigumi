@@ -58,8 +58,13 @@ Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
 
   Shared_edge_finder shared_edge_finder{m};
   const auto& shared_edges = shared_edge_finder.shared_edges();
-  for (const auto& edge : shared_edges) {
-    Faces_around_edge_classifier(m, edge);
+
+  {
+    std::vector<Edge> shared_edges_vec(shared_edges.begin(), shared_edges.end());
+#pragma omp parallel for schedule(guided)
+    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(shared_edges_vec.size()); ++i) {
+      Faces_around_edge_classifier(m, shared_edges_vec.at(i));
+    }
   }
 
   Face_tag_propagator{m, shared_edges};
