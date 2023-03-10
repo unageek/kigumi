@@ -65,7 +65,7 @@ template <class K>
 class Triangulator {
   using Point_3 = typename K::Point_3;
   using Triangle_3 = typename K::Triangle_3;
-  using Vb = CGAL::Triangulation_vertex_base_with_info_2<Point_3, K>;
+  using Vb = CGAL::Triangulation_vertex_base_with_info_2<std::size_t, K>;
   using Fb = CGAL::Constrained_triangulation_face_base_2<K>;
   using Tds = CGAL::Triangulation_data_structure_2<Vb, Fb>;
   using CDT = CGAL::Constrained_Delaunay_triangulation_2<K, Tds>;
@@ -74,28 +74,29 @@ class Triangulator {
   using Vertex_handle = typename Tds::Vertex_handle;
   using Intersection_of_constraints_exception = typename CDT::Intersection_of_constraints_exception;
 
-  explicit Triangulator(const Triangle_3& triangle) : projector_(triangle) {
+  explicit Triangulator(const Triangle_3& triangle, const std::array<std::size_t, 3>& ids)
+      : projector_(triangle) {
     auto p = triangle.vertex(0);
     auto q = triangle.vertex(1);
     auto r = triangle.vertex(2);
-    insert(p);
-    insert(q);
-    insert(r);
+    insert(p, ids[0]);
+    insert(q, ids[1]);
+    insert(r, ids[2]);
   }
 
   template <class OutputIterator>
   void get_triangles(OutputIterator tris) const {
     for (auto it = cdt_.finite_faces_begin(); it != cdt_.finite_faces_end(); ++it) {
-      const auto& p = it->vertex(0)->info();
-      const auto& q = it->vertex(1)->info();
-      const auto& r = it->vertex(2)->info();
-      *tris++ = {p, q, r};
+      auto id0 = it->vertex(0)->info();
+      auto id1 = it->vertex(1)->info();
+      auto id2 = it->vertex(2)->info();
+      *tris++ = {id0, id1, id2};
     }
   }
 
-  Vertex_handle insert(const Point_3& p) {
+  Vertex_handle insert(const Point_3& p, std::size_t id) {
     auto vh = cdt_.insert(projector_(p));
-    vh->info() = p;
+    vh->info() = id;
     return vh;
   }
 

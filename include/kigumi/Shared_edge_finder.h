@@ -35,7 +35,7 @@ class Shared_edge_finder {
         continue;
       }
 
-      const auto f = m.face(fh);
+      const auto& f = m.face(fh);
       auto e1 = make_edge(f[0], f[1]);
       auto e2 = make_edge(f[1], f[2]);
       auto e3 = make_edge(f[2], f[0]);

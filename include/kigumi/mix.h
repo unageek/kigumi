@@ -23,17 +23,15 @@ Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
 
   std::cout << "Constructing mixed mesh..." << std::endl;
 
-  Mixed_triangle_mesh<K, FaceData> m;
+  Mixed_triangle_mesh<K, FaceData> m(corefine.point_list().into_vector());
 
-  std::vector<typename K::Triangle_3> tris;
+  std::vector<std::array<std::size_t, 3>> tris;
   for (auto fh : left.faces()) {
     tris.clear();
     corefine.get_left_triangles(fh, std::back_inserter(tris));
     for (const auto& tri : tris) {
-      auto p = tri.vertex(0);
-      auto q = tri.vertex(1);
-      auto r = tri.vertex(2);
-      auto new_fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
+      auto new_fh =
+          m.add_face({Vertex_handle{tri[0]}, Vertex_handle{tri[1]}, Vertex_handle{tri[2]}});
       m.data(new_fh).from_left = true;
       m.data(new_fh).data = left.data(fh);
     }
@@ -43,10 +41,8 @@ Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
     tris.clear();
     corefine.get_right_triangles(fh, std::back_inserter(tris));
     for (const auto& tri : tris) {
-      auto p = tri.vertex(0);
-      auto q = tri.vertex(1);
-      auto r = tri.vertex(2);
-      auto new_fh = m.add_face({m.add_vertex(p), m.add_vertex(q), m.add_vertex(r)});
+      auto new_fh =
+          m.add_face({Vertex_handle{tri[0]}, Vertex_handle{tri[1]}, Vertex_handle{tri[2]}});
       m.data(new_fh).from_left = false;
       m.data(new_fh).data = right.data(fh);
     }
@@ -62,6 +58,7 @@ Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
   {
     std::vector<Edge> shared_edges_vec(shared_edges.begin(), shared_edges.end());
 #pragma omp parallel for schedule(guided)
+    // NOLINTNEXTLINE(modernize-loop-convert)
     for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(shared_edges_vec.size()); ++i) {
       Faces_around_edge_classifier(m, shared_edges_vec.at(i));
     }

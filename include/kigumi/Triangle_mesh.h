@@ -4,7 +4,6 @@
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
-#include <kigumi/Point_list.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <algorithm>
@@ -42,16 +41,14 @@ class Triangle_mesh {
   ~Triangle_mesh() = default;
 
   Triangle_mesh(const Triangle_mesh& other)
-      : point_list_{other.point_list_},
-        points_{other.points_},
+      : points_{other.points_},
         faces_{other.faces_},
         face_data_{other.face_data_},
         indices_{other.indices_},
         face_indices_{other.face_indices_} {}
 
   Triangle_mesh(Triangle_mesh&& other) noexcept
-      : point_list_{std::move(other.point_list_)},
-        points_{std::move(other.points_)},
+      : points_{std::move(other.points_)},
         faces_{std::move(other.faces_)},
         face_data_{std::move(other.face_data_)},
         indices_{std::move(other.indices_)},
@@ -59,7 +56,6 @@ class Triangle_mesh {
 
   Triangle_mesh& operator=(const Triangle_mesh& other) {
     if (this != &other) {
-      point_list_ = other.point_list_;
       points_ = other.points_;
       faces_ = other.faces_;
       face_data_ = other.face_data_;
@@ -70,7 +66,6 @@ class Triangle_mesh {
   }
 
   Triangle_mesh& operator=(Triangle_mesh&& other) noexcept {
-    point_list_ = std::move(other.point_list_);
     points_ = std::move(other.points_);
     faces_ = std::move(other.faces_);
     face_data_ = std::move(other.face_data_);
@@ -79,7 +74,12 @@ class Triangle_mesh {
     return *this;
   }
 
-  Vertex_handle add_vertex(const Point& p) { return {point_list_.insert(p)}; }
+  explicit Triangle_mesh(std::vector<Point>&& points) : points_{std::move(points)} {}
+
+  Vertex_handle add_vertex(const Point& p) {
+    points_.push_back(p);
+    return {points_.size() - 1};
+  }
 
   Face_handle add_face(const Face& face) {
     faces_.push_back(face);
@@ -88,8 +88,6 @@ class Triangle_mesh {
   }
 
   void finalize() {
-    points_ = point_list_.into_vector();
-
     std::vector<std::pair<Vertex_handle, Face_handle>> map;
     std::size_t face_index{};
     for (const auto& face : faces_) {
@@ -176,7 +174,6 @@ class Triangle_mesh {
   }
 
  private:
-  Point_list<K> point_list_;
   std::vector<Point> points_;
   std::vector<Face> faces_;
   std::vector<Face_data> face_data_;
