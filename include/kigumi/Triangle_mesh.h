@@ -1,8 +1,6 @@
 #pragma once
 
 #include <CGAL/Bbox_3.h>
-#include <kigumi/AABB_tree/AABB_leaf.h>
-#include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
@@ -12,7 +10,6 @@
 #include <algorithm>
 #include <boost/range/iterator_range.hpp>
 #include <memory>
-#include <mutex>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -40,16 +37,6 @@ class Triangle_mesh {
   using Triangle = typename K::Triangle_3;
 
  public:
-  class Leaf : public AABB_leaf {
-   public:
-    Leaf(const Triangle& tri, Face_handle fh) : AABB_leaf{tri.bbox()}, fh_{fh} {}
-
-    Face_handle face_handle() const { return fh_; }
-
-   private:
-    Face_handle fh_;
-  };
-
   Triangle_mesh() = default;
 
   ~Triangle_mesh() = default;
@@ -68,8 +55,7 @@ class Triangle_mesh {
         faces_{std::move(other.faces_)},
         face_data_{std::move(other.face_data_)},
         indices_{std::move(other.indices_)},
-        face_indices_{std::move(other.face_indices_)},
-        aabb_tree_{std::move(other.aabb_tree_)} {}
+        face_indices_{std::move(other.face_indices_)} {}
 
   Triangle_mesh& operator=(const Triangle_mesh& other) {
     if (this != &other) {
@@ -79,7 +65,6 @@ class Triangle_mesh {
       face_data_ = other.face_data_;
       indices_ = other.indices_;
       face_indices_ = other.face_indices_;
-      aabb_tree_.reset();
     }
     return *this;
   }
@@ -91,7 +76,6 @@ class Triangle_mesh {
     face_data_ = std::move(other.face_data_);
     indices_ = std::move(other.indices_);
     face_indices_ = std::move(other.face_indices_);
-    aabb_tree_ = std::move(other.aabb_tree_);
     return *this;
   }
 
@@ -187,20 +171,6 @@ class Triangle_mesh {
 
   Bbox bbox() const { return CGAL::bbox_3(points_.begin(), points_.end()); }
 
-  const AABB_tree<Leaf>& aabb_tree() const {
-    std::lock_guard<std::mutex> lk{aabb_tree_mutex_};
-
-    if (!aabb_tree_) {
-      std::vector<Leaf> leaves;
-      for (auto fh : faces()) {
-        leaves.emplace_back(triangle(fh), fh);
-      }
-      aabb_tree_ = std::make_unique<AABB_tree<Leaf>>(std::move(leaves));
-    }
-
-    return *aabb_tree_;
-  }
-
   Triangle_soup<K, FaceData> into_Triangle_soup() {
     return {std::move(points_), std::move(faces_), std::move(face_data_)};
   }
@@ -212,8 +182,6 @@ class Triangle_mesh {
   std::vector<Face_data> face_data_;
   std::vector<std::size_t> indices_;
   std::vector<Face_handle> face_indices_;
-  mutable std::unique_ptr<AABB_tree<Leaf>> aabb_tree_;
-  mutable std::mutex aabb_tree_mutex_;
 };
 
 }  // namespace kigumi

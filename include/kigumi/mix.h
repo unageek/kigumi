@@ -71,7 +71,7 @@ Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
 
   std::cout << "Global classification..." << std::endl;
 
-  Global_face_classifier{m, shared_edges};
+  Global_face_classifier{m, shared_edges, left, right};
 
   return m.into_Triangle_soup();
 }
