@@ -44,7 +44,7 @@ class Face_pair_finder {
             auto right_tri = right_.triangle(fh);
             leaves.clear();
             left_tree.template get_intersecting_leaves<Coincide<K>>(std::back_inserter(leaves),
-                                                                    right_.triangle(fh));
+                                                                    right_.triangle(fh).bbox());
             for (const auto* leaf : leaves) {
               auto left_tri = left_.triangle(leaf->face_handle());
               if (coincide(left_tri, right_tri)) {
@@ -61,7 +61,7 @@ class Face_pair_finder {
             auto left_tri = left_.triangle(fh);
             leaves.clear();
             right_tree.template get_intersecting_leaves<Coincide<K>>(std::back_inserter(leaves),
-                                                                     left_.triangle(fh));
+                                                                     left_.triangle(fh).bbox());
             for (const auto* leaf : leaves) {
               auto right_tri = right_.triangle(leaf->face_handle());
               if (coincide(left_tri, right_tri)) {
@@ -101,7 +101,7 @@ class Face_pair_finder {
 
             leaves.clear();
             left_tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves),
-                                                                   right_.triangle(fh));
+                                                                   right_.triangle(fh).bbox());
             for (const auto* leaf : leaves) {
               if (left_fhs_to_skip.contains(leaf->face_handle())) {
                 continue;
@@ -122,7 +122,7 @@ class Face_pair_finder {
 
             leaves.clear();
             right_tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves),
-                                                                    left_.triangle(fh));
+                                                                    left_.triangle(fh).bbox());
             for (const auto* leaf : leaves) {
               if (right_fhs_to_skip.contains(leaf->face_handle())) {
                 continue;

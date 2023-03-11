@@ -12,9 +12,12 @@ class Overlap {
   using Bbox = CGAL::Bbox_3;
   using FT = typename K::FT;
   using Ray = typename K::Ray_3;
-  using Triangle = typename K::Triangle_3;
 
  public:
+  static bool do_intersect(const Bbox& bbox, const Bbox& query_bbox) {
+    return CGAL::do_overlap(bbox, query_bbox);
+  }
+
   static bool do_intersect(const Bbox& bbox, const Ray& ray) {
     auto p = ray.source();
     auto d = ray.direction();
@@ -49,10 +52,6 @@ class Overlap {
     }
 
     return true;
-  }
-
-  static bool do_intersect(const Bbox& bbox, const Triangle& triangle) {
-    return CGAL::do_overlap(bbox, triangle.bbox());
   }
 };
 
