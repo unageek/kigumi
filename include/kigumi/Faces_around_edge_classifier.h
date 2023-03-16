@@ -138,9 +138,12 @@ class Faces_around_edge_classifier {
       }
     }
 
-    for (const auto& face : faces) {
-      auto fh = face.fh;
-      Face_tag_propagator{m, border, fh};
+    for (const auto& f : faces) {
+      auto fh = f.fh;
+      auto tag = m.data(fh).tag;
+      if (tag == Face_tag::Union || tag == Face_tag::Intersection) {
+        Face_tag_propagator{m, border, fh};
+      }
     }
   }
 

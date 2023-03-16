@@ -17,14 +17,20 @@ TEST(FacesAroundEdgeClassfierTest, NonOverlapping) {
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
   auto r1 = m.add_vertex({0, 1, 0});
+  auto r2 = m.add_vertex({-1, 0, 0});
+  auto r3 = m.add_vertex({0, -1, 0});
   auto f0 = m.add_face({p, q, r0});
-  auto f1 = m.add_face({p, q, r1});
+  auto f1 = m.add_face({q, p, r1});
+  auto f2 = m.add_face({q, p, r2});
+  auto f3 = m.add_face({p, q, r3});
   m.finalize();
   Shared_edge_finder shared_edge_finder{m};
   const auto& shared_edges = shared_edge_finder.shared_edges();
   Faces_around_edge_classifier{m, {p, q}, shared_edges};
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Intersection);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::Union);
   ASSERT_EQ(m.data(f1).tag, Face_tag::Union);
+  ASSERT_EQ(m.data(f2).tag, Face_tag::Intersection);
+  ASSERT_EQ(m.data(f3).tag, Face_tag::Intersection);
 }
 
 TEST(FacesAroundEdgeClassfierTest, NonOverlappingUnknown) {
