@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kigumi/AABB_tree/Overlap.h>
+#include <kigumi/Face_tag_propagator.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>

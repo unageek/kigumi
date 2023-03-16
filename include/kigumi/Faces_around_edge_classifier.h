@@ -1,9 +1,11 @@
 #pragma once
 
+#include <kigumi/Face_tag_propagator.h>
 #include <kigumi/Mixed.h>
 
 #include <algorithm>
 #include <stdexcept>
+#include <unordered_set>
 #include <vector>
 
 namespace kigumi {
@@ -14,7 +16,19 @@ class Faces_around_edge_classifier {
   using Vector_2 = typename K::Vector_2;
 
  public:
-  Faces_around_edge_classifier(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge) {
+  Faces_around_edge_classifier(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge,
+                               const std::unordered_set<Edge>& border) {
+    bool found_untagged_face{};
+    for (auto fh : m.faces_around_edge(edge)) {
+      if (m.data(fh).tag == Face_tag::Unknown) {
+        found_untagged_face = true;
+        break;
+      }
+    }
+    if (!found_untagged_face) {
+      return;
+    }
+
     const auto& p = m.point(edge[0]);
     const auto& q = m.point(edge[1]);
     Plane_3 plane{p, q - p};
@@ -78,7 +92,8 @@ class Faces_around_edge_classifier {
       const auto& fj = faces.at(j);
       auto& fj_data = m.data(fj.fh);
 
-      if (fi_data.tag != Face_tag::Unknown || fj_data.tag != Face_tag::Unknown) {
+      if (fi_data.tag == Face_tag::Coplanar || fi_data.tag == Face_tag::Opposite ||
+          fj_data.tag == Face_tag::Coplanar || fj_data.tag == Face_tag::Opposite) {
         continue;
       }
 
@@ -120,6 +135,14 @@ class Faces_around_edge_classifier {
       } else if ((f_data.tag == Face_tag::Union || f_data.tag == Face_tag::Intersection) &&
                  f_data.tag != tag) {
         throw std::runtime_error("invalid input meshes");
+      }
+    }
+
+    for (const auto& f : faces) {
+      auto fh = f.fh;
+      auto tag = m.data(fh).tag;
+      if (tag == Face_tag::Union || tag == Face_tag::Intersection) {
+        Face_tag_propagator{m, border, fh};
       }
     }
   }
