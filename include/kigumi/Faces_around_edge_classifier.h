@@ -140,8 +140,8 @@ class Faces_around_edge_classifier {
 
     for (const auto& f : faces) {
       auto fh = f.fh;
-      auto tag = m.data(fh).tag;
-      if (tag == Face_tag::Union || tag == Face_tag::Intersection) {
+      auto f_tag = m.data(fh).tag;
+      if (f_tag == Face_tag::Union || f_tag == Face_tag::Intersection) {
         Face_tag_propagator{m, border, fh};
       }
     }
