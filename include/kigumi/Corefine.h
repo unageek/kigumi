@@ -5,7 +5,9 @@
 #include <kigumi/Point_list.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangulator.h>
+#include <kigumi/intersection.h>
 
+#include <iostream>
 #include <iterator>
 #include <stdexcept>
 #include <unordered_map>
@@ -44,7 +46,7 @@ class Corefine {
         auto [left_fh, right_fh] = pairs.at(i);
         auto left_tri = left_.triangle(left_fh);
         auto right_tri = right_.triangle(right_fh);
-        auto result = CGAL::intersection(left_tri, right_tri);
+        auto result = intersection_fast(left_tri, right_tri);
         refine_intersection(result);
         if (result) {
           local_infos.emplace_back(left_fh, right_fh, std::move(result));
