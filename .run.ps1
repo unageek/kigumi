@@ -52,7 +52,7 @@ switch -regex ($args[0]) {
         break
     }
     '^configure-on-ci$' {
-        buildenv
+        loadBuildEnvironment
         Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='C:/vcpkg/scripts/buildsystems/vcpkg.cmake' }
         break
     }
