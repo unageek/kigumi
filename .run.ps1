@@ -12,7 +12,7 @@ function loadBuildEnvironment {
         -property installationPath
 
     if (-not $vsDir) {
-        throw 'Some of the required workloads/components of Visual Studio are not installed.'
+        throw 'MSVC is not installed.'
     }
 
     Invoke-BatchFile "$vsDir\VC\Auxiliary\Build\vcvars64.bat"
@@ -31,24 +31,14 @@ if ( $i -ne -1 ) {
 Set-Location $PSScriptRoot
 
 switch -regex ($args[0]) {
-    '^init-vcpkg$' {
-        Set-Location vcpkg
-        Exec { .\bootstrap-vcpkg.bat }
-        Exec { .\vcpkg remove --outdated --recurse }
-        Exec { .\vcpkg install boost-program-options cgal gtest --triplet=x64-windows }
-        break
-    }
-    '^cmake$' {
+    '^c(onfigure)$' {
         loadBuildEnvironment
-        New-Item build -ItemType Directory -Force
-        Set-Location build
-        Exec { cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" $externalArgs }
+        Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='vcpkg/scripts/buildsystems/vcpkg.cmake' $externalArgs }
         break
     }
     '^b(uild)?$' {
         loadBuildEnvironment
-        Set-Location build
-        Exec { ninja }
+        Exec { cmake --build build }
         break
     }
     '^r(un)?$' {
@@ -58,8 +48,12 @@ switch -regex ($args[0]) {
     }
     '^t(est)?$' {
         loadBuildEnvironment
-        Set-Location build
-        Exec { ctest -V }
+        Exec { ctest -V --test-dir build }
+        break
+    }
+    '^configure-on-ci$' {
+        buildenv
+        Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='C:/vcpkg/scripts/buildsystems/vcpkg.cmake' }
         break
     }
     default {

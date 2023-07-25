@@ -28,9 +28,8 @@ git clone --recursive https://github.com/unageek/kigumi.git
 
 ```
 cd kigumi
-./run init-vcpkg
-./run cmake
-./run b
+./run configure  # or ./run c
+./run build      # or ./run b
 ```
 
 ## Run

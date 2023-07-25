@@ -3,7 +3,7 @@
 ## Prerequisites
 
 ```bash
-sudo apt install clang cmake libcgal-dev libgtest-dev libomp-dev ninja-build zsh
+sudo apt install clang cmake libomp-dev ninja-build
 ```
 
 ## Clone
@@ -16,8 +16,8 @@ git clone https://github.com/unageek/kigumi.git
 
 ```
 cd kigumi
-./run cmake
-./run b
+./run configure  # or ./run c
+./run build      # or ./run b
 ```
 
 ## Run
