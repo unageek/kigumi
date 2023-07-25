@@ -15,18 +15,32 @@
 
 namespace kigumi {
 
-//  indices_   face_indices_
-//        |        |
-//        0:  0 -> a:  (0, 1, 2)
-//                 b:  (0, 2, 3)
-//                 c:  (0, 3, 4)
-//        3:  1 -> a
-//        4:  2 -> a
-//                 b
-//        6:  3 -> b
-//                 c
-//        8:  4 -> c
-//        9:  end
+// Example 1:
+//
+//      3       2     indices_   face_indices_
+//       +-----+            |        |
+//      / \ b / \           0:  0 -> a:  (0, 1, 2)
+//     / c \ / a \                   b:  (0, 2, 3)
+//    +-----+-----+                  c:  (0, 3, 4)
+//   4      0      1        3:  1 -> a
+//                          4:  2 -> a
+//                                   b
+//                          6:  3 -> b
+//                                   c
+//                          8:  4 -> c
+//                          9:  END
+//
+// Example 2:
+//
+//       5            indices_   face_indices_
+//       +                  |        |
+//      / \   + 4           0:  0 -> a:  (0, 1, 2)
+//     / a \                1:  1 -> a
+//    +-----+    + 3        2
+//   0       1              2
+//                          2
+//       + 2                2:  5 -> a
+//                          3:  END
 
 template <class K, class FaceData = Null_data>
 class Triangle_mesh {
@@ -101,13 +115,15 @@ class Triangle_mesh {
     std::sort(map.begin(), map.end());
 
     std::size_t index{};
-    Vertex_handle prev_vh;
+    std::ptrdiff_t prev_vi{-1};
     for (const auto& [vh, fh] : map) {
       face_indices_.push_back(fh);
-      if (index == 0 || vh != prev_vh) {
+
+      auto vi = static_cast<std::ptrdiff_t>(vh.i);
+      for (std::ptrdiff_t i = 0; i < vi - prev_vi; ++i) {
         indices_.push_back(index);
       }
-      prev_vh = vh;
+      prev_vi = vi;
       ++index;
     }
     indices_.push_back(index);
