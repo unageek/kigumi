@@ -13,7 +13,7 @@
 - Tools and libraries
 
   ```bash
-  brew install cgal cmake googletest llvm ninja
+  brew install automake autoconf-archive cmake llvm ninja
   ```
 
 ## Clone
@@ -26,8 +26,8 @@ git clone https://github.com/unageek/kigumi.git
 
 ```
 cd kigumi
-./run cmake -- -DCMAKE_CXX_COMPILER=$(brew --prefix)/opt/llvm/bin/clang++
-./run b
+./run configure  # or ./run c
+./run build      # or ./run b
 ```
 
 ## Run

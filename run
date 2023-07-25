@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 set -eu
 
 if [ $# -lt 1 ]; then
@@ -6,36 +6,31 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-external_args=()
-found_double_hyphen=false
-for arg in "$@"; do
-  if [ "$arg" = '--' ]; then
-    found_double_hyphen=true
-    continue
-  fi
-  if [ "$found_double_hyphen" = true ]; then
-    external_args+=("$arg")
-  fi
-done
+get_external_args() {
+  while [ $# -gt 0 ]; do
+    if [ "$1" = '--' ]; then
+      shift
+      break
+    fi
+    shift
+  done
+  echo "$@"
+}
 
-cd $(dirname $0)
+cd "$(dirname "$0")"
 
 case $1 in
-  'cmake' )
-    mkdir -p build
-    cd build
-    cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release $external_args
+  'c'|'configure' )
+    cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake "$(tools/cmake-args)" $(get_external_args "$@")
     ;;
   'b'|'build' )
-    cd build
-    ninja
+    cmake --build build
     ;;
   'r'|'run' )
-    ./build/$2 $external_args
+    ./build/"$2" $(get_external_args "$@")
     ;;
   't'|'test' )
-    cd build
-    ctest -V
+    ctest -V --test-dir build
     ;;
   'lint' )
     clang-tidy -p build examples/mix/main.cc examples/extract/main.cc
