@@ -31,7 +31,7 @@ if ( $i -ne -1 ) {
 Set-Location $PSScriptRoot
 
 switch -regex ($args[0]) {
-    '^c(onfigure)$' {
+    '^c(onfigure)?$' {
         loadBuildEnvironment
         Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='vcpkg/scripts/buildsystems/vcpkg.cmake' $externalArgs }
         break
