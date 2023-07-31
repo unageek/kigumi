@@ -2,8 +2,6 @@
 
 ## Prerequisites
 
-1. [PowerShell](https://apps.microsoft.com/store/detail/powershell/9MZ1SNWT0N5D)
-
 1. [Visual Studio 2022](https://visualstudio.microsoft.com/)
 
    Under **Workloads**, select the following item:
