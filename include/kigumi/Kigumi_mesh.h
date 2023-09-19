@@ -237,35 +237,35 @@ class Boolean_operation {
     switch (op) {
       case Operator::V:  // The universe
         return true;
-      case Operator::A:  // A ∪ B
+      case Operator::A:  // A \cup B
         return a || b;
-      case Operator::B:  // (B ⧵ A)ᶜ
+      case Operator::B:  // (B \setminus A)^c
         return a || !b;
-      case Operator::C:  // (A ⧵ B)ᶜ
+      case Operator::C:  // (A \setminus B)^c
         return !a || b;
-      case Operator::D:  // (A ∩ B)ᶜ
+      case Operator::D:  // (A \cap B)^c
         return !a || !b;
-      case Operator::E:  // (A △ B)ᶜ
+      case Operator::E:  // (A \triangle B)^c
         return a == b;
-      case Operator::F:  // Aᶜ
+      case Operator::F:  // A^c
         return !a;
-      case Operator::G:  // Bᶜ
+      case Operator::G:  // B^c
         return !b;
       case Operator::H:  // B
         return b;
       case Operator::I:  // A
         return a;
-      case Operator::J:  // A △ B
+      case Operator::J:  // A \triangle B
         return a != b;
-      case Operator::K:  // A ∩ B
+      case Operator::K:  // A \cap B
         return a && b;
-      case Operator::L:  // A ⧵ B
+      case Operator::L:  // A \setminus B
         return a && !b;
-      case Operator::M:  // B ⧵ A
+      case Operator::M:  // B \setminus A
         return !a && b;
-      case Operator::X:  // (A ∪ B)ᶜ
+      case Operator::X:  // (A \cup B)^c
         return !a && !b;
-      case Operator::O:  // ∅
+      case Operator::O:  // The empty set
         return false;
       default:
         throw std::runtime_error("invalid operator");

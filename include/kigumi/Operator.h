@@ -29,23 +29,23 @@ namespace kigumi {
 // A | B: Output either A or B.
 
 enum class Operator {
-  // Bocheński notation
+  // Bochenski notation
   V,  // The universe
-  A,  // A ∪ B
-  B,  // (B ⧵ A)ᶜ
-  C,  // (A ⧵ B)ᶜ
-  D,  // (A ∩ B)ᶜ
-  E,  // (A △ B)ᶜ
-  F,  // Aᶜ
-  G,  // Bᶜ
+  A,  // A \cup B
+  B,  // (B \setminus A)^c
+  C,  // (A \setminus B)^c
+  D,  // (A \cap B)^c
+  E,  // (A \triangle B)^c
+  F,  // A^c
+  G,  // B^c
   H,  // B
   I,  // A
-  J,  // A △ B
-  K,  // A ∩ B
-  L,  // A ⧵ B
-  M,  // B ⧵ A
-  X,  // (A ∪ B)ᶜ
-  O,  // ∅
+  J,  // A \triangle B
+  K,  // A \cap B
+  L,  // A \setminus B
+  M,  // B \setminus A
+  X,  // (A \cup B)^c
+  O,  // The empty set
 
   // Aliases
   Union = A,
