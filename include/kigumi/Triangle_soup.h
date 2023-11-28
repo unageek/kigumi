@@ -72,18 +72,25 @@ class Triangle_soup {
   }
 
   explicit Triangle_soup(const std::string& filename) {
-    // CGAL::IO::read_OBJ does not support std::vector<std::array<...>>.
     std::vector<std::vector<std::size_t>> faces;
     CGAL::IO::read_polygon_soup(filename, points_, faces);
 
     faces_.reserve(faces.size());
-    for (const auto& face : faces) {
-      if (face.size() != 3) {
-        throw std::runtime_error("not a triangle mesh");
+    face_data_.reserve(faces.size());
+
+    for (const auto& f : faces) {
+      if (f.size() < 3) {
+        continue;
       }
-      faces_.push_back({Vertex_handle{face[0]}, Vertex_handle{face[1]}, Vertex_handle{face[2]}});
-      face_data_.emplace_back();
+
+      for (std::size_t i = 0; i < f.size() - 2; ++i) {
+        faces_.push_back({Vertex_handle{f[0]}, Vertex_handle{f[i + 1]}, Vertex_handle{f[i + 2]}});
+        face_data_.emplace_back();
+      }
     }
+
+    faces_.shrink_to_fit();
+    face_data_.shrink_to_fit();
   }
 
   Triangle_soup(std::vector<Point>&& points, std::vector<Face>&& faces,

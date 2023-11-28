@@ -15,7 +15,7 @@
 - Apply multiple Boolean operators simultaneously
 - Attach custom data to faces that propagate through Boolean operations
 - Save/load exact mesh data
-  - The format is non-portable at the moment!
+  - Beware that the format is non-portable at the moment.
 
 For details of the API, see [Kigumi_mesh.h](include/kigumi/Kigumi_mesh.h).
 
@@ -27,12 +27,15 @@ The following conditions must be satisfied so that Boolean operations work prope
 
 1. A mesh must not be empty.
    - An empty mesh can represent either the empty set or the whole space. Thus, the program refuses to handle such inputs.
-1. A mesh must only have triangle faces.
 1. A mesh must not have a degenerate (zero-area) face.
 1. For each pair of faces (f1, f2) (f1 ≠ f2), one of the following must be met:
    - f1 and f2 have an edge in common and do not intersect elsewhere than the edge,
    - f1 and f2 have a vertex in common and do not intersect elsewhere than the vertex,
    - f1 and f2 do not intersect.
+
+Additional notes:
+
+1. Faces that have more than three vertices are interpreted as triangle fans.
 
 ### Conditions on the pair of input meshes
 
