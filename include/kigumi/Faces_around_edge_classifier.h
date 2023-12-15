@@ -116,25 +116,47 @@ class Faces_around_edge_classifier {
       return;
     }
 
-    // Tag rest of the faces, while checking consistency.
+    // Check consistency and tag rest of the faces.
 
-    auto tag = m.data(faces.at(k).fh).tag;
-    auto orientation = faces.at(k).orientation;
-    // Go around and return to the starting point to check consistency.
-    for (std::size_t i = k + 1; i <= k + faces.size(); ++i) {
-      const auto& f = faces.at(i % faces.size());
-      auto& f_data = m.data(f.fh);
+    // An example of inconsistent configuration:
+    //
+    //             Int.
+    //              |
+    //              |-->
+    //              |
+    //   ??? -------+------- Uni.
+    //    :     |       |
+    //    :     V       V
+    //    :
+    //   Should be Intersection due to global classification.
 
-      if (f.orientation == orientation) {
-        tag = tag == Face_tag::Union ? Face_tag::Intersection : Face_tag::Union;
+    auto consistent = true;
+    for (auto run = 0; run < 2; run++) {
+      auto tag = m.data(faces.at(k).fh).tag;
+      auto orientation = faces.at(k).orientation;
+      // Go around and return to the starting point to check consistency.
+      for (std::size_t i = k + 1; i <= k + faces.size(); ++i) {
+        const auto& f = faces.at(i % faces.size());
+        auto& f_data = m.data(f.fh);
+
+        if (f.orientation == orientation) {
+          tag = tag == Face_tag::Union ? Face_tag::Intersection : Face_tag::Union;
+        }
+        orientation = f.orientation;
+
+        if (f_data.tag == Face_tag::Unknown) {
+          if (run == 1) {
+            f_data.tag = tag;
+          }
+        } else if ((f_data.tag == Face_tag::Union || f_data.tag == Face_tag::Intersection) &&
+                   f_data.tag != tag) {
+          consistent = false;
+        }
       }
-      orientation = f.orientation;
 
-      if (f_data.tag == Face_tag::Unknown) {
-        f_data.tag = tag;
-      } else if ((f_data.tag == Face_tag::Union || f_data.tag == Face_tag::Intersection) &&
-                 f_data.tag != tag) {
-        throw std::runtime_error("invalid input meshes");
+      if (!consistent) {
+        // Leave unknown faces to the global classifier.
+        break;
       }
     }
 
