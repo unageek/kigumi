@@ -182,32 +182,32 @@ class Triangle_soup {
 template <class K, class FaceData>
 struct Write<Triangle_soup<K, FaceData>> {
   static void write(std::ostream& out, const Triangle_soup<K, FaceData>& tt) {
-    do_write(out, tt.num_vertices());
-    do_write(out, tt.num_faces());
+    do_write<std::int32_t>(out, tt.num_vertices());
+    do_write<std::int32_t>(out, tt.num_faces());
 
     for (std::size_t i = 0; i < tt.num_vertices(); ++i) {
       const auto& p = tt.point({i});
 
       if (p.approx().x().is_point() && p.approx().y().is_point() && p.approx().z().is_point()) {
-        do_write(out, false);
-        do_write(out, p.approx().x().inf());
-        do_write(out, p.approx().y().inf());
-        do_write(out, p.approx().z().inf());
+        do_write<bool>(out, false);
+        do_write<double>(out, p.approx().x().inf());
+        do_write<double>(out, p.approx().y().inf());
+        do_write<double>(out, p.approx().z().inf());
       } else {
-        do_write(out, true);
-        do_write(out, p.exact().x());
-        do_write(out, p.exact().y());
-        do_write(out, p.exact().z());
+        do_write<bool>(out, true);
+        do_write<mpq_class>(out, p.exact().x());
+        do_write<mpq_class>(out, p.exact().y());
+        do_write<mpq_class>(out, p.exact().z());
       }
     }
 
     for (const auto& fh : tt.faces()) {
       const auto& f = tt.face(fh);
       const auto& f_data = tt.data(fh);
-      do_write(out, f[0]);
-      do_write(out, f[1]);
-      do_write(out, f[2]);
-      do_write(out, f_data);
+      do_write<Vertex_handle>(out, f[0]);
+      do_write<Vertex_handle>(out, f[1]);
+      do_write<Vertex_handle>(out, f[2]);
+      do_write<FaceData>(out, f_data);
     }
   }
 };
@@ -217,28 +217,28 @@ struct Read<Triangle_soup<K, FaceData>> {
   static void read(std::istream& in, Triangle_soup<K, FaceData>& tt) {
     std::size_t num_vertices{};
     std::size_t num_faces{};
-    do_read(in, num_vertices);
-    do_read(in, num_faces);
+    do_read<std::int32_t>(in, num_vertices);
+    do_read<std::int32_t>(in, num_faces);
 
     for (std::size_t i = 0; i < num_vertices; ++i) {
       bool is_exact{};
-      do_read(in, is_exact);
+      do_read<bool>(in, is_exact);
 
       if (!is_exact) {
         double x{};
         double y{};
         double z{};
-        do_read(in, x);
-        do_read(in, y);
-        do_read(in, z);
+        do_read<double>(in, x);
+        do_read<double>(in, y);
+        do_read<double>(in, z);
         tt.add_vertex({x, y, z});
       } else {
         mpq_class x;
         mpq_class y;
         mpq_class z;
-        do_read(in, x);
-        do_read(in, y);
-        do_read(in, z);
+        do_read<mpq_class>(in, x);
+        do_read<mpq_class>(in, y);
+        do_read<mpq_class>(in, z);
         tt.add_vertex({CGAL::Lazy_exact_nt<mpq_class>{x}, CGAL::Lazy_exact_nt<mpq_class>{y},
                        CGAL::Lazy_exact_nt<mpq_class>{z}});
       }
@@ -247,10 +247,10 @@ struct Read<Triangle_soup<K, FaceData>> {
     for (std::size_t i = 0; i < num_faces; ++i) {
       Face face{};
       FaceData f_data{};
-      do_read(in, face[0]);
-      do_read(in, face[1]);
-      do_read(in, face[2]);
-      do_read(in, f_data);
+      do_read<Vertex_handle>(in, face[0]);
+      do_read<Vertex_handle>(in, face[1]);
+      do_read<Vertex_handle>(in, face[2]);
+      do_read<FaceData>(in, f_data);
       auto fh = tt.add_face(face);
       tt.data(fh) = f_data;
     }

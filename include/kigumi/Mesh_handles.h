@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kigumi/io.h>
+
 #include <functional>
 #include <limits>
 
@@ -20,6 +22,18 @@ struct Vertex_handle {
 inline bool operator<(Vertex_handle a, Vertex_handle b) { return a.i < b.i; }
 inline bool operator==(Vertex_handle a, Vertex_handle b) { return a.i == b.i; }
 inline bool operator!=(Vertex_handle a, Vertex_handle b) { return a.i != b.i; }
+
+template <>
+struct Write<Vertex_handle> {
+  static void write(std::ostream& out, const Vertex_handle& tt) {
+    do_write<std::int32_t>(out, tt.i);
+  }
+};
+
+template <>
+struct Read<Vertex_handle> {
+  static void read(std::istream& in, Vertex_handle& tt) { do_read<std::int32_t>(in, tt.i); }
+};
 
 }  // namespace kigumi
 
