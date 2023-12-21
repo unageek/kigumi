@@ -1,6 +1,6 @@
 # ![kigumi](docs/logo.svg#gh-light-mode-only)![kigumi](docs/logo_dark.svg#gh-dark-mode-only)
 
-3D regularized Boolean set operations that just work! 🙌
+Rock-solid Boolean operations on triangle meshes 🪨
 
 ## Build Instructions
 
@@ -10,12 +10,11 @@
 
 - Can handle non-manifold meshes
 - Can handle open meshes
-- Can handle disjointness
+- Can handle meshes composed of disjoint parts
 - Distinguish between the empty and the entire meshes
 - Apply multiple Boolean operators simultaneously
 - Attach custom data to faces that propagate through Boolean operations
-- Save/load exact mesh data
-  - Beware that the format is non-portable at the moment.
+- Save exact mesh data in a portable binary format
 
 For details of the API, see [Kigumi_mesh.h](include/kigumi/Kigumi_mesh.h).
 
@@ -41,7 +40,7 @@ Additional notes:
 
 ## Algorithm
 
-The algorithm described in [[1]](#1) is implemented.
+An enhanced version of the algorithm described in [[1]](#1) is used.
 
 ## References
 
