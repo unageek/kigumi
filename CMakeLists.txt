@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Boost REQUIRED COMPONENTS program_options)
+find_package(Boost REQUIRED COMPONENTS atomic program_options)
 find_package(CGAL CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(OpenMP REQUIRED)
