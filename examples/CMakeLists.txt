@@ -5,7 +5,7 @@ add_executable(${TARGET}
 )
 
 if(UNIX)
-    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror -fsanitize=undefined)
+    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror)
 elseif(MSVC)
     target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702)
 endif()
@@ -15,10 +15,10 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::atomic
     Boost::program_options
     CGAL::CGAL
     OpenMP::OpenMP_CXX
-    -fsanitize=undefined
 )
 
 
@@ -30,7 +30,7 @@ add_executable(${TARGET}
 )
 
 if(UNIX)
-    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror -fsanitize=undefined)
+    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror)
 elseif(MSVC)
     target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702)
 endif()
@@ -40,8 +40,8 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::atomic
     Boost::program_options
     CGAL::CGAL
     OpenMP::OpenMP_CXX
-    -fsanitize=undefined
 )
