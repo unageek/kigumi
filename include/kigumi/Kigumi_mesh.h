@@ -28,7 +28,7 @@ enum class Kigumi_mesh_kind {
 template <>
 struct Write<Kigumi_mesh_kind> {
   static void write(std::ostream& out, const Kigumi_mesh_kind& tt) {
-    do_write(out, static_cast<std::uint8_t>(tt));
+    do_write<std::uint8_t>(out, static_cast<std::uint8_t>(tt));
   }
 };
 
@@ -36,7 +36,7 @@ template <>
 struct Read<Kigumi_mesh_kind> {
   static void read(std::istream& in, Kigumi_mesh_kind& tt) {
     std::uint8_t x{};
-    do_read(in, x);
+    do_read<std::uint8_t>(in, x);
     tt = static_cast<Kigumi_mesh_kind>(x);
   }
 };
@@ -149,16 +149,16 @@ class Kigumi_mesh {
 template <class K, class FaceData>
 struct Write<Kigumi_mesh<K, FaceData>> {
   static void write(std::ostream& out, const Kigumi_mesh<K, FaceData>& tt) {
-    do_write(out, tt.kind_);
-    do_write(out, tt.soup_);
+    do_write<Kigumi_mesh_kind>(out, tt.kind_);
+    do_write<Triangle_soup<K, FaceData>>(out, tt.soup_);
   }
 };
 
 template <class K, class FaceData>
 struct Read<Kigumi_mesh<K, FaceData>> {
   static void read(std::istream& in, Kigumi_mesh<K, FaceData>& tt) {
-    do_read(in, tt.kind_);
-    do_read(in, tt.soup_);
+    do_read<Kigumi_mesh_kind>(in, tt.kind_);
+    do_read<Triangle_soup<K, FaceData>>(in, tt.soup_);
   }
 };
 
@@ -280,18 +280,18 @@ class Boolean_operation {
 template <class K, class FaceData>
 struct Write<Boolean_operation<K, FaceData>> {
   static void write(std::ostream& out, const Boolean_operation<K, FaceData>& tt) {
-    do_write(out, tt.first_kind_);
-    do_write(out, tt.second_kind_);
-    do_write(out, tt.m_);
+    do_write<Kigumi_mesh_kind>(out, tt.first_kind_);
+    do_write<Kigumi_mesh_kind>(out, tt.second_kind_);
+    do_write<Mixed_triangle_soup<K, FaceData>>(out, tt.m_);
   }
 };
 
 template <class K, class FaceData>
 struct Read<Boolean_operation<K, FaceData>> {
   static void read(std::istream& in, Boolean_operation<K, FaceData>& tt) {
-    do_read(in, tt.first_kind_);
-    do_read(in, tt.second_kind_);
-    do_read(in, tt.m_);
+    do_read<Kigumi_mesh_kind>(in, tt.first_kind_);
+    do_read<Kigumi_mesh_kind>(in, tt.second_kind_);
+    do_read<Mixed_triangle_soup<K, FaceData>>(in, tt.m_);
   }
 };
 

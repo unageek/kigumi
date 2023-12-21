@@ -2,40 +2,72 @@
 
 #include <CGAL/gmpxx.h>
 
+#include <boost/endian/conversion.hpp>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 namespace kigumi {
 
+template <class To, class From>
+To checked_cast(From value) {
+  if (!std::in_range<To>(value)) {
+    throw std::runtime_error("checked_cast failed");
+  }
+
+  return static_cast<To>(value);
+}
+
 template <class T>
 struct Write {
   static void write(std::ostream& out, const T& tt) {
-    out.write(reinterpret_cast<const char*>(&tt), sizeof(tt));
+    static_assert(std::is_arithmetic_v<T> && !std::is_same_v<T, bool>);
+
+    T x{tt};
+    boost::endian::native_to_little_inplace(x);
+    out.write(reinterpret_cast<const char*>(&x), sizeof(T));
   }
 };
 
 template <class T>
 struct Read {
-  static void read(std::istream& in, T& tt) { in.read(reinterpret_cast<char*>(&tt), sizeof(tt)); }
+  static void read(std::istream& in, T& tt) {
+    static_assert(std::is_arithmetic_v<T> && !std::is_same_v<T, bool>);
+
+    in.read(reinterpret_cast<char*>(&tt), sizeof(T));
+    boost::endian::little_to_native_inplace(tt);
+  }
 };
 
-template <class T>
+template <class U, class T, std::enable_if_t<std::is_same_v<U, T>, std::nullptr_t> = nullptr>
 void do_write(std::ostream& out, const T& tt) {
   Write<T>::write(out, tt);
 }
 
-template <class T>
+template <class U, class T, std::enable_if_t<!std::is_same_v<U, T>, std::nullptr_t> = nullptr>
+void do_write(std::ostream& out, const T& tt) {
+  Write<U>::write(out, checked_cast<U>(tt));
+}
+
+template <class U, class T, std::enable_if_t<std::is_same_v<U, T>, std::nullptr_t> = nullptr>
 void do_read(std::istream& in, T& tt) {
   Read<T>::read(in, tt);
+}
+
+template <class U, class T, std::enable_if_t<!std::is_same_v<U, T>, std::nullptr_t> = nullptr>
+void do_read(std::istream& in, T& tt) {
+  U x{};
+  Read<U>::read(in, x);
+  tt = checked_cast<T>(x);
 }
 
 template <>
 struct Write<bool> {
   static void write(std::ostream& out, const bool& tt) {
-    do_write(out, static_cast<std::uint8_t>(tt));
+    do_write<std::uint8_t>(out, static_cast<std::uint8_t>(tt ? 1 : 0));
   }
 };
 
@@ -43,27 +75,27 @@ template <>
 struct Read<bool> {
   static void read(std::istream& in, bool& tt) {
     std::uint8_t x{};
-    do_read(in, x);
-    tt = static_cast<bool>(x);
+    do_read<std::uint8_t>(in, x);
+    tt = x != 0;
   }
 };
 
 template <>
 struct Write<mpq_class> {
   static void write(std::ostream& out, const mpq_class& tt) {
-    do_write(out, tt < 0);
+    do_write<bool>(out, tt < 0);
 
     std::size_t count{};
     std::vector<std::uint8_t> buf;
 
     buf.resize((mpz_sizeinbase(tt.get_num().get_mpz_t(), 2) + 7) / 8);
     mpz_export(buf.data(), &count, 1, 1, 0, 0, tt.get_num().get_mpz_t());
-    out.write(reinterpret_cast<const char*>(&count), sizeof(count));
+    do_write<std::int32_t>(out, count);
     out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(count));
 
     buf.resize((mpz_sizeinbase(tt.get_den().get_mpz_t(), 2) + 7) / 8);
     mpz_export(buf.data(), &count, 1, 1, 0, 0, tt.get_den().get_mpz_t());
-    out.write(reinterpret_cast<const char*>(&count), sizeof(count));
+    do_write<std::int32_t>(out, count);
     out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(count));
   }
 };
@@ -72,19 +104,19 @@ template <>
 struct Read<mpq_class> {
   static void read(std::istream& in, mpq_class& tt) {
     bool neg{};
-    do_read(in, neg);
+    do_read<bool>(in, neg);
 
     mpz_class num;
     mpz_class den;
     std::size_t count{};
     std::vector<std::uint8_t> buf;
 
-    in.read(reinterpret_cast<char*>(&count), sizeof(count));
+    do_read<std::int32_t>(in, count);
     buf.resize(count);
     in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
     mpz_import(num.get_mpz_t(), count, 1, 1, 0, 0, buf.data());
 
-    in.read(reinterpret_cast<char*>(&count), sizeof(count));
+    do_read<std::int32_t>(in, count);
     buf.resize(count);
     in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
     mpz_import(den.get_mpz_t(), count, 1, 1, 0, 0, buf.data());
@@ -103,7 +135,7 @@ void save(const std::string& filename, const T& tt) {
     throw std::runtime_error{"Failed to open file: " + filename};
   }
 
-  do_write(out, tt);
+  do_write<T>(out, tt);
 }
 
 template <class T>
@@ -113,7 +145,7 @@ void load(const std::string& filename, T& tt) {
     throw std::runtime_error{"Failed to open file: " + filename};
   }
 
-  do_read(in, tt);
+  do_read<T>(in, tt);
 }
 
 }  // namespace kigumi

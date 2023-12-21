@@ -17,9 +17,6 @@ inline options parse_options(int argc, const char* argv[]) {
   namespace po = boost::program_options;
 
   options opts;
-  std::string op;
-  std::string extract;
-  std::string prefer;
 
   po::options_description opts_desc("Options", 80, 50);
   opts_desc.add_options()                                         //
@@ -27,7 +24,7 @@ inline options parse_options(int argc, const char* argv[]) {
        "The intermediate result produced by the boole program.")  //
       ("out", po::value(&opts.output_file)->required(),           //
        "The output mesh.")                                        //
-      ("op", po::value(&op)->required(),                          //
+      ("op", po::value(&opts.op)->required(),                     //
        "The Boolean operator to apply. Possible values are:\n"    //
        "  uni  Union\n"                                           //
        "  int  Intersection\n"                                    //
@@ -45,17 +42,29 @@ inline options parse_options(int argc, const char* argv[]) {
     throw;
   }
 
-  if (op == "dif") {
-    opts.op = kigumi::Operator::Difference;
-  } else if (op == "int") {
-    opts.op = kigumi::Operator::Intersection;
-  } else if (op == "sym") {
-    opts.op = kigumi::Operator::SymmetricDifference;
-  } else if (op == "uni") {
-    opts.op = kigumi::Operator::Union;
-  } else {
-    throw std::runtime_error("Invalid value to the option --op.");
-  }
-
   return opts;
 }
+
+namespace kigumi {
+
+void validate(boost::any& v, const std::vector<std::string>& values, Operator*, int) {
+  namespace po = boost::program_options;
+
+  po::validators::check_first_occurrence(v);
+
+  const auto& s = po::validators::get_single_string(values);
+
+  if (s == "dif") {
+    v = Operator::Difference;
+  } else if (s == "int") {
+    v = Operator::Intersection;
+  } else if (s == "sym") {
+    v = Operator::SymmetricDifference;
+  } else if (s == "uni") {
+    v = Operator::Union;
+  } else {
+    throw po::validation_error(po::validation_error::invalid_option_value);
+  }
+}
+
+}  // namespace kigumi
