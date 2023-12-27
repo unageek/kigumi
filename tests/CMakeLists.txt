@@ -2,7 +2,7 @@ set(TARGET kigumi-test)
 
 add_executable(${TARGET}
     face_data.cc
-    Faces_around_edge_classifier_test.cc
+    Local_face_classifier_test.cc
     side_of_mesh.cc
     special.cc
     special_results.cc

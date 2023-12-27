@@ -1,8 +1,8 @@
 #pragma once
 
 #include <kigumi/Corefine.h>
-#include <kigumi/Faces_around_edge_classifier.h>
 #include <kigumi/Global_face_classifier.h>
+#include <kigumi/Local_face_classifier.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Shared_edge_finder.h>
 #include <kigumi/Triangle_soup.h>
@@ -57,7 +57,7 @@ Mixed_triangle_soup<K, FaceData> mix(const Triangle_soup<K, FaceData>& left,
 #pragma omp parallel for schedule(guided)
     // NOLINTNEXTLINE(modernize-loop-convert)
     for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(shared_edges_vec.size()); ++i) {
-      Faces_around_edge_classifier(m, shared_edges_vec.at(i), shared_edges);
+      Local_face_classifier(m, shared_edges_vec.at(i), shared_edges);
     }
   }
 

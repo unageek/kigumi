@@ -11,13 +11,13 @@
 namespace kigumi {
 
 template <class K, class FaceData>
-class Faces_around_edge_classifier {
+class Local_face_classifier {
   using Plane_3 = typename K::Plane_3;
   using Vector_2 = typename K::Vector_2;
 
  public:
-  Faces_around_edge_classifier(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge,
-                               const std::unordered_set<Edge>& border) {
+  Local_face_classifier(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge,
+                        const std::unordered_set<Edge>& border) {
     bool found_untagged_face{};
     for (auto fh : m.faces_around_edge(edge)) {
       if (m.data(fh).tag == Face_tag::Unknown) {
