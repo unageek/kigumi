@@ -2,6 +2,7 @@
 
 #include <kigumi/Face_tag_propagator.h>
 #include <kigumi/Mixed.h>
+#include <kigumi/Warnings.h>
 
 #include <algorithm>
 #include <stdexcept>
@@ -83,7 +84,7 @@ class Local_face_classifier {
     // Find pairs of non-overlapping and non-orientable faces and tag them.
 
     auto is_undefined_configuration = true;
-    // At the end of the loop, the kth face is tagged as union or intersection.
+    // At the end of the loop, the kth face is tagged as either union or intersection.
     std::size_t k{};
     for (std::size_t i = 0; i < faces.size(); ++i) {
       auto j = (i + 1) % faces.size();
@@ -164,10 +165,13 @@ class Local_face_classifier {
       auto fh = f.fh;
       auto f_tag = m.data(fh).tag;
       if (f_tag == Face_tag::Union || f_tag == Face_tag::Intersection) {
-        Face_tag_propagator{m, border, fh};
+        Face_tag_propagator prop{m, border, fh};
+        warnings_ |= prop.warnings();
       }
     }
   }
+
+  Warnings warnings() const { return warnings_; }
 
  private:
   struct Face_around_edge {
@@ -232,6 +236,8 @@ class Local_face_classifier {
       return u1 * v2 - u2 * v1 > 0;
     }
   };
+
+  Warnings warnings_{};
 };
 
 }  // namespace kigumi

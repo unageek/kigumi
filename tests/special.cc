@@ -18,7 +18,7 @@ using kigumi::Triangle_soup;
 TEST(SpecialMeshTest, EmptyEmpty) {
   auto m1 = M::empty();
   auto m2 = M::empty();
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -42,7 +42,7 @@ TEST(SpecialMeshTest, EmptyEmpty) {
 TEST(SpecialMeshTest, EmptyEntire) {
   auto m1 = M::empty();
   auto m2 = M::entire();
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -66,7 +66,7 @@ TEST(SpecialMeshTest, EmptyEntire) {
 TEST(SpecialMeshTest, EntireEmpty) {
   auto m1 = M::entire();
   auto m2 = M::empty();
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -90,7 +90,7 @@ TEST(SpecialMeshTest, EntireEmpty) {
 TEST(SpecialMeshTest, EntireEntire) {
   auto m1 = M::entire();
   auto m2 = M::entire();
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -151,7 +151,7 @@ TEST(SpwcialMeshTest, EmptyNormal) {
 
   auto m1 = M::empty();
   M m2{std::move(soup)};
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -181,7 +181,7 @@ TEST(SpwcialMeshTest, NormalEmpty) {
 
   M m1{std::move(soup)};
   auto m2 = M::empty();
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -211,7 +211,7 @@ TEST(SpwcialMeshTest, EntireNormal) {
 
   auto m1 = M::entire();
   M m2{std::move(soup)};
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -241,7 +241,7 @@ TEST(SpwcialMeshTest, NormalEntire) {
 
   M m1{std::move(soup)};
   auto m2 = M::entire();
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -273,7 +273,7 @@ TEST(SpwcialMeshTest, Equivalent) {
 
   M m1{std::move(soup)};
   M m2{std::move(soup2)};
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));
@@ -313,7 +313,7 @@ TEST(SpwcialMeshTest, Complementary) {
 
   M m1{std::move(soup)};
   M m2{std::move(soup2)};
-  auto b = m1.boolean(m2);
+  auto [b, warnings] = m1.boolean(m2);
   auto f = [&](Operator op) { return b.apply(op); };
 
   ASSERT_ENTIRE(f(Operator::V));

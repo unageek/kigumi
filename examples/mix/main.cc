@@ -1,5 +1,6 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Kigumi_mesh.h>
+#include <kigumi/Warnings.h>
 #include <kigumi/io.h>
 
 #include <iostream>
@@ -23,7 +24,15 @@ int main(int argc, const char* argv[]) {
       throw std::runtime_error("the second mesh is empty");
     }
 
-    auto boolean = first.boolean(second);
+    auto [boolean, warnings] = first.boolean(second);
+    if ((warnings & kigumi::Warnings::FirstMeshPartiallyIntersectsWithSecondMesh) !=
+        kigumi::Warnings::None) {
+      std::cerr << "Warning: the first mesh partially intersects with the second mesh" << std::endl;
+    }
+    if ((warnings & kigumi::Warnings::SecondMeshPartiallyIntersectsWithFirstMesh) !=
+        kigumi::Warnings::None) {
+      std::cerr << "Warning: the second mesh partially intersects with the first mesh" << std::endl;
+    }
     kigumi::save(opts.output_file, boolean);
 
     return 0;

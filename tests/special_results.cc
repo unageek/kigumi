@@ -16,13 +16,15 @@ TEST(SpecialResultTest, A) {
   {
     auto m1 = mk_cube(1, true);
     auto m2 = mk_cube(2);
-    auto m = m1.boolean(m2).apply(Operator::A);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::A);
     ASSERT_TRUE(m.is_entire());
   }
   {
     auto m1 = mk_cube(1, true);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::A);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::A);
     ASSERT_TRUE(m.is_entire());
   }
 }
@@ -31,13 +33,15 @@ TEST(SpecialResultTest, B) {
   {
     auto m1 = mk_cube(2);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::B);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::B);
     ASSERT_TRUE(m.is_entire());
   }
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::B);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::B);
     ASSERT_TRUE(m.is_entire());
   }
 }
@@ -46,13 +50,15 @@ TEST(SpecialResultTest, C) {
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(2);
-    auto m = m1.boolean(m2).apply(Operator::C);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::C);
     ASSERT_TRUE(m.is_entire());
   }
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::C);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::C);
     ASSERT_TRUE(m.is_entire());
   }
 }
@@ -61,13 +67,15 @@ TEST(SpecialResultTest, D) {
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(2, true);
-    auto m = m1.boolean(m2).apply(Operator::D);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::D);
     ASSERT_TRUE(m.is_entire());
   }
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(1, true);
-    auto m = m1.boolean(m2).apply(Operator::D);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::D);
     ASSERT_TRUE(m.is_entire());
   }
 }
@@ -76,13 +84,15 @@ TEST(SpecialResultTest, K) {
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(2, true);
-    auto m = m1.boolean(m2).apply(Operator::K);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::K);
     ASSERT_TRUE(m.is_empty());
   }
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(1, true);
-    auto m = m1.boolean(m2).apply(Operator::K);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::K);
     ASSERT_TRUE(m.is_empty());
   }
 }
@@ -91,13 +101,15 @@ TEST(SpecialResultTest, L) {
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(2);
-    auto m = m1.boolean(m2).apply(Operator::L);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::L);
     ASSERT_TRUE(m.is_empty());
   }
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::L);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::L);
     ASSERT_TRUE(m.is_empty());
   }
 }
@@ -106,13 +118,15 @@ TEST(SpecialResultTest, M) {
   {
     auto m1 = mk_cube(2);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::M);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::M);
     ASSERT_TRUE(m.is_empty());
   }
   {
     auto m1 = mk_cube(1);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::M);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::M);
     ASSERT_TRUE(m.is_empty());
   }
 }
@@ -121,13 +135,15 @@ TEST(SpecialResultTest, X) {
   {
     auto m1 = mk_cube(1, true);
     auto m2 = mk_cube(2);
-    auto m = m1.boolean(m2).apply(Operator::X);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::X);
     ASSERT_TRUE(m.is_empty());
   }
   {
     auto m1 = mk_cube(1, true);
     auto m2 = mk_cube(1);
-    auto m = m1.boolean(m2).apply(Operator::X);
+    auto [b, warnings] = m1.boolean(m2);
+    auto m = b.apply(Operator::X);
     ASSERT_TRUE(m.is_empty());
   }
 }
