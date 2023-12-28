@@ -1,13 +1,14 @@
 #pragma once
 
 #include <kigumi/Mixed.h>
+#include <kigumi/Mixer.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Operator.h>
 #include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>
+#include <kigumi/Warnings.h>
 #include <kigumi/extract.h>
 #include <kigumi/io.h>
-#include <kigumi/mix.h>
 
 #include <algorithm>
 #include <iterator>
@@ -87,12 +88,12 @@ class Kigumi_mesh {
 
   const Triangle_soup<K, Face_data>& soup() const { return soup_; }
 
-  Boolean_operation<K, Face_data> boolean(const Kigumi_mesh& other) const {
+  std::pair<Boolean_operation<K, Face_data>, Warnings> boolean(const Kigumi_mesh& other) const {
     const auto& a = *this;
     const auto& b = other;
 
     if (a.is_empty_or_entire() && b.is_empty_or_entire()) {
-      return {a.kind_, b.kind_, {}};
+      return {{a.kind_, b.kind_, {}}, Warnings::None};
     }
 
     if (a.is_empty_or_entire() || b.is_empty_or_entire()) {
@@ -128,10 +129,12 @@ class Kigumi_mesh {
                        return {.from_left = false, .tag = second_tag, .data = b.soup().data(fh)};
                      });
 
-      return {a.kind_, b.kind_, {std::move(points), std::move(faces), std::move(face_data)}};
+      return {{a.kind_, b.kind_, {std::move(points), std::move(faces), std::move(face_data)}},
+              Warnings::None};
     }
 
-    return {a.kind_, b.kind_, mix(a.soup_, b.soup_)};
+    Mixer mixer{a.soup(), b.soup()};
+    return {{a.kind_, b.kind_, mixer.into_mixed()}, mixer.warnings()};
   }
 
  private:

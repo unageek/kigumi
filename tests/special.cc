@@ -18,97 +18,93 @@ using kigumi::Triangle_soup;
 TEST(SpecialMeshTest, EmptyEmpty) {
   auto m1 = M::empty();
   auto m2 = M::empty();
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_EMPTY(f(Operator::A));
-  ASSERT_ENTIRE(f(Operator::B));
-  ASSERT_ENTIRE(f(Operator::C));
-  ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_ENTIRE(f(Operator::E));
-  ASSERT_ENTIRE(f(Operator::F));
-  ASSERT_ENTIRE(f(Operator::G));
-  ASSERT_EMPTY(f(Operator::H));
-  ASSERT_EMPTY(f(Operator::I));
-  ASSERT_EMPTY(f(Operator::J));
-  ASSERT_EMPTY(f(Operator::K));
-  ASSERT_EMPTY(f(Operator::L));
-  ASSERT_EMPTY(f(Operator::M));
-  ASSERT_ENTIRE(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_EMPTY(b.apply(Operator::A));
+  ASSERT_ENTIRE(b.apply(Operator::B));
+  ASSERT_ENTIRE(b.apply(Operator::C));
+  ASSERT_ENTIRE(b.apply(Operator::D));
+  ASSERT_ENTIRE(b.apply(Operator::E));
+  ASSERT_ENTIRE(b.apply(Operator::F));
+  ASSERT_ENTIRE(b.apply(Operator::G));
+  ASSERT_EMPTY(b.apply(Operator::H));
+  ASSERT_EMPTY(b.apply(Operator::I));
+  ASSERT_EMPTY(b.apply(Operator::J));
+  ASSERT_EMPTY(b.apply(Operator::K));
+  ASSERT_EMPTY(b.apply(Operator::L));
+  ASSERT_EMPTY(b.apply(Operator::M));
+  ASSERT_ENTIRE(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpecialMeshTest, EmptyEntire) {
   auto m1 = M::empty();
   auto m2 = M::entire();
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));
-  ASSERT_EMPTY(f(Operator::B));
-  ASSERT_ENTIRE(f(Operator::C));
-  ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_EMPTY(f(Operator::E));
-  ASSERT_ENTIRE(f(Operator::F));
-  ASSERT_EMPTY(f(Operator::G));
-  ASSERT_ENTIRE(f(Operator::H));
-  ASSERT_EMPTY(f(Operator::I));
-  ASSERT_ENTIRE(f(Operator::J));
-  ASSERT_EMPTY(f(Operator::K));
-  ASSERT_EMPTY(f(Operator::L));
-  ASSERT_ENTIRE(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_ENTIRE(b.apply(Operator::A));
+  ASSERT_EMPTY(b.apply(Operator::B));
+  ASSERT_ENTIRE(b.apply(Operator::C));
+  ASSERT_ENTIRE(b.apply(Operator::D));
+  ASSERT_EMPTY(b.apply(Operator::E));
+  ASSERT_ENTIRE(b.apply(Operator::F));
+  ASSERT_EMPTY(b.apply(Operator::G));
+  ASSERT_ENTIRE(b.apply(Operator::H));
+  ASSERT_EMPTY(b.apply(Operator::I));
+  ASSERT_ENTIRE(b.apply(Operator::J));
+  ASSERT_EMPTY(b.apply(Operator::K));
+  ASSERT_EMPTY(b.apply(Operator::L));
+  ASSERT_ENTIRE(b.apply(Operator::M));
+  ASSERT_EMPTY(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpecialMeshTest, EntireEmpty) {
   auto m1 = M::entire();
   auto m2 = M::empty();
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));
-  ASSERT_ENTIRE(f(Operator::B));
-  ASSERT_EMPTY(f(Operator::C));
-  ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_EMPTY(f(Operator::E));
-  ASSERT_EMPTY(f(Operator::F));
-  ASSERT_ENTIRE(f(Operator::G));
-  ASSERT_EMPTY(f(Operator::H));
-  ASSERT_ENTIRE(f(Operator::I));
-  ASSERT_ENTIRE(f(Operator::J));
-  ASSERT_EMPTY(f(Operator::K));
-  ASSERT_ENTIRE(f(Operator::L));
-  ASSERT_EMPTY(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_ENTIRE(b.apply(Operator::A));
+  ASSERT_ENTIRE(b.apply(Operator::B));
+  ASSERT_EMPTY(b.apply(Operator::C));
+  ASSERT_ENTIRE(b.apply(Operator::D));
+  ASSERT_EMPTY(b.apply(Operator::E));
+  ASSERT_EMPTY(b.apply(Operator::F));
+  ASSERT_ENTIRE(b.apply(Operator::G));
+  ASSERT_EMPTY(b.apply(Operator::H));
+  ASSERT_ENTIRE(b.apply(Operator::I));
+  ASSERT_ENTIRE(b.apply(Operator::J));
+  ASSERT_EMPTY(b.apply(Operator::K));
+  ASSERT_ENTIRE(b.apply(Operator::L));
+  ASSERT_EMPTY(b.apply(Operator::M));
+  ASSERT_EMPTY(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpecialMeshTest, EntireEntire) {
   auto m1 = M::entire();
   auto m2 = M::entire();
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));
-  ASSERT_ENTIRE(f(Operator::B));
-  ASSERT_ENTIRE(f(Operator::C));
-  ASSERT_EMPTY(f(Operator::D));
-  ASSERT_ENTIRE(f(Operator::E));
-  ASSERT_EMPTY(f(Operator::F));
-  ASSERT_EMPTY(f(Operator::G));
-  ASSERT_ENTIRE(f(Operator::H));
-  ASSERT_ENTIRE(f(Operator::I));
-  ASSERT_EMPTY(f(Operator::J));
-  ASSERT_ENTIRE(f(Operator::K));
-  ASSERT_EMPTY(f(Operator::L));
-  ASSERT_EMPTY(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_ENTIRE(b.apply(Operator::A));
+  ASSERT_ENTIRE(b.apply(Operator::B));
+  ASSERT_ENTIRE(b.apply(Operator::C));
+  ASSERT_EMPTY(b.apply(Operator::D));
+  ASSERT_ENTIRE(b.apply(Operator::E));
+  ASSERT_EMPTY(b.apply(Operator::F));
+  ASSERT_EMPTY(b.apply(Operator::G));
+  ASSERT_ENTIRE(b.apply(Operator::H));
+  ASSERT_ENTIRE(b.apply(Operator::I));
+  ASSERT_EMPTY(b.apply(Operator::J));
+  ASSERT_ENTIRE(b.apply(Operator::K));
+  ASSERT_EMPTY(b.apply(Operator::L));
+  ASSERT_EMPTY(b.apply(Operator::M));
+  ASSERT_EMPTY(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 bool is_normal(const M& m) {
@@ -151,25 +147,24 @@ TEST(SpwcialMeshTest, EmptyNormal) {
 
   auto m1 = M::empty();
   M m2{std::move(soup)};
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_NORMAL(f(Operator::A));
-  ASSERT_INVERSE(f(Operator::B));
-  ASSERT_ENTIRE(f(Operator::C));
-  ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_INVERSE(f(Operator::E));
-  ASSERT_ENTIRE(f(Operator::F));
-  ASSERT_INVERSE(f(Operator::G));
-  ASSERT_NORMAL(f(Operator::H));
-  ASSERT_EMPTY(f(Operator::I));
-  ASSERT_NORMAL(f(Operator::J));
-  ASSERT_EMPTY(f(Operator::K));
-  ASSERT_EMPTY(f(Operator::L));
-  ASSERT_NORMAL(f(Operator::M));
-  ASSERT_INVERSE(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_NORMAL(b.apply(Operator::A));
+  ASSERT_INVERSE(b.apply(Operator::B));
+  ASSERT_ENTIRE(b.apply(Operator::C));
+  ASSERT_ENTIRE(b.apply(Operator::D));
+  ASSERT_INVERSE(b.apply(Operator::E));
+  ASSERT_ENTIRE(b.apply(Operator::F));
+  ASSERT_INVERSE(b.apply(Operator::G));
+  ASSERT_NORMAL(b.apply(Operator::H));
+  ASSERT_EMPTY(b.apply(Operator::I));
+  ASSERT_NORMAL(b.apply(Operator::J));
+  ASSERT_EMPTY(b.apply(Operator::K));
+  ASSERT_EMPTY(b.apply(Operator::L));
+  ASSERT_NORMAL(b.apply(Operator::M));
+  ASSERT_INVERSE(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpwcialMeshTest, NormalEmpty) {
@@ -181,25 +176,24 @@ TEST(SpwcialMeshTest, NormalEmpty) {
 
   M m1{std::move(soup)};
   auto m2 = M::empty();
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_NORMAL(f(Operator::A));
-  ASSERT_ENTIRE(f(Operator::B));
-  ASSERT_INVERSE(f(Operator::C));
-  ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_INVERSE(f(Operator::E));
-  ASSERT_INVERSE(f(Operator::F));
-  ASSERT_ENTIRE(f(Operator::G));
-  ASSERT_EMPTY(f(Operator::H));
-  ASSERT_NORMAL(f(Operator::I));
-  ASSERT_NORMAL(f(Operator::J));
-  ASSERT_EMPTY(f(Operator::K));
-  ASSERT_NORMAL(f(Operator::L));
-  ASSERT_EMPTY(f(Operator::M));
-  ASSERT_INVERSE(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_NORMAL(b.apply(Operator::A));
+  ASSERT_ENTIRE(b.apply(Operator::B));
+  ASSERT_INVERSE(b.apply(Operator::C));
+  ASSERT_ENTIRE(b.apply(Operator::D));
+  ASSERT_INVERSE(b.apply(Operator::E));
+  ASSERT_INVERSE(b.apply(Operator::F));
+  ASSERT_ENTIRE(b.apply(Operator::G));
+  ASSERT_EMPTY(b.apply(Operator::H));
+  ASSERT_NORMAL(b.apply(Operator::I));
+  ASSERT_NORMAL(b.apply(Operator::J));
+  ASSERT_EMPTY(b.apply(Operator::K));
+  ASSERT_NORMAL(b.apply(Operator::L));
+  ASSERT_EMPTY(b.apply(Operator::M));
+  ASSERT_INVERSE(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpwcialMeshTest, EntireNormal) {
@@ -211,25 +205,24 @@ TEST(SpwcialMeshTest, EntireNormal) {
 
   auto m1 = M::entire();
   M m2{std::move(soup)};
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));
-  ASSERT_ENTIRE(f(Operator::B));
-  ASSERT_NORMAL(f(Operator::C));
-  ASSERT_INVERSE(f(Operator::D));
-  ASSERT_NORMAL(f(Operator::E));
-  ASSERT_EMPTY(f(Operator::F));
-  ASSERT_INVERSE(f(Operator::G));
-  ASSERT_NORMAL(f(Operator::H));
-  ASSERT_ENTIRE(f(Operator::I));
-  ASSERT_INVERSE(f(Operator::J));
-  ASSERT_NORMAL(f(Operator::K));
-  ASSERT_INVERSE(f(Operator::L));
-  ASSERT_EMPTY(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_ENTIRE(b.apply(Operator::A));
+  ASSERT_ENTIRE(b.apply(Operator::B));
+  ASSERT_NORMAL(b.apply(Operator::C));
+  ASSERT_INVERSE(b.apply(Operator::D));
+  ASSERT_NORMAL(b.apply(Operator::E));
+  ASSERT_EMPTY(b.apply(Operator::F));
+  ASSERT_INVERSE(b.apply(Operator::G));
+  ASSERT_NORMAL(b.apply(Operator::H));
+  ASSERT_ENTIRE(b.apply(Operator::I));
+  ASSERT_INVERSE(b.apply(Operator::J));
+  ASSERT_NORMAL(b.apply(Operator::K));
+  ASSERT_INVERSE(b.apply(Operator::L));
+  ASSERT_EMPTY(b.apply(Operator::M));
+  ASSERT_EMPTY(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpwcialMeshTest, NormalEntire) {
@@ -241,25 +234,24 @@ TEST(SpwcialMeshTest, NormalEntire) {
 
   M m1{std::move(soup)};
   auto m2 = M::entire();
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));
-  ASSERT_NORMAL(f(Operator::B));
-  ASSERT_ENTIRE(f(Operator::C));
-  ASSERT_INVERSE(f(Operator::D));
-  ASSERT_NORMAL(f(Operator::E));
-  ASSERT_INVERSE(f(Operator::F));
-  ASSERT_EMPTY(f(Operator::G));
-  ASSERT_ENTIRE(f(Operator::H));
-  ASSERT_NORMAL(f(Operator::I));
-  ASSERT_INVERSE(f(Operator::J));
-  ASSERT_NORMAL(f(Operator::K));
-  ASSERT_EMPTY(f(Operator::L));
-  ASSERT_INVERSE(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_ENTIRE(b.apply(Operator::A));
+  ASSERT_NORMAL(b.apply(Operator::B));
+  ASSERT_ENTIRE(b.apply(Operator::C));
+  ASSERT_INVERSE(b.apply(Operator::D));
+  ASSERT_NORMAL(b.apply(Operator::E));
+  ASSERT_INVERSE(b.apply(Operator::F));
+  ASSERT_EMPTY(b.apply(Operator::G));
+  ASSERT_ENTIRE(b.apply(Operator::H));
+  ASSERT_NORMAL(b.apply(Operator::I));
+  ASSERT_INVERSE(b.apply(Operator::J));
+  ASSERT_NORMAL(b.apply(Operator::K));
+  ASSERT_EMPTY(b.apply(Operator::L));
+  ASSERT_INVERSE(b.apply(Operator::M));
+  ASSERT_EMPTY(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpwcialMeshTest, Equivalent) {
@@ -273,25 +265,24 @@ TEST(SpwcialMeshTest, Equivalent) {
 
   M m1{std::move(soup)};
   M m2{std::move(soup2)};
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_NORMAL(f(Operator::A));
-  ASSERT_ENTIRE(f(Operator::B));
-  ASSERT_ENTIRE(f(Operator::C));
-  ASSERT_INVERSE(f(Operator::D));
-  ASSERT_ENTIRE(f(Operator::E));
-  ASSERT_INVERSE(f(Operator::F));
-  ASSERT_INVERSE(f(Operator::G));
-  ASSERT_NORMAL(f(Operator::H));
-  ASSERT_NORMAL(f(Operator::I));
-  ASSERT_EMPTY(f(Operator::J));
-  ASSERT_NORMAL(f(Operator::K));
-  ASSERT_EMPTY(f(Operator::L));
-  ASSERT_EMPTY(f(Operator::M));
-  ASSERT_INVERSE(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_NORMAL(b.apply(Operator::A));
+  ASSERT_ENTIRE(b.apply(Operator::B));
+  ASSERT_ENTIRE(b.apply(Operator::C));
+  ASSERT_INVERSE(b.apply(Operator::D));
+  ASSERT_ENTIRE(b.apply(Operator::E));
+  ASSERT_INVERSE(b.apply(Operator::F));
+  ASSERT_INVERSE(b.apply(Operator::G));
+  ASSERT_NORMAL(b.apply(Operator::H));
+  ASSERT_NORMAL(b.apply(Operator::I));
+  ASSERT_EMPTY(b.apply(Operator::J));
+  ASSERT_NORMAL(b.apply(Operator::K));
+  ASSERT_EMPTY(b.apply(Operator::L));
+  ASSERT_EMPTY(b.apply(Operator::M));
+  ASSERT_INVERSE(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
 
 TEST(SpwcialMeshTest, Complementary) {
@@ -313,23 +304,22 @@ TEST(SpwcialMeshTest, Complementary) {
 
   M m1{std::move(soup)};
   M m2{std::move(soup2)};
-  auto b = m1.boolean(m2);
-  auto f = [&](Operator op) { return b.apply(op); };
+  auto [b, warnings] = m1.boolean(m2);
 
-  ASSERT_ENTIRE(f(Operator::V));
-  ASSERT_ENTIRE(f(Operator::A));
-  ASSERT_NORMAL(f(Operator::B));
-  ASSERT_INVERSE(f(Operator::C));
-  ASSERT_ENTIRE(f(Operator::D));
-  ASSERT_EMPTY(f(Operator::E));
-  ASSERT_INVERSE(f(Operator::F));
-  ASSERT_NORMAL(f(Operator::G));
-  ASSERT_INVERSE(f(Operator::H));
-  ASSERT_NORMAL(f(Operator::I));
-  ASSERT_ENTIRE(f(Operator::J));
-  ASSERT_EMPTY(f(Operator::K));
-  ASSERT_NORMAL(f(Operator::L));
-  ASSERT_INVERSE(f(Operator::M));
-  ASSERT_EMPTY(f(Operator::X));
-  ASSERT_EMPTY(f(Operator::O));
+  ASSERT_ENTIRE(b.apply(Operator::V));
+  ASSERT_ENTIRE(b.apply(Operator::A));
+  ASSERT_NORMAL(b.apply(Operator::B));
+  ASSERT_INVERSE(b.apply(Operator::C));
+  ASSERT_ENTIRE(b.apply(Operator::D));
+  ASSERT_EMPTY(b.apply(Operator::E));
+  ASSERT_INVERSE(b.apply(Operator::F));
+  ASSERT_NORMAL(b.apply(Operator::G));
+  ASSERT_INVERSE(b.apply(Operator::H));
+  ASSERT_NORMAL(b.apply(Operator::I));
+  ASSERT_ENTIRE(b.apply(Operator::J));
+  ASSERT_EMPTY(b.apply(Operator::K));
+  ASSERT_NORMAL(b.apply(Operator::L));
+  ASSERT_INVERSE(b.apply(Operator::M));
+  ASSERT_EMPTY(b.apply(Operator::X));
+  ASSERT_EMPTY(b.apply(Operator::O));
 }
