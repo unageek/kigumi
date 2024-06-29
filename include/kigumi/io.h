@@ -1,7 +1,5 @@
 #pragma once
 
-#include <CGAL/gmpxx.h>
-
 #include <boost/endian/conversion.hpp>
 #include <fstream>
 #include <iostream>
@@ -80,6 +78,63 @@ struct Read<bool> {
   }
 };
 
+#ifdef CGAL_USE_BOOST_MP
+
+#include <CGAL/boost_mp.h>
+
+template <>
+struct Write<boost::multiprecision::cpp_rational> {
+  static void write(std::ostream& out, const boost::multiprecision::cpp_rational& tt) {
+    do_write<bool>(out, tt < 0);
+
+    std::vector<std::uint8_t> buf;
+
+    export_bits(numerator(tt), std::back_inserter(buf), 8);
+    do_write<std::int32_t>(out, buf.size());
+    out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(buf.size()));
+
+    buf.clear();
+
+    export_bits(denominator(tt), std::back_inserter(buf), 8);
+    do_write<std::int32_t>(out, buf.size());
+    out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(buf.size()));
+  }
+};
+
+template <>
+struct Read<boost::multiprecision::cpp_rational> {
+  static void read(std::istream& in, boost::multiprecision::cpp_rational& tt) {
+    bool neg{};
+    do_read<bool>(in, neg);
+
+    boost::multiprecision::cpp_int num;
+    boost::multiprecision::cpp_int den;
+    std::size_t count{};
+    std::vector<std::uint8_t> buf;
+
+    do_read<std::int32_t>(in, count);
+    buf.resize(count);
+    in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
+    import_bits(num, buf.begin(), buf.end());
+
+    do_read<std::int32_t>(in, count);
+    buf.resize(count);
+    in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
+    import_bits(den, buf.begin(), buf.end());
+
+    tt = boost::multiprecision::cpp_rational{num, den};
+    if (neg) {
+      tt = -tt;
+    }
+  }
+};
+
+#endif
+
+#ifdef CGAL_USE_GMPXX
+
+#include <CGAL/gmpxx.h>
+
 template <>
 struct Write<mpq_class> {
   static void write(std::ostream& out, const mpq_class& tt) {
@@ -121,12 +176,14 @@ struct Read<mpq_class> {
     in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
     mpz_import(den.get_mpz_t(), count, 1, 1, 0, 0, buf.data());
 
-    tt = mpq_class(num) / mpq_class(den);
+    tt = mpq_class{num} / mpq_class{den};
     if (neg) {
       tt = -tt;
     }
   }
 };
+
+#endif
 
 template <class T>
 void save(const std::string& filename, const T& tt) {

@@ -2,8 +2,8 @@
 
 #include <CGAL/Bbox_3.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Exact_rational.h>
 #include <CGAL/IO/polygon_soup_io.h>
-#include <CGAL/gmpxx.h>
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_items.h>
@@ -195,9 +195,9 @@ struct Write<Triangle_soup<K, FaceData>> {
         do_write<double>(out, p.approx().z().inf());
       } else {
         do_write<bool>(out, true);
-        do_write<mpq_class>(out, p.exact().x());
-        do_write<mpq_class>(out, p.exact().y());
-        do_write<mpq_class>(out, p.exact().z());
+        do_write<CGAL::Exact_rational>(out, p.exact().x());
+        do_write<CGAL::Exact_rational>(out, p.exact().y());
+        do_write<CGAL::Exact_rational>(out, p.exact().z());
       }
     }
 
@@ -233,14 +233,15 @@ struct Read<Triangle_soup<K, FaceData>> {
         do_read<double>(in, z);
         tt.add_vertex({x, y, z});
       } else {
-        mpq_class x;
-        mpq_class y;
-        mpq_class z;
-        do_read<mpq_class>(in, x);
-        do_read<mpq_class>(in, y);
-        do_read<mpq_class>(in, z);
-        tt.add_vertex({CGAL::Lazy_exact_nt<mpq_class>{x}, CGAL::Lazy_exact_nt<mpq_class>{y},
-                       CGAL::Lazy_exact_nt<mpq_class>{z}});
+        CGAL::Exact_rational x;
+        CGAL::Exact_rational y;
+        CGAL::Exact_rational z;
+        do_read<CGAL::Exact_rational>(in, x);
+        do_read<CGAL::Exact_rational>(in, y);
+        do_read<CGAL::Exact_rational>(in, z);
+        tt.add_vertex({CGAL::Lazy_exact_nt<CGAL::Exact_rational>{x},
+                       CGAL::Lazy_exact_nt<CGAL::Exact_rational>{y},
+                       CGAL::Lazy_exact_nt<CGAL::Exact_rational>{z}});
       }
     }
 
