@@ -38,7 +38,7 @@ class Global_face_classifier {
         auto p_src = random_point_in_triangle<K>(tri_src, gen);
         auto side = Side_of_triangle_soup<K, FaceData>{}(soup_trg, p_src);
         if (side != CGAL::ON_ORIENTED_BOUNDARY) {
-          f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::Union : Face_tag::Intersection;
+          f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::Exterior : Face_tag::Interior;
           Face_tag_propagator{m, border, fh_src};
           break;
         }

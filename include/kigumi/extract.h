@@ -25,10 +25,10 @@ Triangle_soup<K, FaceData> extract(const Mixed_triangle_soup<K, FaceData>& m, Op
   for (auto fh : m.faces()) {
     auto mask = Mask::None;
     switch (m.data(fh).tag) {
-      case Face_tag::Union:
+      case Face_tag::Exterior:
         mask = u_mask;
         break;
-      case Face_tag::Intersection:
+      case Face_tag::Interior:
         mask = i_mask;
         break;
       case Face_tag::Coplanar:

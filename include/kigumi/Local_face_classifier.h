@@ -84,7 +84,7 @@ class Local_face_classifier {
     // Find pairs of non-overlapping and non-orientable faces and tag them.
 
     auto is_undefined_configuration = true;
-    // At the end of the loop, the kth face is tagged as either union or intersection.
+    // At the end of the loop, the kth face is tagged as either interior or exterior.
     std::size_t k{};
     for (std::size_t i = 0; i < faces.size(); ++i) {
       auto j = (i + 1) % faces.size();
@@ -102,11 +102,11 @@ class Local_face_classifier {
 
       if (fi.orientation == fj.orientation) {
         if (fi.orientation == CGAL::COUNTERCLOCKWISE) {
-          fi_data.tag = Face_tag::Intersection;
-          fj_data.tag = Face_tag::Union;
+          fi_data.tag = Face_tag::Interior;
+          fj_data.tag = Face_tag::Exterior;
         } else {
-          fi_data.tag = Face_tag::Union;
-          fj_data.tag = Face_tag::Intersection;
+          fi_data.tag = Face_tag::Exterior;
+          fj_data.tag = Face_tag::Interior;
         }
         is_undefined_configuration = false;
         k = j;
@@ -119,17 +119,17 @@ class Local_face_classifier {
 
     // Check consistency and tag rest of the faces.
 
-    // An example of inconsistent configuration:
+    // An example case of inconsistent configuration:
     //
     //             Int.
     //              |
     //              |-->
     //              |
-    //   ??? -------+------- Uni.
+    //   ??? -------+------- Ext.
     //    :     |       |
     //    :     V       V
     //    :
-    //   Should be Intersection due to global classification.
+    //   Should be tagged as interior according to global classification.
 
     auto consistent = true;
     for (auto run = 0; run < 2; run++) {
@@ -141,7 +141,7 @@ class Local_face_classifier {
         auto& f_data = m.data(f.fh);
 
         if (f.orientation == orientation) {
-          tag = tag == Face_tag::Union ? Face_tag::Intersection : Face_tag::Union;
+          tag = tag == Face_tag::Exterior ? Face_tag::Interior : Face_tag::Exterior;
         }
         orientation = f.orientation;
 
@@ -149,7 +149,7 @@ class Local_face_classifier {
           if (run == 1) {
             f_data.tag = tag;
           }
-        } else if ((f_data.tag == Face_tag::Union || f_data.tag == Face_tag::Intersection) &&
+        } else if ((f_data.tag == Face_tag::Exterior || f_data.tag == Face_tag::Interior) &&
                    f_data.tag != tag) {
           consistent = false;
         }
@@ -164,7 +164,7 @@ class Local_face_classifier {
     for (const auto& f : faces) {
       auto fh = f.fh;
       auto f_tag = m.data(fh).tag;
-      if (f_tag == Face_tag::Union || f_tag == Face_tag::Intersection) {
+      if (f_tag == Face_tag::Exterior || f_tag == Face_tag::Interior) {
         Face_tag_propagator prop{m, border, fh};
         warnings_ |= prop.warnings();
       }

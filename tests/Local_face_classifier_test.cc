@@ -27,10 +27,10 @@ TEST(LocalFaceClassfierTest, NonOverlapping) {
   Shared_edge_finder shared_edge_finder{m};
   const auto& shared_edges = shared_edge_finder.shared_edges();
   Local_face_classifier{m, {p, q}, shared_edges};
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Union);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Union);
-  ASSERT_EQ(m.data(f2).tag, Face_tag::Intersection);
-  ASSERT_EQ(m.data(f3).tag, Face_tag::Intersection);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::Exterior);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::Exterior);
+  ASSERT_EQ(m.data(f2).tag, Face_tag::Interior);
+  ASSERT_EQ(m.data(f3).tag, Face_tag::Interior);
 }
 
 TEST(LocalFaceClassfierTest, NonOverlappingUnknown) {

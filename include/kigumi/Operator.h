@@ -6,7 +6,7 @@ namespace kigumi {
 //
 //     |                  tag
 //     |
-//  op |   Uni.  |   Int.  |   Cop.  |   Opp.
+//  op |   Ext.  |   Int.  |   Cop.  |   Opp.
 // ----+---------+---------+---------+---------
 //   V |         |         |         |
 //   A |  A &  B |         |  A |  B |

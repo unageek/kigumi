@@ -9,7 +9,7 @@
 
 namespace kigumi {
 
-enum class Face_tag { Unknown = 0, Union, Intersection, Coplanar, Opposite };
+enum class Face_tag { Unknown = 0, Exterior, Interior, Coplanar, Opposite };
 
 template <>
 struct Write<Face_tag> {

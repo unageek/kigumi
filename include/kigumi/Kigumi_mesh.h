@@ -115,8 +115,8 @@ class Kigumi_mesh {
       Face_tag first_tag{};
       Face_tag second_tag{};
       std::tie(first_tag, second_tag) =
-          a.is_empty() || b.is_entire() ? std::make_pair(Face_tag::Intersection, Face_tag::Union)
-                                        : std::make_pair(Face_tag::Union, Face_tag::Intersection);
+          a.is_empty() || b.is_entire() ? std::make_pair(Face_tag::Interior, Face_tag::Exterior)
+                                        : std::make_pair(Face_tag::Exterior, Face_tag::Interior);
 
       std::vector<Mixed_face_data<Face_data>> face_data;
       face_data.reserve(faces.size());

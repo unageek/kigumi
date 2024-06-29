@@ -15,8 +15,8 @@ class Face_tag_propagator {
                       Face_handle seed)
       : m_{m}, border_{border}, seed_{seed} {
     auto tag = m_.data(seed).tag;
-    if (tag != Face_tag::Intersection && tag != Face_tag::Union) {
-      throw std::runtime_error("seed face is not tagged as intersection or union");
+    if (tag != Face_tag::Interior && tag != Face_tag::Exterior) {
+      throw std::runtime_error("seed face is not tagged as interior or exterior");
     }
 
     propagate();
