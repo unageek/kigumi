@@ -14,10 +14,10 @@ namespace kigumi {
 //   C | ~A      |       B |         | ~A |  B
 //   D |         | ~A & ~B | ~A | ~B |
 //   E | ~A & ~B |  A &  B |         |
-//   F | ~A      | ~A      | ~A      | ~A
-//   G |      ~B |      ~B |      ~B |      ~B
-//   H |       B |       B |       B |       B
-//   I |  A      |  A      |  A      |  A
+//   F | ~A      | ~A      | ~A | ~B | ~A |  B
+//   G |      ~B |      ~B | ~A | ~B |  A | ~B
+//   H |       B |       B |  A |  B | ~A |  B
+//   I |  A      |  A      |  A |  B |  A | ~B
 //   J |  A &  B | ~A & ~B |         |
 //   K |         |  A &  B |  A |  B |
 //   L |  A      |      ~B |         |  A | ~B
@@ -122,18 +122,14 @@ inline Mask intersection_mask(Operator op) {
 
 inline Mask coplanar_mask(Operator op, bool prefer_a) {
   switch (op) {
-    case Operator::I:
-      return Mask::A;
-    case Operator::H:
-      return Mask::B;
     case Operator::A:
+    case Operator::H:
+    case Operator::I:
     case Operator::K:
       return prefer_a ? Mask::A : Mask::B;
-    case Operator::F:
-      return Mask::AInv;
-    case Operator::G:
-      return Mask::BInv;
     case Operator::D:
+    case Operator::F:
+    case Operator::G:
     case Operator::X:
       return prefer_a ? Mask::AInv : Mask::BInv;
     default:
@@ -143,18 +139,14 @@ inline Mask coplanar_mask(Operator op, bool prefer_a) {
 
 inline Mask opposite_mask(Operator op, bool prefer_a) {
   switch (op) {
-    case Operator::I:
-      return Mask::A;
-    case Operator::H:
-      return Mask::B;
     case Operator::B:
+    case Operator::G:
+    case Operator::I:
     case Operator::L:
       return prefer_a ? Mask::A : Mask::BInv;
-    case Operator::F:
-      return Mask::AInv;
-    case Operator::G:
-      return Mask::BInv;
     case Operator::C:
+    case Operator::F:
+    case Operator::H:
     case Operator::M:
       return prefer_a ? Mask::AInv : Mask::B;
     default:
