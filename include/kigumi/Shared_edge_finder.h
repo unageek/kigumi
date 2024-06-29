@@ -2,11 +2,7 @@
 
 #include <kigumi/Mixed.h>
 
-#include <boost/container_hash/hash.hpp>
-#include <functional>
 #include <unordered_set>
-#include <utility>
-#include <vector>
 
 namespace kigumi {
 

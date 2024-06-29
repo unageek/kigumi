@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/container_hash/hash.hpp>
-#include <functional>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -36,9 +35,9 @@ class Point_list {
         p.exact();
       }
       std::size_t seed{};
-      boost::hash_combine(seed, std::hash<double>{}(p.approx().x().inf()));
-      boost::hash_combine(seed, std::hash<double>{}(p.approx().y().inf()));
-      boost::hash_combine(seed, std::hash<double>{}(p.approx().z().inf()));
+      boost::hash_combine(seed, p.approx().x().inf());
+      boost::hash_combine(seed, p.approx().y().inf());
+      boost::hash_combine(seed, p.approx().z().inf());
       return seed;
     }
   };

@@ -39,10 +39,10 @@ struct Read<Vertex_handle> {
 
 template <>
 struct std::hash<kigumi::Face_handle> {
-  std::size_t operator()(kigumi::Face_handle fh) const { return fh.i; }
+  std::size_t operator()(kigumi::Face_handle fh) const noexcept { return fh.i; }
 };
 
 template <>
 struct std::hash<kigumi::Vertex_handle> {
-  std::size_t operator()(kigumi::Vertex_handle vh) const { return vh.i; }
+  std::size_t operator()(kigumi::Vertex_handle vh) const noexcept { return vh.i; }
 };

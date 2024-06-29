@@ -4,10 +4,7 @@
 #include <kigumi/Operator.h>
 #include <kigumi/Triangle_soup.h>
 
-#include <array>
 #include <unordered_map>
-#include <utility>
-#include <vector>
 
 namespace kigumi {
 
