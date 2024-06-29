@@ -38,6 +38,27 @@ Additional notes:
 
 1. Faces that have more than three vertices are interpreted as triangle fans.
 
+## Table of operators
+
+| `Operator::`               | Set notation        | Venn diagram                              |
+| -------------------------- | ------------------- | ----------------------------------------- |
+| `V`                        | $U$ (the universe)  | <img width="100" src="docs/Venn1111.png"> |
+| `A`, `Union`               | $A ∪ B$             | <img width="100" src="docs/Venn0111.png"> |
+| `B`                        | $(B ⧵ A)^c$         | <img width="100" src="docs/Venn1101.png"> |
+| `C`                        | $(A ⧵ B)^c$         | <img width="100" src="docs/Venn1011.png"> |
+| `D`                        | $(A ∩ B)^c$         | <img width="100" src="docs/Venn1110.png"> |
+| `E`                        | $(A △ B)^c$         | <img width="100" src="docs/Venn1001.png"> |
+| `F`                        | $A^c$               | <img width="100" src="docs/Venn1010.png"> |
+| `G`                        | $B^c$               | <img width="100" src="docs/Venn1100.png"> |
+| `H`                        | $B$                 | <img width="100" src="docs/Venn0011.png"> |
+| `I`                        | $A$                 | <img width="100" src="docs/Venn0101.png"> |
+| `J`, `SymmetricDifference` | $A △ B$             | <img width="100" src="docs/Venn0110.png"> |
+| `K`, `Intersection`        | $A ∩ B$             | <img width="100" src="docs/Venn0001.png"> |
+| `L`, `Difference`          | $A ⧵ B$             | <img width="100" src="docs/Venn0100.png"> |
+| `M`                        | $B ⧵ A$             | <img width="100" src="docs/Venn0010.png"> |
+| `X`                        | $(A ∪ B)^c$         | <img width="100" src="docs/Venn1000.png"> |
+| `O`                        | $∅$ (the empty set) | <img width="100" src="docs/Venn0000.png"> |
+
 ## Algorithm
 
 An enhanced version of the algorithm described in [[1]](#1) is used.
