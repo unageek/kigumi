@@ -15,8 +15,11 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
-    Boost::atomic
+    Boost::container_hash
+    Boost::endian
+    Boost::iterator
     Boost::program_options
+    Boost::range
     CGAL::CGAL
     OpenMP::OpenMP_CXX
 )
@@ -40,8 +43,11 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
-    Boost::atomic
+    Boost::container_hash
+    Boost::endian
+    Boost::iterator
     Boost::program_options
+    Boost::range
     CGAL::CGAL
     OpenMP::OpenMP_CXX
 )

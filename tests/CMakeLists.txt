@@ -19,6 +19,10 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::container_hash
+    Boost::endian
+    Boost::iterator
+    Boost::range
     CGAL::CGAL
     GTest::gtest
     GTest::gtest_main
