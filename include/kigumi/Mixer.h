@@ -97,6 +97,6 @@ class Mixer {
   const Triangle_soup<K, FaceData>& right_;
   Mixed_triangle_soup<K, FaceData> mixed_;
   Warnings warnings_{};
-};  // namespace kigumi
+};
 
 }  // namespace kigumi
