@@ -88,7 +88,8 @@ class Mixer {
 
     std::cout << "Global classification..." << std::endl;
 
-    Global_face_classifier{m, shared_edges, left_, right_};
+    Global_face_classifier gfc{m, shared_edges, left_, right_};
+    warnings_ |= gfc.warnings();
 
     mixed_ = m.into_Triangle_soup();
   }

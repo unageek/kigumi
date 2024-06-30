@@ -119,16 +119,15 @@ class Local_face_classifier {
 
     // Check consistency and tag rest of the faces.
 
-    // An example case of inconsistent configuration:
+    // An example case of an inconsistent configuration:
     //
-    //             Int.
-    //              |
-    //              |-->
-    //              |
-    //   ??? -------+------- Ext.
-    //    :     |       |
-    //    :     V       V
-    //    :
+    //                 Right, Int.
+    //                    //|
+    //                    //|
+    //                    //|
+    //             /////////|/////////
+    //   Left, ??? ---------+--------- Left, Ext.
+    //          :
     //   Should be tagged as interior according to global classification.
 
     auto consistent = true;
@@ -152,6 +151,7 @@ class Local_face_classifier {
         } else if ((f_data.tag == Face_tag::Exterior || f_data.tag == Face_tag::Interior) &&
                    f_data.tag != tag) {
           consistent = false;
+          break;
         }
       }
 
@@ -160,6 +160,8 @@ class Local_face_classifier {
         break;
       }
     }
+
+    // Propagate face tags.
 
     for (const auto& f : faces) {
       auto fh = f.fh;
