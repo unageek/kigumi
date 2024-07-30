@@ -1,4 +1,4 @@
-# Building on Ubuntu 22.04
+# Building on Ubuntu 24.04
 
 ## Prerequisites
 

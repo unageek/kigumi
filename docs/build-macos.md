@@ -13,7 +13,7 @@
 - Tools and libraries
 
   ```bash
-  brew install automake autoconf-archive cmake llvm ninja
+  brew install autoconf-archive automake cmake libtool llvm ninja
   ```
 
 ## Clone
