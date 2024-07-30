@@ -33,7 +33,7 @@ Set-Location $PSScriptRoot
 switch -regex ($args[0]) {
     '^c(onfigure)?$' {
         loadBuildEnvironment
-        Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='vcpkg/scripts/buildsystems/vcpkg.cmake' $externalArgs }
+        Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='vcpkg/scripts/buildsystems/vcpkg.cmake' }
         break
     }
     '^b(uild)?$' {
@@ -49,11 +49,6 @@ switch -regex ($args[0]) {
     '^t(est)?$' {
         loadBuildEnvironment
         Exec { ctest -V --test-dir build }
-        break
-    }
-    '^configure-on-ci$' {
-        loadBuildEnvironment
-        Exec { cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE='C:/vcpkg/scripts/buildsystems/vcpkg.cmake' }
         break
     }
     default {

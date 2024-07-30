@@ -1,4 +1,4 @@
-# Building on Windows
+# Building on Windows 10/11
 
 ## Prerequisites
 
@@ -18,18 +18,22 @@
 
 ## Clone
 
+```ps1
+git clone --recurse-submodules https://github.com/unageek/kigumi.git
+cd kigumi
 ```
-git clone --recursive https://github.com/unageek/kigumi.git
+
+To update an existing repository:
+
+```ps1
+git pull --recurse-submodules
 ```
 
 ## Build
 
-```
-cd kigumi
+```ps1
 ./run configure  # or ./run c
 ./run build      # or ./run b
 ```
 
-## Run
-
-See [Running example programs](run.md).
+# [Running example programs](run.md)
