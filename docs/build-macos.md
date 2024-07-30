@@ -1,16 +1,12 @@
-# Building on macOS
+# Building on macOS Sonoma
 
 ## Prerequisites
 
-- Xcode Command Line Tools
-
-  ```bash
-  xcode-select --install
-  ```
+- Xcode 15
 
 - [Homebrew](https://brew.sh)
 
-- Tools and libraries
+- Build tools
 
   ```bash
   brew install autoconf-archive automake cmake libtool llvm ninja
@@ -18,18 +14,24 @@
 
 ## Clone
 
+```bash
+git clone --recurse-submodules https://github.com/unageek/kigumi.git
+cd kigumi
 ```
-git clone https://github.com/unageek/kigumi.git
+
+To update an existing repository:
+
+```bash
+git pull --recurse-submodules
 ```
 
 ## Build
 
-```
-cd kigumi
+```bash
+export CC=$(brew --prefix)/opt/llvm/bin/clang
+export CXX=$(brew --prefix)/opt/llvm/bin/clang++
 ./run configure  # or ./run c
 ./run build      # or ./run b
 ```
 
-## Run
-
-See [Running example programs](run.md).
+## [Running example programs](run.md)
