@@ -70,13 +70,7 @@ jobs:
           key: ${{ runner.os }}-vcpkg
 
       - name: Configure
-        run: |
-          $hash = git rev-parse HEAD:vcpkg
-          Push-Location C:\vcpkg
-          git fetch origin $hash
-          git checkout $hash
-          Pop-Location
-          .\run configure-on-ci
+        run: .\run configure
 
       - name: Build
         run: .\run build
