@@ -10,7 +10,7 @@ on:
 jobs:
   build-ubuntu:
     name: Build - Ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_binary_cache
@@ -36,7 +36,10 @@ jobs:
           key: ${{ runner.os }}-vcpkg
 
       - name: Configure
-        run: ./run configure -- -DCMAKE_CXX_COMPILER=clang++
+        run: ./run configure
+        env:
+          CC: clang
+          CXX: clang++
 
       - name: Build
         run: ./run build
@@ -94,7 +97,7 @@ jobs:
           submodules: "true"
 
       - name: Prerequisites
-        run: brew install automake autoconf-archive cmake llvm ninja
+        run: brew install autoconf-archive automake cmake libtool llvm ninja
 
       - name: Prepare to cache Vcpkg
         run: mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
@@ -108,6 +111,9 @@ jobs:
 
       - name: Configure
         run: ./run configure
+        env:
+          CC: /opt/homebrew/opt/llvm/bin/clang
+          CXX: /opt/homebrew/opt/llvm/bin/clang++
 
       - name: Build
         run: ./run build
