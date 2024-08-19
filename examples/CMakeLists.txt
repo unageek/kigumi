@@ -15,6 +15,7 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::container
     Boost::container_hash
     Boost::endian
     Boost::iterator
@@ -43,6 +44,7 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::container
     Boost::container_hash
     Boost::endian
     Boost::iterator

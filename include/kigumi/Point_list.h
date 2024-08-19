@@ -28,6 +28,11 @@ class Point_list {
 
   std::vector<Point> into_vector() const { return std::move(points_); }
 
+  void reserve(std::size_t capacity) {
+    points_.reserve(capacity);
+    point_to_index_.reserve(capacity);
+  }
+
  private:
   struct Point_hash {
     std::size_t operator()(const Point& p) const noexcept {
