@@ -5,11 +5,12 @@
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/io.h>
 
+#include <cstdint>
 #include <iostream>
 
 namespace kigumi {
 
-enum class Face_tag { Unknown = 0, Exterior, Interior, Coplanar, Opposite };
+enum class Face_tag : std::uint8_t { Unknown = 0, Exterior, Interior, Coplanar, Opposite };
 
 template <>
 struct Write<Face_tag> {
