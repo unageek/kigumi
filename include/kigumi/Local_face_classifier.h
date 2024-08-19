@@ -131,7 +131,7 @@ class Local_face_classifier {
     //   Should be tagged as interior according to global classification.
 
     auto consistent = true;
-    for (auto run = 0; run < 2; run++) {
+    for (auto dry_run : {true, false}) {
       auto tag = m.data(faces.at(k).fh).tag;
       auto orientation = faces.at(k).orientation;
       // Go around and return to the starting point to check consistency.
@@ -145,7 +145,7 @@ class Local_face_classifier {
         orientation = f.orientation;
 
         if (f_data.tag == Face_tag::Unknown) {
-          if (run == 1) {
+          if (!dry_run) {
             f_data.tag = tag;
           }
         } else if ((f_data.tag == Face_tag::Exterior || f_data.tag == Face_tag::Interior) &&
