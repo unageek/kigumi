@@ -8,7 +8,11 @@
 namespace kigumi {
 
 struct Face_handle {
-  std::size_t i{std::numeric_limits<std::size_t>::max()};
+  Face_handle() : i{std::numeric_limits<std::size_t>::max()} {}
+
+  Face_handle(std::size_t i) : i{i} {}
+
+  std::size_t i;
 };
 
 inline bool operator<(Face_handle a, Face_handle b) { return a.i < b.i; }
@@ -16,7 +20,11 @@ inline bool operator==(Face_handle a, Face_handle b) { return a.i == b.i; }
 inline bool operator!=(Face_handle a, Face_handle b) { return a.i != b.i; }
 
 struct Vertex_handle {
-  std::size_t i{std::numeric_limits<std::size_t>::max()};
+  Vertex_handle() : i{std::numeric_limits<std::size_t>::max()} {}
+
+  Vertex_handle(std::size_t i) : i{i} {}
+
+  std::size_t i;
 };
 
 inline bool operator<(Vertex_handle a, Vertex_handle b) { return a.i < b.i; }

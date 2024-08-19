@@ -10,8 +10,6 @@ namespace kigumi {
 class Vertex_iterator : public boost::iterator_facade<Vertex_iterator, Vertex_handle,
                                                       boost::forward_traversal_tag, Vertex_handle> {
  public:
-  Vertex_iterator() = default;
-
   explicit Vertex_iterator(Vertex_handle vh) : vh_{vh} {}
 
  private:
@@ -23,7 +21,7 @@ class Vertex_iterator : public boost::iterator_facade<Vertex_iterator, Vertex_ha
 
   Vertex_handle dereference() const { return vh_; }
 
-  Vertex_handle vh_{0};
+  Vertex_handle vh_;
 };
 
 class Face_around_edge_iterator
@@ -89,8 +87,6 @@ class Face_around_edge_iterator
 class Face_iterator : public boost::iterator_facade<Face_iterator, Face_handle,
                                                     boost::forward_traversal_tag, Face_handle> {
  public:
-  Face_iterator() = default;
-
   explicit Face_iterator(Face_handle fh) : fh_{fh} {}
 
  private:
@@ -102,7 +98,7 @@ class Face_iterator : public boost::iterator_facade<Face_iterator, Face_handle,
 
   Face_handle dereference() const { return fh_; }
 
-  Face_handle fh_{0};
+  Face_handle fh_;
 };
 
 class Face_around_face_iterator
@@ -152,7 +148,7 @@ class Face_around_face_iterator
     if (it3_ != end3_) {
       return *it3_;
     }
-    return Face_handle{};
+    return {};
   }
 
   Face_handle fh_;
