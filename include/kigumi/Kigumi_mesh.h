@@ -11,6 +11,7 @@
 #include <kigumi/io.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <iterator>
 #include <stdexcept>
 #include <string>
@@ -20,7 +21,7 @@
 
 namespace kigumi {
 
-enum class Kigumi_mesh_kind {
+enum class Kigumi_mesh_kind : std::uint8_t {
   Empty,
   Entire,
   Normal,

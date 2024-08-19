@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace kigumi {
 
 // Face output table
@@ -28,7 +30,7 @@ namespace kigumi {
 // A & B: Output both A and B.
 // A | B: Output either A or B.
 
-enum class Operator {
+enum class Operator : std::uint8_t {
   // Bochenski notation
   V,  // The universe
   A,  // A \cup B
@@ -54,7 +56,7 @@ enum class Operator {
   Difference = L,
 };
 
-enum class Mask {
+enum class Mask : std::uint8_t {
   None = 0,
   A = 1,
   B = 2,
@@ -63,11 +65,11 @@ enum class Mask {
 };
 
 inline Mask operator|(Mask a, Mask b) {
-  return static_cast<Mask>(static_cast<int>(a) | static_cast<int>(b));
+  return static_cast<Mask>(static_cast<std::uint8_t>(a) | static_cast<std::uint8_t>(b));
 }
 
 inline Mask operator&(Mask a, Mask b) {
-  return static_cast<Mask>(static_cast<int>(a) & static_cast<int>(b));
+  return static_cast<Mask>(static_cast<std::uint8_t>(a) & static_cast<std::uint8_t>(b));
 }
 
 inline Mask union_mask(Operator op) {
