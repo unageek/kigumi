@@ -102,6 +102,7 @@ class Face_face_intersection {
                               std::size_t p, std::size_t q, std::size_t r, CGAL::Orientation apqr,
                               CGAL::Orientation bpqr) {
     if (apqr * bpqr > 0) {
+      // No intersections.
       return;
     }
 
@@ -115,6 +116,7 @@ class Face_face_intersection {
     auto abrp = orientation(a, b, r, p);
 
     if (abpq * abqr < 0 || abqr * abrp < 0 || abrp * abpq < 0) {
+      // No intersections.
       return;
     }
 
@@ -208,6 +210,7 @@ class Face_face_intersection {
                                  CGAL::Orientation abp, CGAL::Orientation abq,
                                  CGAL::Orientation apq, CGAL::Orientation bpq) {
     if (abp * abq > 0 || apq * bpq > 0) {
+      // No intersections.
       return;
     }
 
@@ -231,6 +234,7 @@ class Face_face_intersection {
     if (abp == 0) {
       second = vp;
     } else if (abq == 0) {
+      // Case 1.
       return;
     }
 
@@ -261,6 +265,7 @@ class Face_face_intersection {
     auto aq = orientation(a, q);
 
     if (ap * aq > 0) {
+      // No intersections.
       return;
     }
 
