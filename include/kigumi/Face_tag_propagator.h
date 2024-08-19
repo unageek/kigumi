@@ -16,7 +16,7 @@ class Face_tag_propagator {
       : m_{m}, border_{border}, seed_{seed} {
     auto tag = m_.data(seed).tag;
     if (tag != Face_tag::Interior && tag != Face_tag::Exterior) {
-      throw std::runtime_error("seed face is not tagged as interior or exterior");
+      throw std::runtime_error("the seed face must be tagged as either interior or exterior");
     }
 
     propagate();

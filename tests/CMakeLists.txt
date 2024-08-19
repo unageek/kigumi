@@ -2,6 +2,7 @@ set(TARGET kigumi-test)
 
 add_executable(${TARGET}
     face_data.cc
+    Face_face_intersection_tests.cc
     Local_face_classifier_test.cc
     side_of_mesh.cc
     special.cc
@@ -19,6 +20,7 @@ target_include_directories(${TARGET} PRIVATE
 )
 
 target_link_libraries(${TARGET} PRIVATE
+    Boost::container
     Boost::container_hash
     Boost::endian
     Boost::iterator
