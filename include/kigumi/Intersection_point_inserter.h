@@ -88,8 +88,8 @@ class Intersection_point_inserter {
     const auto& pp = points_.at(p);
     const auto& pq = points_.at(q);
 
-    auto result = typename K::Construct_line_line_intersection_point_3{}(pa, pb, pp, pq);
-    auto id = points_.insert(std::move(result));
+    auto point = typename K::Construct_line_line_intersection_point_3{}(pa, pb, pp, pq);
+    auto id = points_.insert(std::move(point));
     line_line_intersection_cache_.emplace(key, id);
     return id;
   }
@@ -121,8 +121,8 @@ class Intersection_point_inserter {
     const auto& pp = points_.at(p);
     const auto& pq = points_.at(q);
 
-    auto result = typename K::Construct_plane_line_intersection_point_3{}(pa, pb, pc, pp, pq);
-    auto id = points_.insert(std::move(result));
+    auto point = typename K::Construct_plane_line_intersection_point_3{}(pa, pb, pc, pp, pq);
+    auto id = points_.insert(std::move(point));
     plane_line_intersection_cache_.emplace(key, id);
     return id;
   }

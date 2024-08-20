@@ -54,17 +54,17 @@ class AABB_tree {
 
     switch (num_leaves) {
       case 0:
-        return;
+        break;
 
       case 1:
         if (DoIntersect::do_intersect(root_leaf()->bbox(), query)) {
           *leaves++ = root_leaf();
         }
-        return;
+        break;
 
       default:
         traverse<DoIntersect>(leaves, num_leaves, query, root_node());
-        return;
+        break;
     }
   }
 

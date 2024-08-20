@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kigumi/Coplanar_face_finder.h>
 #include <kigumi/Face_face_intersection.h>
 #include <kigumi/Face_pair_finder.h>
 #include <kigumi/Intersection_point_inserter.h>
@@ -14,6 +15,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -33,11 +35,6 @@ class Corefine {
   Corefine(const Triangle_soup& left, const Triangle_soup& right) : left_{left}, right_{right} {
     std::cout << "Finding face pairs..." << std::endl;
 
-    Face_pair_finder finder{left_, right_};
-    auto pairs = finder.find_face_pairs();
-
-    std::cout << "Finding symbolic intersections..." << std::endl;
-
     points_.reserve(left_.num_vertices() + right_.num_vertices());
     for (auto vh : left_.vertices()) {
       left_point_ids_.push_back(points_.insert(left_.point(vh)));
@@ -45,6 +42,24 @@ class Corefine {
     for (auto vh : right_.vertices()) {
       right_point_ids_.push_back(points_.insert(right_.point(vh)));
     }
+
+    Coplanar_face_finder cop_finder{left_, right_, left_point_ids_, right_point_ids_};
+    auto left_coplanar_faces = cop_finder.take_left_coplanar_faces();
+    auto left_opposite_faces = cop_finder.take_left_opposite_faces();
+    auto right_coplanar_faces = cop_finder.take_right_coplanar_faces();
+    auto right_opposite_faces = cop_finder.take_right_opposite_faces();
+
+    std::unordered_set<Face_handle> left_faces_to_ignore;
+    left_faces_to_ignore.insert(left_coplanar_faces.begin(), left_coplanar_faces.end());
+    left_faces_to_ignore.insert(left_opposite_faces.begin(), left_opposite_faces.end());
+    std::unordered_set<Face_handle> right_faces_to_ignore;
+    right_faces_to_ignore.insert(right_coplanar_faces.begin(), right_coplanar_faces.end());
+    right_faces_to_ignore.insert(right_opposite_faces.begin(), right_opposite_faces.end());
+
+    Face_pair_finder finder{left_, right_, left_faces_to_ignore, right_faces_to_ignore};
+    auto pairs = finder.find_face_pairs();
+
+    std::cout << "Finding symbolic intersections..." << std::endl;
 
     std::vector<Intersection_info> infos;
 
