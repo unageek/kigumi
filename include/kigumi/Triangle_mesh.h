@@ -88,7 +88,7 @@ class Triangle_mesh {
     return *this;
   }
 
-  explicit Triangle_mesh(std::vector<Point>&& points) : points_{std::move(points)} {}
+  explicit Triangle_mesh(std::vector<Point> points) : points_{std::move(points)} {}
 
   Vertex_handle add_vertex(const Point& p) {
     points_.push_back(p);

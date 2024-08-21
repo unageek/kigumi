@@ -93,8 +93,7 @@ class Triangle_soup {
     face_data_.shrink_to_fit();
   }
 
-  Triangle_soup(std::vector<Point>&& points, std::vector<Face>&& faces,
-                std::vector<FaceData>&& face_data)
+  Triangle_soup(std::vector<Point> points, std::vector<Face> faces, std::vector<FaceData> face_data)
       : points_{std::move(points)}, faces_{std::move(faces)}, face_data_{std::move(face_data)} {}
 
   Vertex_handle add_vertex(const Point& p) {
