@@ -9,14 +9,13 @@
 #include <kigumi/Triangle_region.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangulator.h>
+#include <kigumi/parallel_do.h>
 
 #include <algorithm>
-#include <atomic>
 #include <boost/container/static_vector.hpp>
+#include <boost/iterator/zip_iterator.hpp>
 #include <iostream>
-#include <mutex>
 #include <stdexcept>
-#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -63,47 +62,29 @@ class Corefine {
 
     std::vector<Intersection_info> infos;
 
-    {
-      std::vector<std::thread> threads;
-      std::atomic<std::size_t> next_index{};
-      std::mutex mutex;
-      auto num_threads = std::thread::hardware_concurrency();
-      for (unsigned tid = 0; tid < num_threads; ++tid) {
-        threads.emplace_back([&] {
-          std::vector<Intersection_info> local_infos;
-          Face_face_intersection face_face_intersection{points_};
+    parallel_do(
+        pairs.begin(), pairs.end(), std::vector<Intersection_info>{},
+        [&](const auto& pair, auto& local_infos) {
+          thread_local Face_face_intersection face_face_intersection{points_};
 
-          while (true) {
-            auto i = next_index++;
-            if (i >= pairs.size()) {
-              break;
-            }
-
-            auto [left_fh, right_fh] = pairs.at(i);
-            const auto& left_face = left_.face(left_fh);
-            const auto& right_face = right_.face(right_fh);
-            auto a = left_point_ids_.at(left_face[0].i);
-            auto b = left_point_ids_.at(left_face[1].i);
-            auto c = left_point_ids_.at(left_face[2].i);
-            auto p = right_point_ids_.at(right_face[0].i);
-            auto q = right_point_ids_.at(right_face[1].i);
-            auto r = right_point_ids_.at(right_face[2].i);
-            auto sym_inters = face_face_intersection(a, b, c, p, q, r);
-            if (sym_inters.empty()) {
-              continue;
-            }
-            local_infos.emplace_back(left_fh, right_fh, sym_inters);
+          auto [left_fh, right_fh] = pair;
+          const auto& left_face = left_.face(left_fh);
+          const auto& right_face = right_.face(right_fh);
+          auto a = left_point_ids_.at(left_face[0].i);
+          auto b = left_point_ids_.at(left_face[1].i);
+          auto c = left_point_ids_.at(left_face[2].i);
+          auto p = right_point_ids_.at(right_face[0].i);
+          auto q = right_point_ids_.at(right_face[1].i);
+          auto r = right_point_ids_.at(right_face[2].i);
+          auto sym_inters = face_face_intersection(a, b, c, p, q, r);
+          if (sym_inters.empty()) {
+            return;
           }
-
-          std::lock_guard lock{mutex};
+          local_infos.emplace_back(left_fh, right_fh, sym_inters);
+        },
+        [&](const auto& local_infos) {
           infos.insert(infos.end(), local_infos.begin(), local_infos.end());
         });
-      }
-
-      for (auto& thread : threads) {
-        thread.join();
-      }
-    }
 
     std::cout << "Constructing intersection points..." << std::endl;
 
@@ -157,41 +138,20 @@ class Corefine {
     }
     partitions.push_back(infos.end());
 
-    bool caught{};
-    {
-      std::vector<std::thread> threads;
-      std::atomic<std::size_t> next_index{};
-      auto num_threads = std::thread::hardware_concurrency();
-      for (unsigned tid = 0; tid < num_threads; ++tid) {
-        threads.emplace_back([&] {
-          while (true) {
-            auto i = next_index++;
-            if (i >= partitions.size() - 1 || caught) {
-              break;
-            }
-
-            auto begin = partitions.at(i);
-            auto end = partitions.at(i + 1);
-
-            auto& triangulator = left_triangulators_.at(begin->left_fh);
-            for (auto it = begin; it != end; ++it) {
-              try {
-                insert_intersection(triangulator, *it);
-              } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
-                caught = true;
-                break;
-              }
-            }
-          }
-        });
-      }
-
-      for (auto& thread : threads) {
-        thread.join();
-      }
-    }
-
-    if (caught) {
+    try {
+      parallel_do(boost::make_zip_iterator(
+                      boost::make_tuple(partitions.begin(), std::next(partitions.begin()))),
+                  boost::make_zip_iterator(
+                      boost::make_tuple(std::prev(partitions.end()), partitions.end())),
+                  [&](const auto& partition_range) {
+                    auto begin = partition_range.template get<0>();
+                    auto end = partition_range.template get<1>();
+                    auto& triangulator = left_triangulators_.at(begin->left_fh);
+                    for (auto it = begin; it != end; ++it) {
+                      insert_intersection(triangulator, *it);
+                    }
+                  });
+    } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the second mesh has self-intersections");
     }
 
@@ -206,40 +166,20 @@ class Corefine {
     }
     partitions.push_back(infos.end());
 
-    {
-      std::vector<std::thread> threads;
-      std::atomic<std::size_t> next_index{};
-      auto num_threads = std::thread::hardware_concurrency();
-      for (unsigned tid = 0; tid < num_threads; ++tid) {
-        threads.emplace_back([&] {
-          while (true) {
-            auto i = next_index++;
-            if (i >= partitions.size() - 1 || caught) {
-              break;
-            }
-
-            auto begin = partitions.at(i);
-            auto end = partitions.at(i + 1);
-
-            auto& triangulator = right_triangulators_.at(begin->right_fh);
-            for (auto it = begin; it != end; ++it) {
-              try {
-                insert_intersection(triangulator, *it);
-              } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
-                caught = true;
-                break;
-              }
-            }
-          }
-        });
-      }
-
-      for (auto& thread : threads) {
-        thread.join();
-      }
-    }
-
-    if (caught) {
+    try {
+      parallel_do(boost::make_zip_iterator(
+                      boost::make_tuple(partitions.begin(), std::next(partitions.begin()))),
+                  boost::make_zip_iterator(
+                      boost::make_tuple(std::prev(partitions.end()), partitions.end())),
+                  [&](const auto& partition_range) {
+                    auto begin = partition_range.template get<0>();
+                    auto end = partition_range.template get<1>();
+                    auto& triangulator = right_triangulators_.at(begin->right_fh);
+                    for (auto it = begin; it != end; ++it) {
+                      insert_intersection(triangulator, *it);
+                    }
+                  });
+    } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the first mesh has self-intersections");
     }
   }

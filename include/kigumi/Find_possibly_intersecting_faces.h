@@ -2,11 +2,9 @@
 
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Triangle_soup.h>
+#include <kigumi/parallel_do.h>
 
-#include <atomic>
 #include <iterator>
-#include <mutex>
-#include <thread>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -34,24 +32,14 @@ class Find_possibly_intersecting_faces {
     const auto& b_faces_to_ignore = left_is_a ? right_faces_to_ignore : left_faces_to_ignore;
     const auto& a_tree = a.aabb_tree();
 
-    std::vector<std::thread> threads;
-    std::atomic<std::size_t> next_index{};
-    std::mutex mutex;
-    auto num_threads = std::thread::hardware_concurrency();
-    for (unsigned tid = 0; tid < num_threads; ++tid) {
-      threads.emplace_back([&] {
-        std::vector<Face_handle_pair> local_pairs;
-        std::vector<const Leaf*> leaves;
+    parallel_do(
+        b.faces_begin(), b.faces_end(),
+        std::pair<std::vector<Face_handle_pair>, std::vector<const Leaf*>>{},
+        [&](auto b_fh, auto& local_state) {
+          auto& [local_pairs, leaves] = local_state;
 
-        while (true) {
-          auto i = next_index++;
-          if (i >= b.num_faces()) {
-            break;
-          }
-
-          Face_handle b_fh{i};
           if (b_faces_to_ignore.contains(b_fh)) {
-            continue;
+            return;
           }
 
           leaves.clear();
@@ -69,16 +57,12 @@ class Find_possibly_intersecting_faces {
               local_pairs.emplace_back(b_fh, a_fh);
             }
           }
-        }
+        },
+        [&](const auto& local_state) {
+          const auto& [local_pairs, leaves] = local_state;
 
-        std::lock_guard lock{mutex};
-        pairs.insert(pairs.end(), local_pairs.begin(), local_pairs.end());
-      });
-    }
-
-    for (auto& thread : threads) {
-      thread.join();
-    }
+          pairs.insert(pairs.end(), local_pairs.begin(), local_pairs.end());
+        });
 
     return pairs;
   }

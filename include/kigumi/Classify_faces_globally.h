@@ -6,12 +6,10 @@
 #include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>
+#include <kigumi/parallel_do.h>
 
-#include <atomic>
-#include <mutex>
 #include <queue>
 #include <stdexcept>
-#include <thread>
 #include <unordered_set>
 #include <vector>
 
@@ -30,23 +28,12 @@ class Classify_faces_globally {
     auto representative_faces = find_unclassified_connected_components(m, border_edges);
     Warnings warnings{};
 
-    std::vector<std::thread> threads;
-    std::atomic<std::size_t> next_index{};
-    std::mutex mutex;
-    auto num_threads = std::thread::hardware_concurrency();
-    for (unsigned tid = 0; tid < num_threads; ++tid) {
-      threads.emplace_back([&] {
-        Propagate_face_tags propagate_face_tags;
-        Side_of_triangle_soup side_of_triangle_soup;
-        Warnings local_warnings{};
+    parallel_do(
+        representative_faces.begin(), representative_faces.end(), Warnings{},
+        [&](auto fh_src, auto& local_warnings) {
+          thread_local Propagate_face_tags propagate_face_tags;
+          thread_local Side_of_triangle_soup side_of_triangle_soup;
 
-        while (true) {
-          auto i = next_index++;
-          if (i >= representative_faces.size()) {
-            break;
-          }
-
-          auto fh_src = representative_faces.at(i);
           auto& f_src = m.data(fh_src);
           auto tri_src = m.triangle(fh_src);
           const auto& soup_trg = f_src.from_left ? right : left;
@@ -58,16 +45,8 @@ class Classify_faces_globally {
           }
           f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::Exterior : Face_tag::Interior;
           local_warnings |= propagate_face_tags(m, border_edges, fh_src);
-        }
-
-        std::lock_guard lock{mutex};
-        warnings |= local_warnings;
-      });
-    }
-
-    for (auto& thread : threads) {
-      thread.join();
-    }
+        },
+        [&](const auto& local_warnings) { warnings |= local_warnings; });
 
     return warnings;
   }

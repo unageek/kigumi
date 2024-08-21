@@ -7,19 +7,28 @@
 
 namespace kigumi {
 
-class Vertex_iterator : public boost::iterator_facade<Vertex_iterator, Vertex_handle,
-                                                      boost::forward_traversal_tag, Vertex_handle> {
+class Vertex_iterator
+    : public boost::iterator_facade<Vertex_iterator, Vertex_handle,
+                                    boost::random_access_traversal_tag, Vertex_handle> {
  public:
   explicit Vertex_iterator(Vertex_handle vh) : vh_{vh} {}
 
  private:
-  friend class boost::iterator_core_access;
+  friend boost::iterator_core_access;
 
-  void increment() { ++vh_.i; }
+  void advance(std::ptrdiff_t n) { vh_.i += n; }
+
+  void decrement() { --vh_.i; }
+
+  Vertex_handle dereference() const { return vh_; }
+
+  std::ptrdiff_t distance_to(const Vertex_iterator& other) const {
+    return static_cast<std::ptrdiff_t>(other.vh_.i) - static_cast<std::ptrdiff_t>(vh_.i);
+  }
 
   bool equal(const Vertex_iterator& other) const { return vh_ == other.vh_; }
 
-  Vertex_handle dereference() const { return vh_; }
+  void increment() { ++vh_.i; }
 
   Vertex_handle vh_;
 };
@@ -84,19 +93,28 @@ class Face_around_edge_iterator
   Index_iterator j_end_;
 };
 
-class Face_iterator : public boost::iterator_facade<Face_iterator, Face_handle,
-                                                    boost::forward_traversal_tag, Face_handle> {
+class Face_iterator
+    : public boost::iterator_facade<Face_iterator, Face_handle, boost::random_access_traversal_tag,
+                                    Face_handle> {
  public:
   explicit Face_iterator(Face_handle fh) : fh_{fh} {}
 
  private:
   friend class boost::iterator_core_access;
 
-  void increment() { ++fh_.i; }
+  void advance(std::ptrdiff_t n) { fh_.i += n; }
+
+  void decrement() { --fh_.i; }
+
+  Face_handle dereference() const { return fh_; }
+
+  std::ptrdiff_t distance_to(const Face_iterator& other) const {
+    return static_cast<std::ptrdiff_t>(other.fh_.i) - static_cast<std::ptrdiff_t>(fh_.i);
+  }
 
   bool equal(const Face_iterator& other) const { return fh_ == other.fh_; }
 
-  Face_handle dereference() const { return fh_; }
+  void increment() { ++fh_.i; }
 
   Face_handle fh_;
 };

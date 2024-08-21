@@ -7,12 +7,10 @@
 #include <kigumi/Mixed.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>
+#include <kigumi/parallel_do.h>
 
-#include <atomic>
 #include <iostream>
 #include <iterator>
-#include <mutex>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -65,36 +63,15 @@ class Mix {
     auto border_edges = Find_border_edges{}(m);
     Warnings warnings{};
 
-    {
-      std::vector<Edge> border_edges_vec(border_edges.begin(), border_edges.end());
-      std::vector<std::thread> threads;
-      std::atomic<std::size_t> next_index{};
-      std::mutex mutex;
-      auto num_threads = std::thread::hardware_concurrency();
-      for (unsigned tid = 0; tid < num_threads; ++tid) {
-        threads.emplace_back([&] {
-          Classify_faces_locally classify_faces_locally;
-          Warnings local_warnings{};
+    std::vector<Edge> edges(border_edges.begin(), border_edges.end());
+    parallel_do(
+        edges.begin(), edges.end(), Warnings{},
+        [&](const auto& edge, auto& local_warnings) {
+          thread_local Classify_faces_locally classify_faces_locally;
 
-          while (true) {
-            auto i = next_index++;
-            if (i >= border_edges_vec.size()) {
-              break;
-            }
-
-            const auto& edge = border_edges_vec.at(i);
-            local_warnings |= classify_faces_locally(m, edge, border_edges);
-          }
-
-          std::lock_guard lock{mutex};
-          warnings |= local_warnings;
-        });
-      }
-
-      for (auto& thread : threads) {
-        thread.join();
-      }
-    }
+          local_warnings |= classify_faces_locally(m, edge, border_edges);
+        },
+        [&](const auto& local_warnings) { warnings |= local_warnings; });
 
     std::cout << "Global classification..." << std::endl;
 
