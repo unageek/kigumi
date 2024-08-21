@@ -11,9 +11,12 @@
 #include <kigumi/Triangulator.h>
 
 #include <algorithm>
+#include <atomic>
 #include <boost/container/static_vector.hpp>
 #include <iostream>
+#include <mutex>
 #include <stdexcept>
+#include <thread>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -60,31 +63,46 @@ class Corefine {
 
     std::vector<Intersection_info> infos;
 
-#pragma omp parallel
     {
-      std::vector<Intersection_info> local_infos;
-      Face_face_intersection face_face_intersection{points_};
+      std::vector<std::thread> threads;
+      std::atomic<std::size_t> next_index{};
+      std::mutex mutex;
+      auto num_threads = std::thread::hardware_concurrency();
+      for (unsigned tid = 0; tid < num_threads; ++tid) {
+        threads.emplace_back([&] {
+          std::vector<Intersection_info> local_infos;
+          Face_face_intersection face_face_intersection{points_};
 
-#pragma omp for schedule(guided)
-      for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(pairs.size()); ++i) {
-        auto [left_fh, right_fh] = pairs.at(i);
-        const auto& left_face = left_.face(left_fh);
-        const auto& right_face = right_.face(right_fh);
-        auto a = left_point_ids_.at(left_face[0].i);
-        auto b = left_point_ids_.at(left_face[1].i);
-        auto c = left_point_ids_.at(left_face[2].i);
-        auto p = right_point_ids_.at(right_face[0].i);
-        auto q = right_point_ids_.at(right_face[1].i);
-        auto r = right_point_ids_.at(right_face[2].i);
-        auto sym_inters = face_face_intersection(a, b, c, p, q, r);
-        if (sym_inters.empty()) {
-          continue;
-        }
-        local_infos.emplace_back(left_fh, right_fh, sym_inters);
+          while (true) {
+            auto i = next_index++;
+            if (i >= pairs.size()) {
+              break;
+            }
+
+            auto [left_fh, right_fh] = pairs.at(i);
+            const auto& left_face = left_.face(left_fh);
+            const auto& right_face = right_.face(right_fh);
+            auto a = left_point_ids_.at(left_face[0].i);
+            auto b = left_point_ids_.at(left_face[1].i);
+            auto c = left_point_ids_.at(left_face[2].i);
+            auto p = right_point_ids_.at(right_face[0].i);
+            auto q = right_point_ids_.at(right_face[1].i);
+            auto r = right_point_ids_.at(right_face[2].i);
+            auto sym_inters = face_face_intersection(a, b, c, p, q, r);
+            if (sym_inters.empty()) {
+              continue;
+            }
+            local_infos.emplace_back(left_fh, right_fh, sym_inters);
+          }
+
+          std::lock_guard lock{mutex};
+          infos.insert(infos.end(), local_infos.begin(), local_infos.end());
+        });
       }
 
-#pragma omp critical
-      infos.insert(infos.end(), local_infos.begin(), local_infos.end());
+      for (auto& thread : threads) {
+        thread.join();
+      }
     }
 
     std::cout << "Constructing intersection points..." << std::endl;
@@ -140,23 +158,36 @@ class Corefine {
     partitions.push_back(infos.end());
 
     bool caught{};
-#pragma omp parallel for schedule(guided)
-    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(partitions.size() - 1); ++i) {
-      if (caught) {
-        continue;
+    {
+      std::vector<std::thread> threads;
+      std::atomic<std::size_t> next_index{};
+      auto num_threads = std::thread::hardware_concurrency();
+      for (unsigned tid = 0; tid < num_threads; ++tid) {
+        threads.emplace_back([&] {
+          while (true) {
+            auto i = next_index++;
+            if (i >= partitions.size() - 1 || caught) {
+              break;
+            }
+
+            auto begin = partitions.at(i);
+            auto end = partitions.at(i + 1);
+
+            auto& triangulator = left_triangulators_.at(begin->left_fh);
+            for (auto it = begin; it != end; ++it) {
+              try {
+                insert_intersection(triangulator, *it);
+              } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
+                caught = true;
+                break;
+              }
+            }
+          }
+        });
       }
 
-      auto begin = partitions.at(i);
-      auto end = partitions.at(i + 1);
-
-      auto& triangulator = left_triangulators_.at(begin->left_fh);
-      for (auto it = begin; it != end; ++it) {
-        try {
-          insert_intersection(triangulator, *it);
-        } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
-          caught = true;
-          break;
-        }
+      for (auto& thread : threads) {
+        thread.join();
       }
     }
 
@@ -175,23 +206,36 @@ class Corefine {
     }
     partitions.push_back(infos.end());
 
-#pragma omp parallel for schedule(guided)
-    for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(partitions.size() - 1); ++i) {
-      if (caught) {
-        continue;
+    {
+      std::vector<std::thread> threads;
+      std::atomic<std::size_t> next_index{};
+      auto num_threads = std::thread::hardware_concurrency();
+      for (unsigned tid = 0; tid < num_threads; ++tid) {
+        threads.emplace_back([&] {
+          while (true) {
+            auto i = next_index++;
+            if (i >= partitions.size() - 1 || caught) {
+              break;
+            }
+
+            auto begin = partitions.at(i);
+            auto end = partitions.at(i + 1);
+
+            auto& triangulator = right_triangulators_.at(begin->right_fh);
+            for (auto it = begin; it != end; ++it) {
+              try {
+                insert_intersection(triangulator, *it);
+              } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
+                caught = true;
+                break;
+              }
+            }
+          }
+        });
       }
 
-      auto begin = partitions.at(i);
-      auto end = partitions.at(i + 1);
-
-      auto& triangulator = right_triangulators_.at(begin->right_fh);
-      for (auto it = begin; it != end; ++it) {
-        try {
-          insert_intersection(triangulator, *it);
-        } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
-          caught = true;
-          break;
-        }
+      for (auto& thread : threads) {
+        thread.join();
       }
     }
 

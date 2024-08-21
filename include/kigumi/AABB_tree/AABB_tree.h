@@ -3,12 +3,12 @@
 #include <CGAL/Bbox_3.h>
 #include <CGAL/intersections.h>
 #include <kigumi/AABB_tree/AABB_node.h>
-#include <omp.h>
 
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <iterator>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -115,13 +115,18 @@ class AABB_tree {
         node_it->set_left_node(&*left_node_it);
         node_it->set_right_node(&*right_node_it);
 
-#pragma omp parallel sections if (node_depth < concurrency_depth_limit_)
-        {
-#pragma omp section
+        if (node_depth < concurrency_depth_limit_) {
+          std::thread left_thread(&AABB_tree::build, this, left_node_it, leaves_begin,
+                                  leaves_begin + num_left_leaves, node_depth + 1);
+          std::thread right_thread(&AABB_tree::build, this, right_node_it,
+                                   leaves_begin + num_left_leaves, leaves_end, node_depth + 1);
+          left_thread.join();
+          right_thread.join();
+        } else {
           build(left_node_it, leaves_begin, leaves_begin + num_left_leaves, node_depth + 1);
-#pragma omp section
           build(right_node_it, leaves_begin + num_left_leaves, leaves_end, node_depth + 1);
         }
+
         node_it->set_bbox(node_it->left_node()->bbox() + node_it->right_node()->bbox());
         break;
       }
@@ -189,7 +194,8 @@ class AABB_tree {
         std::distance(lengths.begin(), std::max_element(lengths.begin(), lengths.end())));
   }
 
-  const int concurrency_depth_limit_{static_cast<int>(std::log2(omp_get_max_threads()))};
+  const int concurrency_depth_limit_{
+      static_cast<int>(std::log2(std::thread::hardware_concurrency()))};
   const std::vector<Leaf> leaves_;
   std::vector<Node> nodes_;
   const void* root_{nullptr};

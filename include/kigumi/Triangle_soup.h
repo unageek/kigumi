@@ -157,7 +157,7 @@ class Triangle_soup {
   Bbox bbox() const { return CGAL::bbox_3(points_.begin(), points_.end()); }
 
   const AABB_tree<Leaf>& aabb_tree() const {
-    std::lock_guard lk{aabb_tree_mutex_};
+    std::lock_guard lock{aabb_tree_mutex_};
 
     if (!aabb_tree_) {
       std::vector<Leaf> leaves;
