@@ -1,7 +1,7 @@
 #pragma once
 
+#include <kigumi/Mix.h>
 #include <kigumi/Mixed.h>
-#include <kigumi/Mixer.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Operator.h>
 #include <kigumi/Side_of_triangle_soup.h>
@@ -48,13 +48,17 @@ class Boolean_operation;
 
 template <class K, class FaceData = Null_data>
 class Kigumi_mesh {
-  using Face_data = FaceData;
+  using Boolean_operation = Boolean_operation<K, FaceData>;
+  using Mix = Mix<K, FaceData>;
+  using Mixed_face_data = Mixed_face_data<FaceData>;
   using Point = typename K::Point_3;
+  using Side_of_triangle_soup = Side_of_triangle_soup<K, FaceData>;
+  using Triangle_soup = Triangle_soup<K, FaceData>;
 
  public:
   Kigumi_mesh() = default;
 
-  explicit Kigumi_mesh(Triangle_soup<K, Face_data>&& soup)
+  explicit Kigumi_mesh(Triangle_soup soup)
       : kind_{soup.num_faces() == 0 ? Kigumi_mesh_kind::Empty : Kigumi_mesh_kind::Normal},
         soup_{std::move(soup)} {}
 
@@ -63,7 +67,7 @@ class Kigumi_mesh {
   static Kigumi_mesh entire() { return {Kigumi_mesh_kind::Entire, {}}; }
 
   static Kigumi_mesh import(const std::string& filename) {
-    return Kigumi_mesh{Triangle_soup<K, Face_data>{filename}};
+    return Kigumi_mesh{Triangle_soup{filename}};
   }
 
   void export_lossy(const std::string& filename) const { soup_.save(filename); }
@@ -81,15 +85,15 @@ class Kigumi_mesh {
     if (is_entire()) {
       return CGAL::ON_NEGATIVE_SIDE;
     }
-    return Side_of_triangle_soup<K, FaceData>{}(soup(), p);
+    return Side_of_triangle_soup{}(soup(), p);
   }
 
   // TODO: Prevent inconsistent modification of the polygon soup.
-  Triangle_soup<K, Face_data>& soup() { return soup_; }
+  Triangle_soup& soup() { return soup_; }
 
-  const Triangle_soup<K, Face_data>& soup() const { return soup_; }
+  const Triangle_soup& soup() const { return soup_; }
 
-  std::pair<Boolean_operation<K, Face_data>, Warnings> boolean(const Kigumi_mesh& other) const {
+  std::pair<Boolean_operation, Warnings> boolean(const Kigumi_mesh& other) const {
     const auto& a = *this;
     const auto& b = other;
 
@@ -119,14 +123,14 @@ class Kigumi_mesh {
           a.is_empty() || b.is_entire() ? std::make_pair(Face_tag::Interior, Face_tag::Exterior)
                                         : std::make_pair(Face_tag::Exterior, Face_tag::Interior);
 
-      std::vector<Mixed_face_data<Face_data>> face_data;
+      std::vector<Mixed_face_data> face_data;
       face_data.reserve(faces.size());
       std::transform(a.soup().faces_begin(), a.soup().faces_end(), std::back_inserter(face_data),
-                     [&, first_tag](auto fh) -> Mixed_face_data<Face_data> {
+                     [&, first_tag](auto fh) -> Mixed_face_data {
                        return {.from_left = true, .tag = first_tag, .data = a.soup().data(fh)};
                      });
       std::transform(b.soup().faces_begin(), b.soup().faces_end(), std::back_inserter(face_data),
-                     [&, second_tag](auto fh) -> Mixed_face_data<Face_data> {
+                     [&, second_tag](auto fh) -> Mixed_face_data {
                        return {.from_left = false, .tag = second_tag, .data = b.soup().data(fh)};
                      });
 
@@ -134,20 +138,19 @@ class Kigumi_mesh {
               Warnings::None};
     }
 
-    Mixer mixer{a.soup(), b.soup()};
-    return {{a.kind_, b.kind_, mixer.into_mixed()}, mixer.warnings()};
+    auto [mixed, warnings] = Mix{}(a.soup(), b.soup());
+    return {{a.kind_, b.kind_, std::move(mixed)}, warnings};
   }
 
  private:
-  friend class Boolean_operation<K, Face_data>;
-  friend struct Read<Kigumi_mesh>;
-  friend struct Write<Kigumi_mesh>;
+  friend Boolean_operation;
+  friend Read<Kigumi_mesh>;
+  friend Write<Kigumi_mesh>;
 
-  Kigumi_mesh(Kigumi_mesh_kind kind, Triangle_soup<K, Face_data>&& soup)
-      : kind_{kind}, soup_{std::move(soup)} {}
+  Kigumi_mesh(Kigumi_mesh_kind kind, Triangle_soup soup) : kind_{kind}, soup_{std::move(soup)} {}
 
   Kigumi_mesh_kind kind_{Kigumi_mesh_kind::Normal};
-  Triangle_soup<K, Face_data> soup_;
+  Triangle_soup soup_;
 };
 
 template <class K, class FaceData>
@@ -168,13 +171,15 @@ struct Read<Kigumi_mesh<K, FaceData>> {
 
 template <class K, class FaceData = Null_data>
 class Boolean_operation {
+  using Mixed_triangle_soup = Mixed_triangle_soup<K, FaceData>;
+
  public:
   Boolean_operation()
       : first_kind_{Kigumi_mesh_kind::Empty}, second_kind_{Kigumi_mesh_kind::Empty} {}
 
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
-                    Mixed_triangle_soup<K, FaceData>&& m)
+                    Mixed_triangle_soup&& m)
       : first_kind_{first_kind}, second_kind_{second_kind}, m_{std::move(m)} {}
 
   Kigumi_mesh<K, FaceData> apply(Operator op, bool prefer_first = true) const {
@@ -234,8 +239,8 @@ class Boolean_operation {
   }
 
  private:
-  friend struct Read<Boolean_operation>;
-  friend struct Write<Boolean_operation>;
+  friend Read<Boolean_operation>;
+  friend Write<Boolean_operation>;
 
   static bool apply(Operator op, bool a, bool b) {
     switch (op) {
@@ -278,7 +283,7 @@ class Boolean_operation {
 
   Kigumi_mesh_kind first_kind_;
   Kigumi_mesh_kind second_kind_;
-  Mixed_triangle_soup<K, FaceData> m_;
+  Mixed_triangle_soup m_;
 };
 
 template <class K, class FaceData>

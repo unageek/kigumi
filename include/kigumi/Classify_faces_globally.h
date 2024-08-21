@@ -1,7 +1,8 @@
 #pragma once
 
-#include <kigumi/Face_tag_propagator.h>
+#include <kigumi/Mesh_handles.h>
 #include <kigumi/Mixed.h>
+#include <kigumi/Propagate_face_tags.h>
 #include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>
@@ -14,17 +15,22 @@
 namespace kigumi {
 
 template <class K, class FaceData>
-class Global_face_classifier {
+class Classify_faces_globally {
+  using Mixed_triangle_mesh = Mixed_triangle_mesh<K, FaceData>;
+  using Propagate_face_tags = Propagate_face_tags<K, FaceData>;
+  using Side_of_triangle_soup = Side_of_triangle_soup<K, FaceData>;
+  using Triangle_soup = Triangle_soup<K, FaceData>;
+
  public:
-  explicit Global_face_classifier(Mixed_triangle_mesh<K, FaceData>& m,
-                                  const std::unordered_set<Edge>& border,
-                                  const Triangle_soup<K, FaceData>& left,
-                                  const Triangle_soup<K, FaceData>& right)
-      : m_{m}, border_{border} {
-    auto representative_faces = find_unclassified_connected_components();
+  Warnings operator()(Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges,
+                      const Triangle_soup& left, const Triangle_soup& right) const {
+    auto representative_faces = find_unclassified_connected_components(m, border_edges);
+    Warnings warnings{};
 
 #pragma omp parallel
     {
+      Propagate_face_tags propagate_face_tags;
+      Side_of_triangle_soup side_of_triangle_soup;
       Warnings local_warnings{};
 
 #pragma omp for schedule(dynamic)
@@ -35,31 +41,31 @@ class Global_face_classifier {
         auto tri_src = m.triangle(fh_src);
         const auto& soup_trg = f_src.from_left ? right : left;
         auto p_src = CGAL::centroid(tri_src);
-        auto side = Side_of_triangle_soup<K, FaceData>{}(soup_trg, p_src);
+        auto side = side_of_triangle_soup(soup_trg, p_src);
         if (side == CGAL::ON_ORIENTED_BOUNDARY) {
           throw std::runtime_error(
               "local classification must be performed before global classification");
         }
         f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::Exterior : Face_tag::Interior;
-        Face_tag_propagator prop{m, border, fh_src};
-        local_warnings |= prop.warnings();
+        local_warnings |= propagate_face_tags(m, border_edges, fh_src);
       }
 
 #pragma omp critical
-      warnings_ |= local_warnings;
+      warnings |= local_warnings;
     }
+
+    return warnings;
   }
 
-  Warnings warnings() const { return warnings_; }
-
  private:
-  std::vector<Face_handle> find_unclassified_connected_components() {
+  static std::vector<Face_handle> find_unclassified_connected_components(
+      const Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges) {
     std::vector<Face_handle> representative_faces;
-    std::vector<bool> visited(m_.num_faces(), false);
+    std::vector<bool> visited(m.num_faces(), false);
     std::queue<Face_handle> queue;
 
-    auto begin = m_.faces_begin();
-    auto end = m_.faces_end();
+    auto begin = m.faces_begin();
+    auto end = m.faces_end();
 
     while (true) {
       for (auto it = begin; it != end; ++it) {
@@ -69,7 +75,7 @@ class Global_face_classifier {
         }
 
         visited.at(fh.i) = true;
-        if (m_.data(fh).tag == Face_tag::Unknown) {
+        if (m.data(fh).tag == Face_tag::Unknown) {
           queue.push(fh);
           representative_faces.push_back(fh);
           begin = ++it;
@@ -85,7 +91,7 @@ class Global_face_classifier {
         auto fh = queue.front();
         queue.pop();
 
-        for (auto adj_fh : m_.faces_around_face(fh, border_)) {
+        for (auto adj_fh : m.faces_around_face(fh, border_edges)) {
           if (visited.at(adj_fh.i)) {
             continue;
           }
@@ -98,10 +104,6 @@ class Global_face_classifier {
 
     return representative_faces;
   }
-
-  Mixed_triangle_mesh<K, FaceData>& m_;
-  const std::unordered_set<Edge>& border_;
-  Warnings warnings_{};
 };
 
 }  // namespace kigumi

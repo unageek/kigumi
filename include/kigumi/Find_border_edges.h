@@ -7,9 +7,11 @@
 namespace kigumi {
 
 template <class K, class FaceData>
-class Shared_edge_finder {
+class Find_border_edges {
+  using Mixed_triangle_mesh = Mixed_triangle_mesh<K, FaceData>;
+
  public:
-  explicit Shared_edge_finder(const Mixed_triangle_mesh<K, FaceData>& m) {
+  std::unordered_set<Edge> operator()(const Mixed_triangle_mesh& m) const {
     std::unordered_set<Edge> left_edges;
 
     for (auto fh : m.faces()) {
@@ -26,6 +28,8 @@ class Shared_edge_finder {
       left_edges.insert(e3);
     }
 
+    std::unordered_set<Edge> border_edges;
+
     for (auto fh : m.faces()) {
       if (m.data(fh).from_left) {
         continue;
@@ -36,21 +40,18 @@ class Shared_edge_finder {
       auto e2 = make_edge(f[1], f[2]);
       auto e3 = make_edge(f[2], f[0]);
       if (left_edges.contains(e1)) {
-        shared_edges_.insert(e1);
+        border_edges.insert(e1);
       }
       if (left_edges.contains(e2)) {
-        shared_edges_.insert(e2);
+        border_edges.insert(e2);
       }
       if (left_edges.contains(e3)) {
-        shared_edges_.insert(e3);
+        border_edges.insert(e3);
       }
     }
+
+    return border_edges;
   }
-
-  const std::unordered_set<Edge>& shared_edges() const { return shared_edges_; }
-
- private:
-  std::unordered_set<Edge> shared_edges_;
 };
 
 }  // namespace kigumi

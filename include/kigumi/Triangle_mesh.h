@@ -154,17 +154,17 @@ class Triangle_mesh {
                                       Face_around_edge_iterator(i_end, i_end, j_end, j_end));
   }
 
-  auto faces_around_face(Face_handle fh, const std::unordered_set<Edge>& border) {
+  auto faces_around_face(Face_handle fh, const std::unordered_set<Edge>& border_edges) const {
     const auto& f = face(fh);
     auto e1 = make_edge(f[0], f[1]);
     auto e2 = make_edge(f[1], f[2]);
     auto e3 = make_edge(f[2], f[0]);
     auto end1 = faces_around_edge(e1).end();
-    auto it1 = border.contains(e1) ? end1 : faces_around_edge(e1).begin();
+    auto it1 = border_edges.contains(e1) ? end1 : faces_around_edge(e1).begin();
     auto end2 = faces_around_edge(e2).end();
-    auto it2 = border.contains(e2) ? end2 : faces_around_edge(e2).begin();
+    auto it2 = border_edges.contains(e2) ? end2 : faces_around_edge(e2).begin();
     auto end3 = faces_around_edge(e3).end();
-    auto it3 = border.contains(e3) ? end3 : faces_around_edge(e3).begin();
+    auto it3 = border_edges.contains(e3) ? end3 : faces_around_edge(e3).begin();
     return boost::make_iterator_range(
         Face_around_face_iterator(fh, it1, end1, it2, end2, it3, end3),
         Face_around_face_iterator(fh, end1, end1, end2, end2, end3, end3));

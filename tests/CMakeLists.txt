@@ -1,9 +1,9 @@
 set(TARGET kigumi-test)
 
 add_executable(${TARGET}
+    Classify_faces_locally_test.cc
     face_data.cc
     Face_face_intersection_tests.cc
-    Local_face_classifier_test.cc
     side_of_mesh.cc
     special.cc
     special_results.cc

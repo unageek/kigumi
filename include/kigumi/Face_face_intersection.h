@@ -17,13 +17,18 @@ namespace kigumi {
 
 template <class K>
 class Face_face_intersection {
+  using Orientation_3_key = std::array<std::size_t, 4>;
+  using Orientation_3_key_hash = boost::hash<Orientation_3_key>;
+  using Orientation_3_map =
+      std::unordered_map<Orientation_3_key, CGAL::Orientation, Orientation_3_key_hash>;
   using Point_list = Point_list<K>;
 
  public:
   explicit Face_face_intersection(const Point_list& points) : points_(points) {}
 
   boost::container::static_vector<std::pair<TriangleRegion, TriangleRegion>, 6> operator()(
-      std::size_t a, std::size_t b, std::size_t c, std::size_t p, std::size_t q, std::size_t r) {
+      std::size_t a, std::size_t b, std::size_t c, std::size_t p, std::size_t q,
+      std::size_t r) const {
     intersections_.clear();
     orientation_3_cache_.clear();
 
@@ -93,6 +98,7 @@ class Face_face_intersection {
     return result;
   }
 
+ private:
   // 1. a, p, q, r: inclusive; b: exclusive.
   // 2. The cases where va is in the interior of epq, eqr, or erp are handled,
   //    while the cases where vp, vq, or vr is in the interior of eab are not.
@@ -100,7 +106,7 @@ class Face_face_intersection {
   //    eab and fpqr are left and right regions, respectively.
   void edge_face_intersection(TriangleRegion eab, std::size_t a, std::size_t b, TriangleRegion fpqr,
                               std::size_t p, std::size_t q, std::size_t r, CGAL::Orientation apqr,
-                              CGAL::Orientation bpqr) {
+                              CGAL::Orientation bpqr) const {
     if (apqr * bpqr > 0) {
       // No intersections.
       return;
@@ -166,7 +172,8 @@ class Face_face_intersection {
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and fpqr are left and right regions, respectively.
   void edge_face_intersection_2d(TriangleRegion eab, std::size_t a, std::size_t b,
-                                 TriangleRegion fpqr, std::size_t p, std::size_t q, std::size_t r) {
+                                 TriangleRegion fpqr, std::size_t p, std::size_t q,
+                                 std::size_t r) const {
     auto [va, vb] = edge_vertices(eab);
 
     auto apq = orientation(a, p, q);
@@ -208,7 +215,7 @@ class Face_face_intersection {
   void edge_edge_intersection_2d(TriangleRegion eab, std::size_t a, std::size_t b,
                                  TriangleRegion epq, std::size_t p, std::size_t q,
                                  CGAL::Orientation abp, CGAL::Orientation abq,
-                                 CGAL::Orientation apq, CGAL::Orientation bpq) {
+                                 CGAL::Orientation apq, CGAL::Orientation bpq) const {
     if (abp * abq > 0 || apq * bpq > 0) {
       // No intersections.
       return;
@@ -257,7 +264,7 @@ class Face_face_intersection {
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and epq are left and right regions, respectively.
   void edge_edge_intersection_1d(TriangleRegion eab, std::size_t a, std::size_t /*b*/,
-                                 TriangleRegion epq, std::size_t p, std::size_t q) {
+                                 TriangleRegion epq, std::size_t p, std::size_t q) const {
     auto [va, vb] = edge_vertices(eab);
     auto [vp, vq] = edge_vertices(epq);
 
@@ -279,12 +286,6 @@ class Face_face_intersection {
     }
   }
 
- private:
-  using Orientation_3_key = std::array<std::size_t, 4>;
-  using Orientation_3_key_hash = boost::hash<Orientation_3_key>;
-  using Orientation_3_map =
-      std::unordered_map<Orientation_3_key, CGAL::Orientation, Orientation_3_key_hash>;
-
   template <std::size_t N>
   static CGAL::Sign sort(std::array<std::size_t, N>& ids) {
     auto parity = CGAL::POSITIVE;
@@ -299,20 +300,20 @@ class Face_face_intersection {
     return parity;
   }
 
-  CGAL::Orientation orientation(std::size_t a, std::size_t b) {
+  CGAL::Orientation orientation(std::size_t a, std::size_t b) const {
     const auto& pa = points_.at(a);
     const auto& pb = points_.at(b);
     return CGAL::compare_lexicographically(pa, pb);
   }
 
-  CGAL::Orientation orientation(std::size_t a, std::size_t b, std::size_t c) {
+  CGAL::Orientation orientation(std::size_t a, std::size_t b, std::size_t c) const {
     const auto& pa = points_.at(a);
     const auto& pb = points_.at(b);
     const auto& pc = points_.at(c);
     return CGAL::coplanar_orientation(pa, pb, pc);
   }
 
-  CGAL::Orientation orientation(std::size_t a, std::size_t b, std::size_t c, std::size_t d) {
+  CGAL::Orientation orientation(std::size_t a, std::size_t b, std::size_t c, std::size_t d) const {
     Orientation_3_key key{a, b, c, d};
     auto parity = sort(key);
 
@@ -330,7 +331,7 @@ class Face_face_intersection {
     return parity * o;
   }
 
-  void insert(TriangleRegion first, TriangleRegion second) {
+  void insert(TriangleRegion first, TriangleRegion second) const {
     if (!is_left_region(first)) {
       std::swap(first, second);
     }
@@ -339,8 +340,8 @@ class Face_face_intersection {
   }
 
   const Point_list& points_;
-  std::vector<std::pair<TriangleRegion, TriangleRegion>> intersections_;
-  Orientation_3_map orientation_3_cache_;
+  mutable std::vector<std::pair<TriangleRegion, TriangleRegion>> intersections_;
+  mutable Orientation_3_map orientation_3_cache_;
 };
 
 }  // namespace kigumi

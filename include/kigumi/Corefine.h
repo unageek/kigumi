@@ -1,8 +1,8 @@
 #pragma once
 
-#include <kigumi/Coplanar_face_finder.h>
 #include <kigumi/Face_face_intersection.h>
-#include <kigumi/Face_pair_finder.h>
+#include <kigumi/Find_coplanar_faces.h>
+#include <kigumi/Find_possibly_intersecting_faces.h>
 #include <kigumi/Intersection_point_inserter.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Point_list.h>
@@ -24,6 +24,8 @@ namespace kigumi {
 template <class K, class FaceData>
 class Corefine {
   using Face_face_intersection = Face_face_intersection<K>;
+  using Find_coplanar_faces = Find_coplanar_faces<K, FaceData>;
+  using Find_possibly_intersecting_faces = Find_possibly_intersecting_faces<K, FaceData>;
   using Intersection_point_inserter = Intersection_point_inserter<K>;
   using Point = typename K::Point_3;
   using Point_list = Point_list<K>;
@@ -43,21 +45,16 @@ class Corefine {
       right_point_ids_.push_back(points_.insert(right_.point(vh)));
     }
 
-    Coplanar_face_finder cop_finder{left_, right_, left_point_ids_, right_point_ids_};
-    auto left_coplanar_faces = cop_finder.take_left_coplanar_faces();
-    auto left_opposite_faces = cop_finder.take_left_opposite_faces();
-    auto right_coplanar_faces = cop_finder.take_right_coplanar_faces();
-    auto right_opposite_faces = cop_finder.take_right_opposite_faces();
-
+    auto cop = Find_coplanar_faces{}(left_, right_, left_point_ids_, right_point_ids_);
     std::unordered_set<Face_handle> left_faces_to_ignore;
-    left_faces_to_ignore.insert(left_coplanar_faces.begin(), left_coplanar_faces.end());
-    left_faces_to_ignore.insert(left_opposite_faces.begin(), left_opposite_faces.end());
+    left_faces_to_ignore.insert(cop.left_coplanar_faces.begin(), cop.left_coplanar_faces.end());
+    left_faces_to_ignore.insert(cop.left_opposite_faces.begin(), cop.left_opposite_faces.end());
     std::unordered_set<Face_handle> right_faces_to_ignore;
-    right_faces_to_ignore.insert(right_coplanar_faces.begin(), right_coplanar_faces.end());
-    right_faces_to_ignore.insert(right_opposite_faces.begin(), right_opposite_faces.end());
+    right_faces_to_ignore.insert(cop.right_coplanar_faces.begin(), cop.right_coplanar_faces.end());
+    right_faces_to_ignore.insert(cop.right_opposite_faces.begin(), cop.right_opposite_faces.end());
 
-    Face_pair_finder finder{left_, right_, left_faces_to_ignore, right_faces_to_ignore};
-    auto pairs = finder.find_face_pairs();
+    auto pairs = Find_possibly_intersecting_faces{}(left_, right_, left_faces_to_ignore,
+                                                    right_faces_to_ignore);
 
     std::cout << "Finding symbolic intersections..." << std::endl;
 
