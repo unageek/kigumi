@@ -11,7 +11,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Boost REQUIRED COMPONENTS container container_hash endian iterator program_options range)
 find_package(CGAL CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
-find_package(OpenMP REQUIRED)
 
 add_subdirectory(examples)
 enable_testing()

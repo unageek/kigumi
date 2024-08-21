@@ -22,7 +22,6 @@ target_link_libraries(${TARGET} PRIVATE
     Boost::program_options
     Boost::range
     CGAL::CGAL
-    OpenMP::OpenMP_CXX
 )
 
 
@@ -51,5 +50,4 @@ target_link_libraries(${TARGET} PRIVATE
     Boost::program_options
     Boost::range
     CGAL::CGAL
-    OpenMP::OpenMP_CXX
 )

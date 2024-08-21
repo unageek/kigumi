@@ -28,7 +28,6 @@ target_link_libraries(${TARGET} PRIVATE
     CGAL::CGAL
     GTest::gtest
     GTest::gtest_main
-    OpenMP::OpenMP_CXX
     -fsanitize=undefined
 )
 
