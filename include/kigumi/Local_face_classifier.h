@@ -231,11 +231,7 @@ class Local_face_classifier {
       if (f1.radial_bin != f2.radial_bin) {
         return f1.radial_bin < f2.radial_bin;
       }
-      auto u1 = f1.r.x();
-      auto v1 = f1.r.y();
-      auto u2 = f2.r.x();
-      auto v2 = f2.r.y();
-      return u1 * v2 - u2 * v1 > 0;
+      return CGAL::orientation(f1.r, f2.r) > 0;
     }
   };
 
