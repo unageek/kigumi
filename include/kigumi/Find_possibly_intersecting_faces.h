@@ -1,6 +1,5 @@
 #pragma once
 
-#include <kigumi/AABB_tree/Overlap.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Triangle_soup.h>
 
@@ -14,7 +13,6 @@ namespace kigumi {
 template <class K, class FaceData>
 class Find_possibly_intersecting_faces {
   using Face_handle_pair = std::pair<Face_handle, Face_handle>;
-  using Overlap = Overlap<K>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
   using Leaf = typename Triangle_soup::Leaf;
 
@@ -42,8 +40,8 @@ class Find_possibly_intersecting_faces {
           }
 
           leaves.clear();
-          left_tree.template get_intersecting_leaves<Overlap>(std::back_inserter(leaves),
-                                                              right.triangle(right_fh).bbox());
+          left_tree.template get_intersecting_leaves(std::back_inserter(leaves),
+                                                     right.triangle(right_fh).bbox());
 
           for (const auto* leaf : leaves) {
             auto left_fh = leaf->face_handle();
@@ -63,8 +61,8 @@ class Find_possibly_intersecting_faces {
           }
 
           leaves.clear();
-          right_tree.template get_intersecting_leaves<Overlap>(std::back_inserter(leaves),
-                                                               left.triangle(left_fh).bbox());
+          right_tree.template get_intersecting_leaves(std::back_inserter(leaves),
+                                                      left.triangle(left_fh).bbox());
 
           for (const auto* leaf : leaves) {
             auto right_fh = leaf->face_handle();

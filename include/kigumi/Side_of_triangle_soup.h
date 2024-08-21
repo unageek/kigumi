@@ -1,7 +1,6 @@
 #pragma once
 
 #include <CGAL/Intersections_3/Ray_3_Triangle_3.h>
-#include <kigumi/AABB_tree/Overlap.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <algorithm>
@@ -40,7 +39,7 @@ class Side_of_triangle_soup {
       }
 
       Ray ray{p, p_trg};
-      tree.template get_intersecting_leaves<Overlap<K>>(std::back_inserter(leaves_), ray);
+      tree.template get_intersecting_leaves(std::back_inserter(leaves_), ray);
 
       for (const auto* leaf : leaves_) {
         auto fh = leaf->face_handle();

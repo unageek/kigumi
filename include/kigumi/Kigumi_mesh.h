@@ -179,7 +179,7 @@ class Boolean_operation {
 
   // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
-                    Mixed_triangle_soup&& m)
+                    Mixed_triangle_soup m)
       : first_kind_{first_kind}, second_kind_{second_kind}, m_{std::move(m)} {}
 
   Kigumi_mesh<K, FaceData> apply(Operator op, bool prefer_first = true) const {

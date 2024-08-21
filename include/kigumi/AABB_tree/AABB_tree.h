@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CGAL/Bbox_3.h>
+#include <CGAL/intersections.h>
 #include <kigumi/AABB_tree/AABB_node.h>
 #include <omp.h>
 
@@ -23,7 +24,7 @@ class AABB_tree {
   using Leaf_ptr_iterator = typename std::vector<Leaf_ptr>::iterator;
 
  public:
-  explicit AABB_tree(std::vector<Leaf>&& leaves) : leaves_{std::move(leaves)} {
+  explicit AABB_tree(std::vector<Leaf> leaves) : leaves_{std::move(leaves)} {
     auto num_leaves = leaves_.size();
     if (num_leaves == 0) {
       return;
@@ -48,7 +49,7 @@ class AABB_tree {
     build(nodes_.begin(), leaf_ptrs.begin(), leaf_ptrs.end(), 0);
   }
 
-  template <class DoIntersect, class OutputIterator, class Query>
+  template <class OutputIterator, class Query>
   void get_intersecting_leaves(OutputIterator leaves, const Query& query) const {
     auto num_leaves = leaves_.size();
 
@@ -57,13 +58,13 @@ class AABB_tree {
         break;
 
       case 1:
-        if (DoIntersect::do_intersect(root_leaf()->bbox(), query)) {
+        if (CGAL::do_intersect(root_leaf()->bbox(), query)) {
           *leaves++ = root_leaf();
         }
         break;
 
       default:
-        traverse<DoIntersect>(leaves, num_leaves, query, root_node());
+        traverse(leaves, num_leaves, query, root_node());
         break;
     }
   }
@@ -127,37 +128,37 @@ class AABB_tree {
     }
   }
 
-  template <class DoIntersect, class OutputIterator, class Query>
+  template <class OutputIterator, class Query>
   // NOLINTNEXTLINE(misc-no-recursion)
   void traverse(OutputIterator leaves, std::size_t num_leaves, const Query& query,
                 const Node* node) const {
     switch (num_leaves) {
       case 2:  // left: leaf, right: leaf
-        if (DoIntersect::do_intersect(node->left_leaf()->bbox(), query)) {
+        if (CGAL::do_intersect(node->left_leaf()->bbox(), query)) {
           *leaves++ = node->left_leaf();
         }
-        if (DoIntersect::do_intersect(node->right_leaf()->bbox(), query)) {
+        if (CGAL::do_intersect(node->right_leaf()->bbox(), query)) {
           *leaves++ = node->right_leaf();
         }
         break;
 
       case 3:  // left: leaf, right: node
-        if (DoIntersect::do_intersect(node->left_leaf()->bbox(), query)) {
+        if (CGAL::do_intersect(node->left_leaf()->bbox(), query)) {
           *leaves++ = node->left_leaf();
         }
-        if (DoIntersect::do_intersect(node->right_node()->bbox(), query)) {
-          traverse<DoIntersect>(leaves, 2, query, node->right_node());
+        if (CGAL::do_intersect(node->right_node()->bbox(), query)) {
+          traverse(leaves, 2, query, node->right_node());
         }
         break;
 
       default:  // left: node, right: node
       {
         auto num_left_leaves = num_leaves / 2;
-        if (DoIntersect::do_intersect(node->left_node()->bbox(), query)) {
-          traverse<DoIntersect>(leaves, num_left_leaves, query, node->left_node());
+        if (CGAL::do_intersect(node->left_node()->bbox(), query)) {
+          traverse(leaves, num_left_leaves, query, node->left_node());
         }
-        if (DoIntersect::do_intersect(node->right_node()->bbox(), query)) {
-          traverse<DoIntersect>(leaves, num_leaves - num_left_leaves, query, node->right_node());
+        if (CGAL::do_intersect(node->right_node()->bbox(), query)) {
+          traverse(leaves, num_leaves - num_left_leaves, query, node->right_node());
         }
         break;
       }
