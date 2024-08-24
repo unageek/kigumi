@@ -29,17 +29,17 @@ enum class Kigumi_mesh_kind : std::uint8_t {
 
 template <>
 struct Write<Kigumi_mesh_kind> {
-  static void write(std::ostream& out, const Kigumi_mesh_kind& tt) {
-    do_write<std::uint8_t>(out, static_cast<std::uint8_t>(tt));
+  void operator()(std::ostream& out, const Kigumi_mesh_kind& t) const {
+    kigumi_write<std::uint8_t>(out, static_cast<std::uint8_t>(t));
   }
 };
 
 template <>
 struct Read<Kigumi_mesh_kind> {
-  static void read(std::istream& in, Kigumi_mesh_kind& tt) {
+  void operator()(std::istream& in, Kigumi_mesh_kind& t) const {
     std::uint8_t x{};
-    do_read<std::uint8_t>(in, x);
-    tt = static_cast<Kigumi_mesh_kind>(x);
+    kigumi_read<std::uint8_t>(in, x);
+    t = static_cast<Kigumi_mesh_kind>(x);
   }
 };
 
@@ -155,17 +155,17 @@ class Kigumi_mesh {
 
 template <class K, class FaceData>
 struct Write<Kigumi_mesh<K, FaceData>> {
-  static void write(std::ostream& out, const Kigumi_mesh<K, FaceData>& tt) {
-    do_write<Kigumi_mesh_kind>(out, tt.kind_);
-    do_write<Triangle_soup<K, FaceData>>(out, tt.soup_);
+  void operator()(std::ostream& out, const Kigumi_mesh<K, FaceData>& t) const {
+    kigumi_write<Kigumi_mesh_kind>(out, t.kind_);
+    kigumi_write<Triangle_soup<K, FaceData>>(out, t.soup_);
   }
 };
 
 template <class K, class FaceData>
 struct Read<Kigumi_mesh<K, FaceData>> {
-  static void read(std::istream& in, Kigumi_mesh<K, FaceData>& tt) {
-    do_read<Kigumi_mesh_kind>(in, tt.kind_);
-    do_read<Triangle_soup<K, FaceData>>(in, tt.soup_);
+  void operator()(std::istream& in, Kigumi_mesh<K, FaceData>& t) const {
+    kigumi_read<Kigumi_mesh_kind>(in, t.kind_);
+    kigumi_read<Triangle_soup<K, FaceData>>(in, t.soup_);
   }
 };
 
@@ -288,19 +288,19 @@ class Boolean_operation {
 
 template <class K, class FaceData>
 struct Write<Boolean_operation<K, FaceData>> {
-  static void write(std::ostream& out, const Boolean_operation<K, FaceData>& tt) {
-    do_write<Kigumi_mesh_kind>(out, tt.first_kind_);
-    do_write<Kigumi_mesh_kind>(out, tt.second_kind_);
-    do_write<Mixed_triangle_soup<K, FaceData>>(out, tt.m_);
+  void operator()(std::ostream& out, const Boolean_operation<K, FaceData>& t) const {
+    kigumi_write<Kigumi_mesh_kind>(out, t.first_kind_);
+    kigumi_write<Kigumi_mesh_kind>(out, t.second_kind_);
+    kigumi_write<Mixed_triangle_soup<K, FaceData>>(out, t.m_);
   }
 };
 
 template <class K, class FaceData>
 struct Read<Boolean_operation<K, FaceData>> {
-  static void read(std::istream& in, Boolean_operation<K, FaceData>& tt) {
-    do_read<Kigumi_mesh_kind>(in, tt.first_kind_);
-    do_read<Kigumi_mesh_kind>(in, tt.second_kind_);
-    do_read<Mixed_triangle_soup<K, FaceData>>(in, tt.m_);
+  void operator()(std::istream& in, Boolean_operation<K, FaceData>& t) const {
+    kigumi_read<Kigumi_mesh_kind>(in, t.first_kind_);
+    kigumi_read<Kigumi_mesh_kind>(in, t.second_kind_);
+    kigumi_read<Mixed_triangle_soup<K, FaceData>>(in, t.m_);
   }
 };
 

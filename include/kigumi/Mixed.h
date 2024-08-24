@@ -14,17 +14,17 @@ enum class Face_tag : std::uint8_t { Unknown = 0, Exterior, Interior, Coplanar, 
 
 template <>
 struct Write<Face_tag> {
-  static void write(std::ostream& out, const Face_tag& tt) {
-    do_write<std::uint8_t>(out, static_cast<std::uint8_t>(tt));
+  void operator()(std::ostream& out, const Face_tag& t) const {
+    kigumi_write<std::uint8_t>(out, static_cast<std::uint8_t>(t));
   }
 };
 
 template <>
 struct Read<Face_tag> {
-  static void read(std::istream& in, Face_tag& tt) {
+  void operator()(std::istream& in, Face_tag& t) const {
     std::uint8_t x{};
-    do_read<std::uint8_t>(in, x);
-    tt = static_cast<Face_tag>(x);
+    kigumi_read<std::uint8_t>(in, x);
+    t = static_cast<Face_tag>(x);
   }
 };
 
@@ -37,19 +37,19 @@ struct Mixed_face_data {
 
 template <class FaceData>
 struct Write<Mixed_face_data<FaceData>> {
-  static void write(std::ostream& out, const Mixed_face_data<FaceData>& tt) {
-    do_write<bool>(out, tt.from_left);
-    do_write<Face_tag>(out, tt.tag);
-    do_write<FaceData>(out, tt.data);
+  void operator()(std::ostream& out, const Mixed_face_data<FaceData>& t) const {
+    kigumi_write<bool>(out, t.from_left);
+    kigumi_write<Face_tag>(out, t.tag);
+    kigumi_write<FaceData>(out, t.data);
   }
 };
 
 template <class FaceData>
 struct Read<Mixed_face_data<FaceData>> {
-  static void read(std::istream& in, Mixed_face_data<FaceData>& tt) {
-    do_read<bool>(in, tt.from_left);
-    do_read<Face_tag>(in, tt.tag);
-    do_read<FaceData>(in, tt.data);
+  void operator()(std::istream& in, Mixed_face_data<FaceData>& t) const {
+    kigumi_read<bool>(in, t.from_left);
+    kigumi_read<Face_tag>(in, t.tag);
+    kigumi_read<FaceData>(in, t.data);
   }
 };
 

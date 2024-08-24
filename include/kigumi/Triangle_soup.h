@@ -180,79 +180,79 @@ class Triangle_soup {
 
 template <class K, class FaceData>
 struct Write<Triangle_soup<K, FaceData>> {
-  static void write(std::ostream& out, const Triangle_soup<K, FaceData>& tt) {
-    do_write<std::int32_t>(out, tt.num_vertices());
-    do_write<std::int32_t>(out, tt.num_faces());
+  void operator()(std::ostream& out, const Triangle_soup<K, FaceData>& t) const {
+    kigumi_write<std::int32_t>(out, t.num_vertices());
+    kigumi_write<std::int32_t>(out, t.num_faces());
 
-    for (std::size_t i = 0; i < tt.num_vertices(); ++i) {
-      const auto& p = tt.point({i});
+    for (std::size_t i = 0; i < t.num_vertices(); ++i) {
+      const auto& p = t.point({i});
 
       if (p.approx().x().is_point() && p.approx().y().is_point() && p.approx().z().is_point()) {
-        do_write<bool>(out, false);
-        do_write<double>(out, p.approx().x().inf());
-        do_write<double>(out, p.approx().y().inf());
-        do_write<double>(out, p.approx().z().inf());
+        kigumi_write<bool>(out, false);
+        kigumi_write<double>(out, p.approx().x().inf());
+        kigumi_write<double>(out, p.approx().y().inf());
+        kigumi_write<double>(out, p.approx().z().inf());
       } else {
-        do_write<bool>(out, true);
-        do_write<CGAL::Exact_rational>(out, p.exact().x());
-        do_write<CGAL::Exact_rational>(out, p.exact().y());
-        do_write<CGAL::Exact_rational>(out, p.exact().z());
+        kigumi_write<bool>(out, true);
+        kigumi_write<CGAL::Exact_rational>(out, p.exact().x());
+        kigumi_write<CGAL::Exact_rational>(out, p.exact().y());
+        kigumi_write<CGAL::Exact_rational>(out, p.exact().z());
       }
     }
 
-    for (const auto& fh : tt.faces()) {
-      const auto& f = tt.face(fh);
-      const auto& f_data = tt.data(fh);
-      do_write<Vertex_handle>(out, f[0]);
-      do_write<Vertex_handle>(out, f[1]);
-      do_write<Vertex_handle>(out, f[2]);
-      do_write<FaceData>(out, f_data);
+    for (const auto& fh : t.faces()) {
+      const auto& f = t.face(fh);
+      const auto& f_data = t.data(fh);
+      kigumi_write<Vertex_handle>(out, f[0]);
+      kigumi_write<Vertex_handle>(out, f[1]);
+      kigumi_write<Vertex_handle>(out, f[2]);
+      kigumi_write<FaceData>(out, f_data);
     }
   }
 };
 
 template <class K, class FaceData>
 struct Read<Triangle_soup<K, FaceData>> {
-  static void read(std::istream& in, Triangle_soup<K, FaceData>& tt) {
+  void operator()(std::istream& in, Triangle_soup<K, FaceData>& t) const {
     std::size_t num_vertices{};
     std::size_t num_faces{};
-    do_read<std::int32_t>(in, num_vertices);
-    do_read<std::int32_t>(in, num_faces);
+    kigumi_read<std::int32_t>(in, num_vertices);
+    kigumi_read<std::int32_t>(in, num_faces);
 
     for (std::size_t i = 0; i < num_vertices; ++i) {
       bool is_exact{};
-      do_read<bool>(in, is_exact);
+      kigumi_read<bool>(in, is_exact);
 
       if (!is_exact) {
         double x{};
         double y{};
         double z{};
-        do_read<double>(in, x);
-        do_read<double>(in, y);
-        do_read<double>(in, z);
-        tt.add_vertex({x, y, z});
+        kigumi_read<double>(in, x);
+        kigumi_read<double>(in, y);
+        kigumi_read<double>(in, z);
+        t.add_vertex({x, y, z});
       } else {
         CGAL::Exact_rational x;
         CGAL::Exact_rational y;
         CGAL::Exact_rational z;
-        do_read<CGAL::Exact_rational>(in, x);
-        do_read<CGAL::Exact_rational>(in, y);
-        do_read<CGAL::Exact_rational>(in, z);
-        tt.add_vertex({CGAL::Lazy_exact_nt<CGAL::Exact_rational>{x},
-                       CGAL::Lazy_exact_nt<CGAL::Exact_rational>{y},
-                       CGAL::Lazy_exact_nt<CGAL::Exact_rational>{z}});
+        kigumi_read<CGAL::Exact_rational>(in, x);
+        kigumi_read<CGAL::Exact_rational>(in, y);
+        kigumi_read<CGAL::Exact_rational>(in, z);
+        t.add_vertex({CGAL::Lazy_exact_nt<CGAL::Exact_rational>{x},
+                      CGAL::Lazy_exact_nt<CGAL::Exact_rational>{y},
+                      CGAL::Lazy_exact_nt<CGAL::Exact_rational>{z}});
       }
     }
 
     for (std::size_t i = 0; i < num_faces; ++i) {
       Face face{};
       FaceData f_data{};
-      do_read<Vertex_handle>(in, face[0]);
-      do_read<Vertex_handle>(in, face[1]);
-      do_read<Vertex_handle>(in, face[2]);
-      do_read<FaceData>(in, f_data);
-      auto fh = tt.add_face(face);
-      tt.data(fh) = f_data;
+      kigumi_read<Vertex_handle>(in, face[0]);
+      kigumi_read<Vertex_handle>(in, face[1]);
+      kigumi_read<Vertex_handle>(in, face[2]);
+      kigumi_read<FaceData>(in, f_data);
+      auto fh = t.add_face(face);
+      t.data(fh) = f_data;
     }
   }
 };

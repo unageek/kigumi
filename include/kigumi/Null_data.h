@@ -9,14 +9,14 @@ struct Null_data {};
 
 template <>
 struct Write<Null_data> {
-  static void write(std::ostream& /*out*/, const Null_data& /*tt*/) {
+  void operator()(std::ostream& /*out*/, const Null_data& /*t*/) const {
     // no-op
   }
 };
 
 template <>
 struct Read<Null_data> {
-  static void read(std::istream& /*in*/, Null_data& /*tt*/) {
+  void operator()(std::istream& /*in*/, Null_data& /*t*/) const {
     // no-op
   }
 };

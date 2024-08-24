@@ -223,7 +223,7 @@ class Classify_faces_locally {
         return 6;  // -v
       }
 
-      throw std::runtime_error("degenerated face");
+      throw std::runtime_error("degenerate face");
     }
   };
 
