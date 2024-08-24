@@ -198,7 +198,7 @@ class Corefine {
     get_triangles(right_, fh, right_triangulators_, right_point_ids_, tris);
   }
 
-  const Point_list& point_list() const { return points_; }
+  std::vector<Point> take_points() { return points_.take_points(); }
 
  private:
   struct Intersection_info {

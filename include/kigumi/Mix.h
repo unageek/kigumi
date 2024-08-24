@@ -31,7 +31,7 @@ class Mix {
 
     std::cout << "Constructing mixed mesh..." << std::endl;
 
-    Mixed_triangle_mesh<K, FaceData> m(corefine.point_list().into_vector());
+    Mixed_triangle_mesh<K, FaceData> m(corefine.take_points());
 
     std::vector<std::array<std::size_t, 3>> tris;
     for (auto fh : left.faces()) {

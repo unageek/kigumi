@@ -14,7 +14,9 @@ class Point_list {
  public:
   const Point& at(std::size_t i) const { return points_.at(i); }
 
-  std::size_t insert(const Point& p) {
+  std::size_t insert(const Point& p) { return insert(Point{p}); }
+
+  std::size_t insert(Point&& p) {
     auto it = point_to_index_.find(p);
     if (it != point_to_index_.end()) {
       return it->second;
@@ -22,11 +24,11 @@ class Point_list {
 
     auto i = points_.size();
     points_.push_back(p);
-    point_to_index_.emplace(p, i);
+    point_to_index_.emplace(std::move(p), i);
     return i;
   }
 
-  std::vector<Point> into_vector() const { return std::move(points_); }
+  std::vector<Point> take_points() { return std::move(points_); }
 
   void reserve(std::size_t capacity) {
     points_.reserve(capacity);
