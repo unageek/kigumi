@@ -35,6 +35,8 @@ class Point_list {
     point_to_index_.reserve(capacity);
   }
 
+  std::size_t size() const { return points_.size(); }
+
  private:
   struct Point_hash {
     std::size_t operator()(const Point& p) const noexcept {

@@ -62,9 +62,10 @@ class Corefine {
 
     std::vector<Intersection_info> infos;
 
+    std::size_t num_intersections{};
     parallel_do(
-        pairs.begin(), pairs.end(), std::vector<Intersection_info>{},
-        [&](const auto& pair, auto& local_infos) {
+        pairs.begin(), pairs.end(), std::pair<std::vector<Intersection_info>, std::size_t>{},
+        [&](const auto& pair, auto& local_state) {
           thread_local Face_face_intersection face_face_intersection{points_};
 
           auto [left_fh, right_fh] = pair;
@@ -80,18 +81,23 @@ class Corefine {
           if (sym_inters.empty()) {
             return;
           }
+          auto& [local_infos, local_num_intersections] = local_state;
           local_infos.emplace_back(left_fh, right_fh, sym_inters);
+          local_num_intersections += sym_inters.size();
         },
-        [&](auto& local_infos) {
+        [&](auto& local_state) {
+          auto& [local_infos, local_num_intersections] = local_state;
           if (infos.empty()) {
             infos = std::move(local_infos);
           } else {
             infos.insert(infos.end(), local_infos.begin(), local_infos.end());
           }
+          num_intersections += local_num_intersections;
         });
 
     std::cout << "Constructing intersection points..." << std::endl;
 
+    points_.reserve(points_.size() + num_intersections / 2);
     Intersection_point_inserter inserter(points_);
     for (auto& info : infos) {
       const auto& left_face = left_.face(info.left_fh);
