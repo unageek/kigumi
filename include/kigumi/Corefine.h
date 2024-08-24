@@ -82,7 +82,7 @@ class Corefine {
           }
           local_infos.emplace_back(left_fh, right_fh, sym_inters);
         },
-        [&](const auto& local_infos) {
+        [&](auto& local_infos) {
           if (infos.empty()) {
             infos = std::move(local_infos);
           } else {

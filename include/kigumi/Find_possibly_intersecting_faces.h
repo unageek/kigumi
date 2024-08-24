@@ -58,8 +58,8 @@ class Find_possibly_intersecting_faces {
             }
           }
         },
-        [&](const auto& local_state) {
-          const auto& [local_pairs, leaves] = local_state;
+        [&](auto& local_state) {
+          auto& [local_pairs, leaves] = local_state;
 
           if (pairs.empty()) {
             pairs = std::move(local_pairs);
