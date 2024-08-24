@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kigumi/Extract.h>
 #include <kigumi/Mix.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Null_data.h>
@@ -7,7 +8,6 @@
 #include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>
-#include <kigumi/extract.h>
 #include <kigumi/io.h>
 
 #include <algorithm>
@@ -171,6 +171,8 @@ struct Read<Kigumi_mesh<K, FaceData>> {
 
 template <class K, class FaceData = Null_data>
 class Boolean_operation {
+  using Extract = Extract<K, FaceData>;
+  using Kigumi_mesh = Kigumi_mesh<K, FaceData>;
   using Mixed_triangle_soup = Mixed_triangle_soup<K, FaceData>;
 
  public:
@@ -182,8 +184,8 @@ class Boolean_operation {
                     Mixed_triangle_soup m)
       : first_kind_{first_kind}, second_kind_{second_kind}, m_{std::move(m)} {}
 
-  Kigumi_mesh<K, FaceData> apply(Operator op, bool prefer_first = true) const {
-    auto soup = extract(m_, op, prefer_first);
+  Kigumi_mesh apply(Operator op, bool prefer_first = true) const {
+    auto soup = Extract{}(m_, op, prefer_first);
     if (soup.num_faces() != 0) {
       return {Kigumi_mesh_kind::Normal, std::move(soup)};
     }
