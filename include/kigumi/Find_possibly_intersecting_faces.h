@@ -61,7 +61,11 @@ class Find_possibly_intersecting_faces {
         [&](const auto& local_state) {
           const auto& [local_pairs, leaves] = local_state;
 
-          pairs.insert(pairs.end(), local_pairs.begin(), local_pairs.end());
+          if (pairs.empty()) {
+            pairs = std::move(local_pairs);
+          } else {
+            pairs.insert(pairs.end(), local_pairs.begin(), local_pairs.end());
+          }
         });
 
     return pairs;

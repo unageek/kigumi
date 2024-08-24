@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <atomic>
 #include <exception>
 #include <iterator>
@@ -13,13 +14,26 @@ template <class RandomAccessIterator, class State, class Body, class Post>
 void parallel_do(RandomAccessIterator first, RandomAccessIterator last, State state, Body body,
                  Post post) {
   auto size = static_cast<std::size_t>(std::distance(first, last));
+  if (size == 0) {
+    return;
+  }
+
+  auto num_threads = std::clamp(static_cast<std::size_t>(std::thread::hardware_concurrency()),
+                                std::size_t{1}, size);
+  if (num_threads == 1) {
+    for (auto it = first; it != last; ++it) {
+      body(*it, state);
+    }
+    post(state);
+    return;
+  }
+
   std::vector<std::thread> threads;
   std::atomic<std::size_t> next_index{};
   std::mutex mutex;
   std::exception_ptr exception_ptr;
-  auto num_threads = std::thread::hardware_concurrency();
 
-  for (unsigned tid = 0; tid < num_threads; ++tid) {
+  for (std::size_t tid = 0; tid < num_threads; ++tid) {
     threads.emplace_back([&] {
       auto local_state = state;
 
@@ -60,13 +74,25 @@ void parallel_do(RandomAccessIterator first, RandomAccessIterator last, State st
 template <class RandomAccessIterator, class Body>
 void parallel_do(RandomAccessIterator first, RandomAccessIterator last, Body body) {
   auto size = static_cast<std::size_t>(std::distance(first, last));
+  if (size == 0) {
+    return;
+  }
+
+  auto num_threads = std::clamp(static_cast<std::size_t>(std::thread::hardware_concurrency()),
+                                std::size_t{1}, size);
+  if (num_threads == 1) {
+    for (auto it = first; it != last; ++it) {
+      body(*it);
+    }
+    return;
+  }
+
   std::vector<std::thread> threads;
   std::atomic<std::size_t> next_index{};
   std::mutex mutex;
   std::exception_ptr exception_ptr;
-  auto num_threads = std::thread::hardware_concurrency();
 
-  for (unsigned tid = 0; tid < num_threads; ++tid) {
+  for (std::size_t tid = 0; tid < num_threads; ++tid) {
     threads.emplace_back([&] {
       try {
         while (true) {

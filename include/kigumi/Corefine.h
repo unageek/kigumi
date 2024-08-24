@@ -83,7 +83,11 @@ class Corefine {
           local_infos.emplace_back(left_fh, right_fh, sym_inters);
         },
         [&](const auto& local_infos) {
-          infos.insert(infos.end(), local_infos.begin(), local_infos.end());
+          if (infos.empty()) {
+            infos = std::move(local_infos);
+          } else {
+            infos.insert(infos.end(), local_infos.begin(), local_infos.end());
+          }
         });
 
     std::cout << "Constructing intersection points..." << std::endl;
