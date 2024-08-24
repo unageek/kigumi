@@ -321,10 +321,10 @@ class Face_face_intersection {
       return parity * it->second;
     }
 
-    const auto& pa = points_.at(key.at(0));
-    const auto& pb = points_.at(key.at(1));
-    const auto& pc = points_.at(key.at(2));
-    const auto& pd = points_.at(key.at(3));
+    const auto& pa = points_.at(key[0]);
+    const auto& pb = points_.at(key[1]);
+    const auto& pc = points_.at(key[2]);
+    const auto& pd = points_.at(key[3]);
 
     auto o = CGAL::orientation(pa, pb, pc, pd);
     orientation_3_cache_.emplace(key, o);
