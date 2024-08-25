@@ -2,8 +2,8 @@
 
 #include <CGAL/Kernel/global_functions.h>
 #include <CGAL/enum.h>
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
-#include <kigumi/Mesh_items.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Propagate_face_tags.h>
 #include <kigumi/Side_of_triangle_soup.h>

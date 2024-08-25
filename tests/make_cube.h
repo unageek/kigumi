@@ -2,7 +2,7 @@
 
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Kigumi_mesh.h>
-#include <kigumi/Mesh_items.h>
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Triangle_soup.h>
 

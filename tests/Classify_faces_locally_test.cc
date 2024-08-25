@@ -1,7 +1,7 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <gtest/gtest.h>
 #include <kigumi/Classify_faces_locally.h>
-#include <kigumi/Mesh_items.h>
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Null_data.h>
 

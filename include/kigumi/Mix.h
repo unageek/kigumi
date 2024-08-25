@@ -4,8 +4,8 @@
 #include <kigumi/Classify_faces_locally.h>
 #include <kigumi/Corefine.h>
 #include <kigumi/Find_border_edges.h>
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
-#include <kigumi/Mesh_items.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>

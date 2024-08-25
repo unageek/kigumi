@@ -8,8 +8,8 @@
 #include <CGAL/number_utils.h>
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
-#include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/io.h>

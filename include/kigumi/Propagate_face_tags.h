@@ -1,7 +1,7 @@
 #pragma once
 
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
-#include <kigumi/Mesh_items.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Warnings.h>
 
@@ -16,7 +16,7 @@ class Propagate_face_tags {
   using Mixed_triangle_mesh = Mixed_triangle_mesh<K, FaceData>;
 
  public:
-  Warnings operator()(Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border,
+  Warnings operator()(Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges,
                       Face_handle seed) const {
     const auto& data = m.data(seed);
     auto from_left = data.from_left;
@@ -33,7 +33,7 @@ class Propagate_face_tags {
       auto fh = queue_.front();
       queue_.pop();
 
-      for (auto fh2 : m.faces_around_face(fh, border)) {
+      for (auto fh2 : m.faces_around_face(fh, border_edges)) {
         auto& tag2 = m.data(fh2).tag;
         if (tag2 == Face_tag::Unknown) {
           tag2 = tag;
