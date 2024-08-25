@@ -18,7 +18,6 @@ class Find_possibly_intersecting_faces {
   using Leaf = typename Triangle_soup::Leaf;
 
  public:
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   std::vector<Face_handle_pair> operator()(
       const Triangle_soup& left, const Triangle_soup& right,
       const std::unordered_set<Face_handle>& left_faces_to_ignore,

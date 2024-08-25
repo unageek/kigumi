@@ -3,6 +3,7 @@
 #include <kigumi/Warnings.h>
 #include <kigumi/io.h>
 
+#include <exception>
 #include <iostream>
 #include <stdexcept>
 

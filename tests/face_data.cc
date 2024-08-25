@@ -1,6 +1,8 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/number_utils.h>
 #include <gtest/gtest.h>
 #include <kigumi/Kigumi_mesh.h>
+#include <kigumi/Operator.h>
 
 #include <cmath>
 #include <utility>
@@ -14,6 +16,8 @@ struct Face_data {
 };
 using M = kigumi::Kigumi_mesh<K, Face_data>;
 using kigumi::Operator;
+
+namespace {
 
 std::pair<double, double> get_areas(const M& m) {
   const auto& soup = m.soup();
@@ -29,6 +33,8 @@ std::pair<double, double> get_areas(const M& m) {
   }
   return {area1, area2};
 }
+
+}  // namespace
 
 TEST(FaceDataTest, EmptyNormal) {
   auto m1 = M::empty();

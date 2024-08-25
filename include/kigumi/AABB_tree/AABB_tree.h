@@ -87,7 +87,7 @@ class AABB_tree {
       {
         auto right_node_it = node_it + 1;
         auto split_axis = bbox_longest_axis(node_it->bbox());
-        std::sort(leaves_begin, leaves_end, [split_axis, this](auto a, auto b) {
+        std::sort(leaves_begin, leaves_end, [split_axis](auto a, auto b) {
           return bbox_center(a->bbox()).at(split_axis) < bbox_center(b->bbox()).at(split_axis);
         });
 
@@ -106,11 +106,10 @@ class AABB_tree {
         // The left tree requires (num_left_leaves - 1) nodes.
         auto right_node_it = node_it + num_left_leaves;
         auto split_axis = bbox_longest_axis(node_it->bbox());
-        std::nth_element(leaves_begin, leaves_begin + num_left_leaves, leaves_end,
-                         [split_axis, this](auto a, auto b) {
-                           return bbox_center(a->bbox()).at(split_axis) <
-                                  bbox_center(b->bbox()).at(split_axis);
-                         });
+        std::nth_element(
+            leaves_begin, leaves_begin + num_left_leaves, leaves_end, [split_axis](auto a, auto b) {
+              return bbox_center(a->bbox()).at(split_axis) < bbox_center(b->bbox()).at(split_axis);
+            });
 
         node_it->set_left_node(&*left_node_it);
         node_it->set_right_node(&*right_node_it);
@@ -174,7 +173,7 @@ class AABB_tree {
 
   const Leaf* root_leaf() const { return static_cast<const Leaf*>(root_); }
 
-  std::array<double, 3> bbox_center(const Bbox& bbox) {
+  static std::array<double, 3> bbox_center(const Bbox& bbox) {
     return {(bbox.xmax() + bbox.xmin()) / 2.0, (bbox.ymax() + bbox.ymin()) / 2.0,
             (bbox.zmax() + bbox.zmin()) / 2.0};
   }
@@ -187,7 +186,7 @@ class AABB_tree {
     return bbox;
   }
 
-  int bbox_longest_axis(const Bbox& bbox) {
+  static int bbox_longest_axis(const Bbox& bbox) {
     std::array<double, 3> lengths{bbox.xmax() - bbox.xmin(), bbox.ymax() - bbox.ymin(),
                                   bbox.zmax() - bbox.zmin()};
     return static_cast<int>(

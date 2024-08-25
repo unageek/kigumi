@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CGAL/Bbox_3.h>
+#include <kigumi/Mesh_handles.h>
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>

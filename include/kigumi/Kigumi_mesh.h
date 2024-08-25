@@ -1,5 +1,6 @@
 #pragma once
 
+#include <CGAL/enum.h>
 #include <kigumi/Extract.h>
 #include <kigumi/Mix.h>
 #include <kigumi/Mixed.h>
@@ -179,7 +180,6 @@ class Boolean_operation {
   Boolean_operation()
       : first_kind_{Kigumi_mesh_kind::Empty}, second_kind_{Kigumi_mesh_kind::Empty} {}
 
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Boolean_operation(Kigumi_mesh_kind first_kind, Kigumi_mesh_kind second_kind,
                     Mixed_triangle_soup m)
       : first_kind_{first_kind}, second_kind_{second_kind}, m_{std::move(m)} {}

@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <array>
+#include <boost/variant/get.hpp>
 #include <vector>
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;

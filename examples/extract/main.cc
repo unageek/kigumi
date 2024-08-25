@@ -2,8 +2,8 @@
 #include <kigumi/Kigumi_mesh.h>
 #include <kigumi/io.h>
 
+#include <exception>
 #include <iostream>
-#include <stdexcept>
 
 #include "parse_options.h"
 

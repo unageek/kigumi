@@ -4,8 +4,11 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_rational.h>
 #include <CGAL/IO/polygon_soup_io.h>
+#include <CGAL/Lazy_exact_nt.h>
+#include <CGAL/number_utils.h>
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
+#include <kigumi/Mesh_handles.h>
 #include <kigumi/Mesh_items.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>

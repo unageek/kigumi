@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kigumi/Mesh_handles.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Operator.h>
 #include <kigumi/Triangle_soup.h>

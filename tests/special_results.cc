@@ -1,5 +1,6 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <gtest/gtest.h>
+#include <kigumi/Operator.h>
 
 #include "make_cube.h"
 

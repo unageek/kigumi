@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/endian/conversion.hpp>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>

@@ -2,15 +2,17 @@
 
 #include <kigumi/Operator.h>
 
+#include <boost/any.hpp>
 #include <boost/program_options.hpp>
+#include <exception>
 #include <iostream>
-#include <stdexcept>
 #include <string>
+#include <vector>
 
 struct options {
   std::string input_file;
   std::string output_file;
-  kigumi::Operator op;
+  kigumi::Operator op{};
 };
 
 inline options parse_options(int argc, const char* argv[]) {
@@ -47,7 +49,7 @@ inline options parse_options(int argc, const char* argv[]) {
 
 namespace kigumi {
 
-void validate(boost::any& v, const std::vector<std::string>& values, Operator*, int) {
+inline void validate(boost::any& v, const std::vector<std::string>& values, Operator*, int) {
   namespace po = boost::program_options;
 
   po::validators::check_first_occurrence(v);

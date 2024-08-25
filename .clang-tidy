@@ -1,13 +1,16 @@
 Checks: "-*,\
   boost-*,\
   bugprone-*,\
+  -bugprone-easily-swappable-parameters,\
   cert-*,\
   clang-analyzer-*,\
+  concurrency-*,\
   cppcoreguidelines-*,\
   -cppcoreguidelines-avoid-magic-numbers,\
   -cppcoreguidelines-pro-type-reinterpret-cast,\
   google-*,\
   -google-runtime-references,\
+  hicpp-*,\
   misc-*,\
   -misc-const-correctness,\
   -misc-non-private-member-variables-in-classes,\

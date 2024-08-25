@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_items.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Warnings.h>
 

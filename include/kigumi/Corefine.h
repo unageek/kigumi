@@ -35,7 +35,6 @@ class Corefine {
   using Triangulator = Triangulator<K>;
 
  public:
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Corefine(const Triangle_soup& left, const Triangle_soup& right) : left_{left}, right_{right} {
     std::cout << "Finding face pairs..." << std::endl;
 

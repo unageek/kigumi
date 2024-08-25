@@ -1,6 +1,9 @@
 #pragma once
 
-#include <CGAL/Intersections_3/Ray_3_Triangle_3.h>
+#include <CGAL/Kernel/global_functions.h>
+#include <CGAL/enum.h>
+#include <CGAL/intersections.h>
+#include <kigumi/Mesh_handles.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <algorithm>

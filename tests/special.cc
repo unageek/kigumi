@@ -1,6 +1,7 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <gtest/gtest.h>
 #include <kigumi/Kigumi_mesh.h>
+#include <kigumi/Operator.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <utility>

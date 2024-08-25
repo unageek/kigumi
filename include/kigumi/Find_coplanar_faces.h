@@ -25,7 +25,6 @@ class Find_coplanar_faces {
   };
 
  public:
-  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
   Result operator()(const Triangle_soup& left, const Triangle_soup& right,
                     const std::vector<std::size_t>& left_points,
                     const std::vector<std::size_t>& right_points) const {
