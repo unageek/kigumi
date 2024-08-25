@@ -56,14 +56,46 @@ inline void validate(boost::any& v, const std::vector<std::string>& values, Oper
 
   const auto& s = po::validators::get_single_string(values);
 
-  if (s == "dif") {
-    v = Operator::Difference;
-  } else if (s == "int") {
-    v = Operator::Intersection;
-  } else if (s == "sym") {
-    v = Operator::SymmetricDifference;
+  if (s == "v") {
+    v = Operator::V;
+  } else if (s == "a") {
+    v = Operator::A;
+  } else if (s == "b") {
+    v = Operator::B;
+  } else if (s == "c") {
+    v = Operator::C;
+  } else if (s == "d") {
+    v = Operator::D;
+  } else if (s == "e") {
+    v = Operator::E;
+  } else if (s == "f") {
+    v = Operator::F;
+  } else if (s == "g") {
+    v = Operator::G;
+  } else if (s == "h") {
+    v = Operator::H;
+  } else if (s == "i") {
+    v = Operator::I;
+  } else if (s == "j") {
+    v = Operator::J;
+  } else if (s == "k") {
+    v = Operator::K;
+  } else if (s == "l") {
+    v = Operator::L;
+  } else if (s == "m") {
+    v = Operator::M;
+  } else if (s == "x") {
+    v = Operator::X;
+  } else if (s == "o") {
+    v = Operator::O;
   } else if (s == "uni") {
     v = Operator::Union;
+  } else if (s == "sym") {
+    v = Operator::SymmetricDifference;
+  } else if (s == "int") {
+    v = Operator::Intersection;
+  } else if (s == "dif") {
+    v = Operator::Difference;
   } else {
     throw po::validation_error(po::validation_error::invalid_option_value);
   }
