@@ -232,13 +232,20 @@ class Corefine {
 
   void insert_intersection(Triangulator& triangulator, const Intersection_info& info) {
     typename Triangulator::Vertex_handle null_vh;
+    auto first = null_vh;
     auto prev = null_vh;
     for (auto id : info.intersections) {
       auto cur = triangulator.insert(points_.at(id), id);
       if (prev != null_vh) {
         triangulator.insert_constraint(prev, cur);
       }
+      if (first == null_vh) {
+        first = cur;
+      }
       prev = cur;
+    }
+    if (info.intersections.size() > 2) {
+      triangulator.insert_constraint(prev, first);
     }
   }
 

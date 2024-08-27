@@ -66,15 +66,15 @@ class Intersection_point_inserter {
  private:
   std::size_t insert_line_line_intersection(std::size_t a, std::size_t b, std::size_t p,
                                             std::size_t q) {
-    if (a > p) {
-      std::swap(a, p);
-      std::swap(b, q);
-    }
     if (a > b) {
       std::swap(a, b);
     }
     if (p > q) {
       std::swap(p, q);
+    }
+    if (a > p) {
+      std::swap(a, p);
+      std::swap(b, q);
     }
 
     Line_line_intersection_key key{a, b, p, q};
