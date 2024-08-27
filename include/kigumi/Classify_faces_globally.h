@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CGAL/Kernel/global_functions.h>
 #include <CGAL/enum.h>
 #include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
@@ -9,6 +8,7 @@
 #include <kigumi/Side_of_triangle_soup.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>
+#include <kigumi/mesh_utility.h>
 #include <kigumi/parallel_do.h>
 
 #include <queue>
@@ -38,9 +38,8 @@ class Classify_faces_globally {
           thread_local Side_of_triangle_soup side_of_triangle_soup;
 
           auto& f_src = m.data(fh_src);
-          auto tri_src = m.triangle(fh_src);
           const auto& soup_trg = f_src.from_left ? right : left;
-          auto p_src = CGAL::centroid(tri_src);
+          auto p_src = internal::face_centroid(m, fh_src);
           auto side = side_of_triangle_soup(soup_trg, p_src);
           if (side == CGAL::ON_ORIENTED_BOUNDARY) {
             throw std::runtime_error(

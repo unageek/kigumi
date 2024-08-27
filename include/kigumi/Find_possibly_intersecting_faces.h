@@ -2,6 +2,7 @@
 
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Triangle_soup.h>
+#include <kigumi/mesh_utility.h>
 #include <kigumi/parallel_do.h>
 
 #include <iterator>
@@ -42,7 +43,7 @@ class Find_possibly_intersecting_faces {
           }
 
           leaves.clear();
-          a_tree.get_intersecting_leaves(std::back_inserter(leaves), b.triangle(b_fh).bbox());
+          a_tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(b, b_fh));
 
           for (const auto* leaf : leaves) {
             auto a_fh = leaf->face_handle();

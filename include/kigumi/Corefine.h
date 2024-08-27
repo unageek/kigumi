@@ -119,20 +119,24 @@ class Corefine {
       if (!left_triangulators_.contains(info.left_fh)) {
         auto fh = info.left_fh;
         const auto& f = left_.face(fh);
-        auto tri = left_.triangle(fh);
         auto a = left_point_ids_.at(f[0].i);
         auto b = left_point_ids_.at(f[1].i);
         auto c = left_point_ids_.at(f[2].i);
-        left_triangulators_.emplace(fh, Triangulator{tri, {a, b, c}});
+        const auto& pa = points_.at(a);
+        const auto& pb = points_.at(b);
+        const auto& pc = points_.at(c);
+        left_triangulators_.emplace(fh, Triangulator{pa, pb, pc, a, b, c});
       }
       if (!right_triangulators_.contains(info.right_fh)) {
         auto fh = info.right_fh;
         const auto& f = right_.face(fh);
-        auto tri = right_.triangle(fh);
         auto a = right_point_ids_.at(f[0].i);
         auto b = right_point_ids_.at(f[1].i);
         auto c = right_point_ids_.at(f[2].i);
-        right_triangulators_.emplace(fh, Triangulator{tri, {a, b, c}});
+        const auto& pa = points_.at(a);
+        const auto& pb = points_.at(b);
+        const auto& pc = points_.at(c);
+        right_triangulators_.emplace(fh, Triangulator{pa, pb, pc, a, b, c});
       }
     }
 

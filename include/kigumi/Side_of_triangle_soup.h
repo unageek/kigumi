@@ -5,6 +5,7 @@
 #include <CGAL/intersections.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Triangle_soup.h>
+#include <kigumi/mesh_utility.h>
 
 #include <algorithm>
 #include <iterator>
@@ -34,8 +35,7 @@ class Side_of_triangle_soup {
       leaves_.clear();
       intersections_.clear();
 
-      auto tri_trg = soup.triangle(fh_trg);
-      auto p_trg = CGAL::centroid(tri_trg);
+      auto p_trg = internal::face_centroid(soup, fh_trg);
 
       if (p == p_trg) {
         return CGAL::ON_ORIENTED_BOUNDARY;
@@ -82,8 +82,7 @@ class Side_of_triangle_soup {
         }
       }
 
-      auto tri = soup.triangle(intersections_.at(0).fh);
-      return tri.supporting_plane().oriented_side(p);
+      return internal::oriented_side_of_face_supporting_plane(soup, intersections_.at(0).fh, p);
     }
 
     // Should not happen.

@@ -5,8 +5,6 @@
 #include <CGAL/Projection_traits_3.h>
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>
 
-#include <array>
-
 namespace kigumi {
 
 template <class K>
@@ -23,14 +21,12 @@ class Triangulator {
   using Vertex_handle = typename Tds::Vertex_handle;
   using Intersection_of_constraints_exception = typename CDT::Intersection_of_constraints_exception;
 
-  Triangulator(const Triangle& triangle, const std::array<std::size_t, 3>& ids)
-      : cdt_{make_cdt_traits(triangle)} {
-    const auto& pa = triangle.vertex(0);
-    const auto& pb = triangle.vertex(1);
-    const auto& pc = triangle.vertex(2);
-    insert(pa, ids[0]);
-    insert(pb, ids[1]);
-    insert(pc, ids[2]);
+  Triangulator(const Point& pa, const Point& pb, const Point& pc, std::size_t a, std::size_t b,
+               std::size_t c)
+      : cdt_{make_cdt_traits(pa, pb, pc)} {
+    insert(pa, a);
+    insert(pb, b);
+    insert(pc, c);
   }
 
   template <class OutputIterator>
@@ -54,10 +50,7 @@ class Triangulator {
   }
 
  private:
-  CDT_traits make_cdt_traits(const Triangle& triangle) {
-    const auto& pa = triangle.vertex(0);
-    const auto& pb = triangle.vertex(1);
-    const auto& pc = triangle.vertex(2);
+  CDT_traits make_cdt_traits(const Point& pa, const Point& pb, const Point& pc) {
     return CDT_traits{CGAL::normal(pa, pb, pc)};
   }
 
