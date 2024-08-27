@@ -13,6 +13,7 @@
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/io.h>
+#include <kigumi/mesh_utility.h>
 
 #include <array>
 #include <boost/range/iterator_range.hpp>
@@ -34,8 +35,10 @@ class Triangle_soup {
 
  public:
   class Leaf : public AABB_leaf {
+    using Bbox = CGAL::Bbox_3;
+
    public:
-    Leaf(const Triangle& tri, Face_handle fh) : AABB_leaf{tri.bbox()}, fh_{fh} {}
+    Leaf(const Bbox& bbox, Face_handle fh) : AABB_leaf{bbox}, fh_{fh} {}
 
     Face_handle face_handle() const { return fh_; }
 
@@ -165,7 +168,7 @@ class Triangle_soup {
     if (!aabb_tree_) {
       std::vector<Leaf> leaves;
       for (auto fh : faces()) {
-        leaves.emplace_back(triangle(fh), fh);
+        leaves.emplace_back(internal::face_bbox(*this, fh), fh);
       }
       aabb_tree_ = std::make_unique<AABB_tree<Leaf>>(std::move(leaves));
     }

@@ -4,10 +4,16 @@
 #include <CGAL/Kernel/global_functions.h>
 #include <CGAL/enum.h>
 #include <kigumi/Mesh_handles.h>
-#include <kigumi/Triangle_mesh.h>
-#include <kigumi/Triangle_soup.h>
 
-namespace kigumi::internal {
+namespace kigumi {
+
+template <class K, class FaceData>
+class Triangle_soup;
+
+template <class K, class FaceData>
+class Triangle_mesh;
+
+namespace internal {
 
 // Facilities for avoiding construction of intermediate kernel objects.
 
@@ -37,4 +43,6 @@ CGAL::Oriented_side oriented_side_of_face_supporting_plane(const Triangle_soup<K
   return CGAL::orientation(m.point(f[0]), m.point(f[1]), m.point(f[2]), p);
 }
 
-}  // namespace kigumi::internal
+}  // namespace internal
+
+}  // namespace kigumi
