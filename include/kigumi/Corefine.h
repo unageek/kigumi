@@ -13,7 +13,7 @@
 
 #include <algorithm>
 #include <boost/container/static_vector.hpp>
-#include <boost/iterator/zip_iterator.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <unordered_map>
@@ -108,7 +108,9 @@ class Corefine {
       auto q = right_point_ids_.at(right_face[1].i);
       auto r = right_point_ids_.at(right_face[2].i);
       for (auto sym_inter : info.symbolic_intersections) {
-        auto id = inserter.insert(sym_inter.first, a, b, c, sym_inter.second, p, q, r);
+        auto left_region = intersection(sym_inter, TriangleRegion::LeftFace);
+        auto right_region = intersection(sym_inter, TriangleRegion::RightFace);
+        auto id = inserter.insert(left_region, a, b, c, right_region, p, q, r);
         info.intersections.push_back(id);
       }
     }
@@ -125,7 +127,8 @@ class Corefine {
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
-        left_triangulators_.emplace(fh, Triangulator{pa, pb, pc, a, b, c});
+        left_triangulators_.emplace(fh,
+                                    Triangulator{TriangleRegion::LeftFace, pa, pb, pc, a, b, c});
       }
       if (!right_triangulators_.contains(info.right_fh)) {
         auto fh = info.right_fh;
@@ -136,62 +139,63 @@ class Corefine {
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
-        right_triangulators_.emplace(fh, Triangulator{pa, pb, pc, a, b, c});
+        right_triangulators_.emplace(fh,
+                                     Triangulator{TriangleRegion::RightFace, pa, pb, pc, a, b, c});
       }
     }
 
-    std::sort(infos.begin(), infos.end(),
-              [](const auto& a, const auto& b) { return a.left_fh < b.left_fh; });
+    auto left_fh_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
+      return a.left_fh < b.left_fh;
+    };
+    std::sort(infos.begin(), infos.end(), left_fh_less);
 
-    std::vector<typename decltype(infos)::const_iterator> partitions;
-    for (auto it = infos.begin(); it != infos.end(); ++it) {
-      if (it == infos.begin() || it->left_fh != std::prev(it)->left_fh) {
-        partitions.push_back(it);
+    std::vector<boost::iterator_range<typename decltype(infos)::const_iterator>> ranges;
+    {
+      auto first = infos.begin();
+      auto last = infos.begin();
+      while (last != infos.end()) {
+        last = std::upper_bound(last, infos.end(), *last, left_fh_less);
+        ranges.emplace_back(first, last);
+        first = last;
       }
     }
-    partitions.push_back(infos.end());
 
     try {
-      parallel_do(boost::make_zip_iterator(
-                      boost::make_tuple(partitions.begin(), std::next(partitions.begin()))),
-                  boost::make_zip_iterator(
-                      boost::make_tuple(std::prev(partitions.end()), partitions.end())),
-                  [&](const auto& partition_range) {
-                    auto begin = partition_range.template get<0>();
-                    auto end = partition_range.template get<1>();
-                    auto& triangulator = left_triangulators_.at(begin->left_fh);
-                    for (auto it = begin; it != end; ++it) {
-                      insert_intersection(triangulator, *it);
-                    }
-                  });
+      parallel_do(ranges.begin(), ranges.end(), [&](const auto& range) {
+        const auto& any_info = range.front();
+        auto& triangulator = left_triangulators_.at(any_info.left_fh);
+        for (const auto& info : range) {
+          insert_intersection(triangulator, info);
+        }
+      });
     } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the second mesh has self-intersections");
     }
 
-    std::sort(infos.begin(), infos.end(),
-              [](const auto& a, const auto& b) { return a.right_fh < b.right_fh; });
+    auto right_fh_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
+      return a.right_fh < b.right_fh;
+    };
+    std::sort(infos.begin(), infos.end(), right_fh_less);
 
-    partitions.clear();
-    for (auto it = infos.begin(); it != infos.end(); ++it) {
-      if (it == infos.begin() || it->right_fh != std::prev(it)->right_fh) {
-        partitions.push_back(it);
+    ranges.clear();
+    {
+      auto first = infos.begin();
+      auto last = infos.begin();
+      while (last != infos.end()) {
+        last = std::upper_bound(last, infos.end(), *last, right_fh_less);
+        ranges.emplace_back(first, last);
+        first = last;
       }
     }
-    partitions.push_back(infos.end());
 
     try {
-      parallel_do(boost::make_zip_iterator(
-                      boost::make_tuple(partitions.begin(), std::next(partitions.begin()))),
-                  boost::make_zip_iterator(
-                      boost::make_tuple(std::prev(partitions.end()), partitions.end())),
-                  [&](const auto& partition_range) {
-                    auto begin = partition_range.template get<0>();
-                    auto end = partition_range.template get<1>();
-                    auto& triangulator = right_triangulators_.at(begin->right_fh);
-                    for (auto it = begin; it != end; ++it) {
-                      insert_intersection(triangulator, *it);
-                    }
-                  });
+      parallel_do(ranges.begin(), ranges.end(), [&](const auto& range) {
+        const auto& any_info = range.front();
+        auto& triangulator = right_triangulators_.at(any_info.right_fh);
+        for (const auto& info : range) {
+          insert_intersection(triangulator, info);
+        }
+      });
     } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the first mesh has self-intersections");
     }
@@ -213,8 +217,7 @@ class Corefine {
   struct Intersection_info {
     Face_handle left_fh;
     Face_handle right_fh;
-    boost::container::static_vector<std::pair<TriangleRegion, TriangleRegion>, 6>
-        symbolic_intersections;
+    boost::container::static_vector<TriangleRegion, 6> symbolic_intersections;
     boost::container::static_vector<std::size_t, 6> intersections;
   };
 
@@ -238,8 +241,10 @@ class Corefine {
     typename Triangulator::Vertex_handle null_vh;
     auto first = null_vh;
     auto prev = null_vh;
-    for (auto id : info.intersections) {
-      auto cur = triangulator.insert(points_.at(id), id);
+    for (std::size_t i = 0; i < info.intersections.size(); ++i) {
+      auto id = info.intersections.at(i);
+      auto sym = info.symbolic_intersections.at(i);
+      auto cur = triangulator.insert(points_.at(id), id, sym);
       if (prev != null_vh) {
         triangulator.insert_constraint(prev, cur);
       }

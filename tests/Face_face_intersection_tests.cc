@@ -17,6 +17,8 @@ using Point = K::Point_3;
 using Point_list = kigumi::Point_list<K>;
 using Segment = K::Segment_3;
 using Triangle = K::Triangle_3;
+using kigumi::intersection;
+using kigumi::TriangleRegion;
 
 namespace {
 
@@ -70,12 +72,14 @@ bool test(Point_list& points, std::array<std::size_t, 3> abc, std::array<std::si
   Face_face_intersection face_face{points};
   while (std::next_permutation(abc.begin(), abc.end())) {
     while (std::next_permutation(pqr.begin(), pqr.end())) {
-      auto actual = face_face(abc[0], abc[1], abc[2], pqr[0], pqr[1], pqr[2]);
-      if (expected.size() != actual.size()) {
+      auto sym_inters = face_face(abc[0], abc[1], abc[2], pqr[0], pqr[1], pqr[2]);
+      if (expected.size() != sym_inters.size()) {
         return false;
       }
 
-      for (auto [left_region, right_region] : actual) {
+      for (auto sym_inter : sym_inters) {
+        auto left_region = intersection(sym_inter, TriangleRegion::LeftFace);
+        auto right_region = intersection(sym_inter, TriangleRegion::RightFace);
         auto id = inserter.insert(left_region, abc[0], abc[1], abc[2], right_region, pqr[0], pqr[1],
                                   pqr[2]);
         const auto& p = points.at(id);

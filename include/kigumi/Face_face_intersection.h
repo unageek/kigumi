@@ -26,9 +26,10 @@ class Face_face_intersection {
  public:
   explicit Face_face_intersection(const Point_list& points) : points_(points) {}
 
-  boost::container::static_vector<std::pair<TriangleRegion, TriangleRegion>, 6> operator()(
-      std::size_t a, std::size_t b, std::size_t c, std::size_t p, std::size_t q,
-      std::size_t r) const {
+  boost::container::static_vector<TriangleRegion, 6> operator()(std::size_t a, std::size_t b,
+                                                                std::size_t c, std::size_t p,
+                                                                std::size_t q,
+                                                                std::size_t r) const {
     intersections_.clear();
     orientation_3_cache_.clear();
 
@@ -52,11 +53,11 @@ class Face_face_intersection {
     edge_face_intersection(eqr, q, r, fabc, a, b, c, qabc, rabc);
     edge_face_intersection(erp, r, p, fabc, a, b, c, rabc, pabc);
 
-    boost::container::static_vector<std::pair<TriangleRegion, TriangleRegion>, 6> result;
+    boost::container::static_vector<TriangleRegion, 6> result;
 
     if (intersections_.size() <= 2) {
       for (const auto& inter : intersections_) {
-        result.push_back(inter);
+        result.push_back(convex_hull(inter.first, inter.second));
       }
     } else {
       boost::container::static_vector<std::pair<std::size_t, std::size_t>, 6> edges;
@@ -75,7 +76,8 @@ class Face_face_intersection {
       boost::container::static_vector<bool, 6> visited(size, false);
       std::size_t i{};
       while (true) {
-        result.push_back(intersections_.at(i));
+        const auto& inter = intersections_.at(i);
+        result.push_back(convex_hull(inter.first, inter.second));
         visited.at(i) = true;
 
         if (result.size() == size) {
