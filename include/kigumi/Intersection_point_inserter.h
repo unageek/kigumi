@@ -22,42 +22,42 @@ class Intersection_point_inserter {
  public:
   explicit Intersection_point_inserter(Point_list& points) : points_(points) {}
 
-  std::size_t insert(TriangleRegion left_region, std::size_t a, std::size_t b, std::size_t c,
-                     TriangleRegion right_region, std::size_t p, std::size_t q, std::size_t r) {
-    if (left_region == TriangleRegion::LeftVertex0) {
+  std::size_t insert(Triangle_region left_region, std::size_t a, std::size_t b, std::size_t c,
+                     Triangle_region right_region, std::size_t p, std::size_t q, std::size_t r) {
+    if (left_region == Triangle_region::LeftVertex0) {
       return a;
     }
-    if (left_region == TriangleRegion::LeftVertex1) {
+    if (left_region == Triangle_region::LeftVertex1) {
       return b;
     }
-    if (left_region == TriangleRegion::LeftVertex2) {
+    if (left_region == Triangle_region::LeftVertex2) {
       return c;
     }
-    if (right_region == TriangleRegion::RightVertex0) {
+    if (right_region == Triangle_region::RightVertex0) {
       return p;
     }
-    if (right_region == TriangleRegion::RightVertex1) {
+    if (right_region == Triangle_region::RightVertex1) {
       return q;
     }
-    if (right_region == TriangleRegion::RightVertex2) {
+    if (right_region == Triangle_region::RightVertex2) {
       return r;
     }
 
-    if (left_region == TriangleRegion::LeftEdge12) {
+    if (left_region == Triangle_region::LeftEdge12) {
       std::tie(a, b, c) = std::make_tuple(b, c, a);
-    } else if (left_region == TriangleRegion::LeftEdge20) {
+    } else if (left_region == Triangle_region::LeftEdge20) {
       std::tie(a, b, c) = std::make_tuple(c, a, b);
     }
-    if (right_region == TriangleRegion::RightEdge12) {
+    if (right_region == Triangle_region::RightEdge12) {
       std::tie(p, q, r) = std::make_tuple(q, r, p);
-    } else if (right_region == TriangleRegion::RightEdge20) {
+    } else if (right_region == Triangle_region::RightEdge20) {
       std::tie(p, q, r) = std::make_tuple(r, p, q);
     }
 
-    if (left_region == TriangleRegion::LeftFace) {
+    if (left_region == Triangle_region::LeftFace) {
       return insert_plane_line_intersection(a, b, c, p, q);
     }
-    if (right_region == TriangleRegion::RightFace) {
+    if (right_region == Triangle_region::RightFace) {
       return insert_plane_line_intersection(p, q, r, a, b);
     }
     return insert_line_line_intersection(a, b, p, q);

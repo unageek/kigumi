@@ -26,15 +26,15 @@ class Face_face_intersection {
  public:
   explicit Face_face_intersection(const Point_list& points) : points_(points) {}
 
-  boost::container::static_vector<TriangleRegion, 6> operator()(std::size_t a, std::size_t b,
+  boost::container::static_vector<Triangle_region, 6> operator()(std::size_t a, std::size_t b,
                                                                 std::size_t c, std::size_t p,
                                                                 std::size_t q,
                                                                 std::size_t r) const {
     intersections_.clear();
     orientation_3_cache_.clear();
 
-    auto fabc = TriangleRegion::LeftFace;
-    auto fpqr = TriangleRegion::RightFace;
+    auto fabc = Triangle_region::LeftFace;
+    auto fpqr = Triangle_region::RightFace;
 
     auto [eab, ebc, eca] = face_edges(fabc);
     auto [epq, eqr, erp] = face_edges(fpqr);
@@ -53,7 +53,7 @@ class Face_face_intersection {
     edge_face_intersection(eqr, q, r, fabc, a, b, c, qabc, rabc);
     edge_face_intersection(erp, r, p, fabc, a, b, c, rabc, pabc);
 
-    boost::container::static_vector<TriangleRegion, 6> result;
+    boost::container::static_vector<Triangle_region, 6> result;
 
     if (intersections_.size() <= 2) {
       for (const auto& inter : intersections_) {
@@ -106,7 +106,7 @@ class Face_face_intersection {
   //    while the cases where vp, vq, or vr is in the interior of eab are not.
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and fpqr are left and right regions, respectively.
-  void edge_face_intersection(TriangleRegion eab, std::size_t a, std::size_t b, TriangleRegion fpqr,
+  void edge_face_intersection(Triangle_region eab, std::size_t a, std::size_t b, Triangle_region fpqr,
                               std::size_t p, std::size_t q, std::size_t r, CGAL::Orientation apqr,
                               CGAL::Orientation bpqr) const {
     if (apqr * bpqr > 0) {
@@ -173,8 +173,8 @@ class Face_face_intersection {
   //    while the cases where vp, vq, or vr is in the interior of eab are not.
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and fpqr are left and right regions, respectively.
-  void edge_face_intersection_2d(TriangleRegion eab, std::size_t a, std::size_t b,
-                                 TriangleRegion fpqr, std::size_t p, std::size_t q,
+  void edge_face_intersection_2d(Triangle_region eab, std::size_t a, std::size_t b,
+                                 Triangle_region fpqr, std::size_t p, std::size_t q,
                                  std::size_t r) const {
     auto [va, vb] = edge_vertices(eab);
 
@@ -214,8 +214,8 @@ class Face_face_intersection {
   //    while the case where vp is in the interior of eab is not.
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and epq are left and right regions, respectively.
-  void edge_edge_intersection_2d(TriangleRegion eab, std::size_t a, std::size_t b,
-                                 TriangleRegion epq, std::size_t p, std::size_t q,
+  void edge_edge_intersection_2d(Triangle_region eab, std::size_t a, std::size_t b,
+                                 Triangle_region epq, std::size_t p, std::size_t q,
                                  CGAL::Orientation abp, CGAL::Orientation abq,
                                  CGAL::Orientation apq, CGAL::Orientation bpq) const {
     if (abp * abq > 0 || apq * bpq > 0) {
@@ -265,8 +265,8 @@ class Face_face_intersection {
   //    while the case where vp is in the interior of eab is not.
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and epq are left and right regions, respectively.
-  void edge_edge_intersection_1d(TriangleRegion eab, std::size_t a, std::size_t /*b*/,
-                                 TriangleRegion epq, std::size_t p, std::size_t q) const {
+  void edge_edge_intersection_1d(Triangle_region eab, std::size_t a, std::size_t /*b*/,
+                                 Triangle_region epq, std::size_t p, std::size_t q) const {
     auto [va, vb] = edge_vertices(eab);
     auto [vp, vq] = edge_vertices(epq);
 
@@ -333,7 +333,7 @@ class Face_face_intersection {
     return parity * o;
   }
 
-  void insert(TriangleRegion first, TriangleRegion second) const {
+  void insert(Triangle_region first, Triangle_region second) const {
     if (!is_left_region(first)) {
       std::swap(first, second);
     }
@@ -342,7 +342,7 @@ class Face_face_intersection {
   }
 
   const Point_list& points_;
-  mutable std::vector<std::pair<TriangleRegion, TriangleRegion>> intersections_;
+  mutable std::vector<std::pair<Triangle_region, Triangle_region>> intersections_;
   mutable Orientation_3_map orientation_3_cache_;
 };
 

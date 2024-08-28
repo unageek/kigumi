@@ -25,7 +25,7 @@ class Triangulator {
   using Intersection_of_constraints_exception = typename CDT::Intersection_of_constraints_exception;
   using Vertex_handle = typename CDT::Vertex_handle;
 
-  Triangulator(TriangleRegion f, const Point& pa, const Point& pb, const Point& pc, std::size_t a,
+  Triangulator(Triangle_region f, const Point& pa, const Point& pb, const Point& pc, std::size_t a,
                std::size_t b, std::size_t c)
       : f_{f}, cdt_{make_cdt_traits(pa, pb, pc)} {
     vhs_[0] = insert(pa, a);
@@ -49,14 +49,14 @@ class Triangulator {
     return vh;
   }
 
-  Vertex_handle insert(const Point& p, std::size_t id, TriangleRegion region) {
+  Vertex_handle insert(const Point& p, std::size_t id, Triangle_region region) {
     Vertex_handle vh;
     region = intersection(region, f_);
-    if (region == TriangleRegion::LeftEdge01 || region == TriangleRegion::RightEdge01) {
+    if (region == Triangle_region::LeftEdge01 || region == Triangle_region::RightEdge01) {
       vh = insert_in_edge(p, id, 0);
-    } else if (region == TriangleRegion::LeftEdge12 || region == TriangleRegion::RightEdge12) {
+    } else if (region == Triangle_region::LeftEdge12 || region == Triangle_region::RightEdge12) {
       vh = insert_in_edge(p, id, 1);
-    } else if (region == TriangleRegion::LeftEdge20 || region == TriangleRegion::RightEdge20) {
+    } else if (region == Triangle_region::LeftEdge20 || region == Triangle_region::RightEdge20) {
       vh = insert_in_edge(p, id, 2);
     } else {
       vh = cdt_.insert(p);
@@ -86,7 +86,7 @@ class Triangulator {
     return CDT_traits{CGAL::normal(pa, pb, pc)};
   }
 
-  TriangleRegion f_{};
+  Triangle_region f_{};
   CDT cdt_;
   std::array<Vertex_handle, 3> vhs_;
 };

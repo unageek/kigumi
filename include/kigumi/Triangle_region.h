@@ -6,7 +6,7 @@
 
 namespace kigumi {
 
-enum class TriangleRegion : std::uint8_t {
+enum class Triangle_region : std::uint8_t {
   LeftVertex0 = 1,
   LeftVertex1 = 2,
   LeftVertex2 = 4,
@@ -23,85 +23,89 @@ enum class TriangleRegion : std::uint8_t {
   RightFace = RightVertex0 | RightVertex1 | RightVertex2,
 };
 
-inline constexpr TriangleRegion convex_hull(TriangleRegion r1, TriangleRegion r2) {
-  return static_cast<TriangleRegion>(static_cast<std::uint8_t>(r1) | static_cast<std::uint8_t>(r2));
+inline constexpr Triangle_region convex_hull(Triangle_region r1, Triangle_region r2) {
+  return static_cast<Triangle_region>(static_cast<std::uint8_t>(r1) |
+                                      static_cast<std::uint8_t>(r2));
 }
 
-inline constexpr TriangleRegion intersection(TriangleRegion r1, TriangleRegion r2) {
-  return static_cast<TriangleRegion>(static_cast<std::uint8_t>(r1) & static_cast<std::uint8_t>(r2));
+inline constexpr Triangle_region intersection(Triangle_region r1, Triangle_region r2) {
+  return static_cast<Triangle_region>(static_cast<std::uint8_t>(r1) &
+                                      static_cast<std::uint8_t>(r2));
 }
 
-inline std::tuple<TriangleRegion, TriangleRegion> edge_vertices(TriangleRegion edge) {
+inline std::tuple<Triangle_region, Triangle_region> edge_vertices(Triangle_region edge) {
   switch (edge) {
-    case TriangleRegion::LeftEdge01:
-      return {TriangleRegion::LeftVertex0, TriangleRegion::LeftVertex1};
-    case TriangleRegion::LeftEdge12:
-      return {TriangleRegion::LeftVertex1, TriangleRegion::LeftVertex2};
-    case TriangleRegion::LeftEdge20:
-      return {TriangleRegion::LeftVertex2, TriangleRegion::LeftVertex0};
-    case TriangleRegion::RightEdge01:
-      return {TriangleRegion::RightVertex0, TriangleRegion::RightVertex1};
-    case TriangleRegion::RightEdge12:
-      return {TriangleRegion::RightVertex1, TriangleRegion::RightVertex2};
-    case TriangleRegion::RightEdge20:
-      return {TriangleRegion::RightVertex2, TriangleRegion::RightVertex0};
+    case Triangle_region::LeftEdge01:
+      return {Triangle_region::LeftVertex0, Triangle_region::LeftVertex1};
+    case Triangle_region::LeftEdge12:
+      return {Triangle_region::LeftVertex1, Triangle_region::LeftVertex2};
+    case Triangle_region::LeftEdge20:
+      return {Triangle_region::LeftVertex2, Triangle_region::LeftVertex0};
+    case Triangle_region::RightEdge01:
+      return {Triangle_region::RightVertex0, Triangle_region::RightVertex1};
+    case Triangle_region::RightEdge12:
+      return {Triangle_region::RightVertex1, Triangle_region::RightVertex2};
+    case Triangle_region::RightEdge20:
+      return {Triangle_region::RightVertex2, Triangle_region::RightVertex0};
     default:
       throw std::invalid_argument("the region must be an edge");
   }
 }
 
-inline std::tuple<TriangleRegion, TriangleRegion, TriangleRegion> face_edges(TriangleRegion face) {
+inline std::tuple<Triangle_region, Triangle_region, Triangle_region> face_edges(
+    Triangle_region face) {
   switch (face) {
-    case TriangleRegion::LeftFace:
-      return {TriangleRegion::LeftEdge01, TriangleRegion::LeftEdge12, TriangleRegion::LeftEdge20};
-    case TriangleRegion::RightFace:
-      return {TriangleRegion::RightEdge01, TriangleRegion::RightEdge12,
-              TriangleRegion::RightEdge20};
+    case Triangle_region::LeftFace:
+      return {Triangle_region::LeftEdge01, Triangle_region::LeftEdge12,
+              Triangle_region::LeftEdge20};
+    case Triangle_region::RightFace:
+      return {Triangle_region::RightEdge01, Triangle_region::RightEdge12,
+              Triangle_region::RightEdge20};
     default:
       throw std::invalid_argument("the region must be a face");
   }
 }
 
-inline std::tuple<TriangleRegion, TriangleRegion, TriangleRegion> face_vertices(
-    TriangleRegion face) {
+inline std::tuple<Triangle_region, Triangle_region, Triangle_region> face_vertices(
+    Triangle_region face) {
   switch (face) {
-    case TriangleRegion::LeftFace:
-      return {TriangleRegion::LeftVertex0, TriangleRegion::LeftVertex1,
-              TriangleRegion::LeftVertex2};
-    case TriangleRegion::RightFace:
-      return {TriangleRegion::RightVertex0, TriangleRegion::RightVertex1,
-              TriangleRegion::RightVertex2};
+    case Triangle_region::LeftFace:
+      return {Triangle_region::LeftVertex0, Triangle_region::LeftVertex1,
+              Triangle_region::LeftVertex2};
+    case Triangle_region::RightFace:
+      return {Triangle_region::RightVertex0, Triangle_region::RightVertex1,
+              Triangle_region::RightVertex2};
     default:
       throw std::invalid_argument("the region must be a face");
   }
 }
 
-inline int dimension(TriangleRegion region) {
+inline int dimension(Triangle_region region) {
   switch (region) {
-    case TriangleRegion::LeftVertex0:
-    case TriangleRegion::LeftVertex1:
-    case TriangleRegion::LeftVertex2:
-    case TriangleRegion::RightVertex0:
-    case TriangleRegion::RightVertex1:
-    case TriangleRegion::RightVertex2:
+    case Triangle_region::LeftVertex0:
+    case Triangle_region::LeftVertex1:
+    case Triangle_region::LeftVertex2:
+    case Triangle_region::RightVertex0:
+    case Triangle_region::RightVertex1:
+    case Triangle_region::RightVertex2:
       return 0;
-    case TriangleRegion::LeftEdge01:
-    case TriangleRegion::LeftEdge12:
-    case TriangleRegion::LeftEdge20:
-    case TriangleRegion::RightEdge01:
-    case TriangleRegion::RightEdge12:
-    case TriangleRegion::RightEdge20:
+    case Triangle_region::LeftEdge01:
+    case Triangle_region::LeftEdge12:
+    case Triangle_region::LeftEdge20:
+    case Triangle_region::RightEdge01:
+    case Triangle_region::RightEdge12:
+    case Triangle_region::RightEdge20:
       return 1;
-    case TriangleRegion::LeftFace:
-    case TriangleRegion::RightFace:
+    case Triangle_region::LeftFace:
+    case Triangle_region::RightFace:
       return 2;
     default:
       throw std::invalid_argument("the region must be a simplex");
   }
 }
 
-inline bool is_left_region(TriangleRegion region) {
-  return convex_hull(region, TriangleRegion::LeftFace) == TriangleRegion::LeftFace;
+inline bool is_left_region(Triangle_region region) {
+  return convex_hull(region, Triangle_region::LeftFace) == Triangle_region::LeftFace;
 }
 
 }  // namespace kigumi

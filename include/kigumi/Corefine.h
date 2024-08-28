@@ -108,8 +108,8 @@ class Corefine {
       auto q = right_point_ids_.at(right_face[1].i);
       auto r = right_point_ids_.at(right_face[2].i);
       for (auto sym_inter : info.symbolic_intersections) {
-        auto left_region = intersection(sym_inter, TriangleRegion::LeftFace);
-        auto right_region = intersection(sym_inter, TriangleRegion::RightFace);
+        auto left_region = intersection(sym_inter, Triangle_region::LeftFace);
+        auto right_region = intersection(sym_inter, Triangle_region::RightFace);
         auto id = inserter.insert(left_region, a, b, c, right_region, p, q, r);
         info.intersections.push_back(id);
       }
@@ -128,7 +128,7 @@ class Corefine {
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
         left_triangulators_.emplace(fh,
-                                    Triangulator{TriangleRegion::LeftFace, pa, pb, pc, a, b, c});
+                                    Triangulator{Triangle_region::LeftFace, pa, pb, pc, a, b, c});
       }
       if (!right_triangulators_.contains(info.right_fh)) {
         auto fh = info.right_fh;
@@ -140,7 +140,7 @@ class Corefine {
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
         right_triangulators_.emplace(fh,
-                                     Triangulator{TriangleRegion::RightFace, pa, pb, pc, a, b, c});
+                                     Triangulator{Triangle_region::RightFace, pa, pb, pc, a, b, c});
       }
     }
 
@@ -217,7 +217,7 @@ class Corefine {
   struct Intersection_info {
     Face_handle left_fh;
     Face_handle right_fh;
-    boost::container::static_vector<TriangleRegion, 6> symbolic_intersections;
+    boost::container::static_vector<Triangle_region, 6> symbolic_intersections;
     boost::container::static_vector<std::size_t, 6> intersections;
   };
 
