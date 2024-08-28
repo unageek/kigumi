@@ -23,12 +23,12 @@ enum class Triangle_region : std::uint8_t {
   RightFace = RightVertex0 | RightVertex1 | RightVertex2,
 };
 
-inline constexpr Triangle_region convex_hull(Triangle_region r1, Triangle_region r2) {
+constexpr Triangle_region convex_hull(Triangle_region r1, Triangle_region r2) {
   return static_cast<Triangle_region>(static_cast<std::uint8_t>(r1) |
                                       static_cast<std::uint8_t>(r2));
 }
 
-inline constexpr Triangle_region intersection(Triangle_region r1, Triangle_region r2) {
+constexpr Triangle_region intersection(Triangle_region r1, Triangle_region r2) {
   return static_cast<Triangle_region>(static_cast<std::uint8_t>(r1) &
                                       static_cast<std::uint8_t>(r2));
 }
