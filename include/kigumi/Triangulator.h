@@ -88,8 +88,6 @@ class Triangulator {
     cdt_.insert_constraint(vh_i, vh_j);
   }
 
-  Triangle_region triangle_region() const { return f_; }
-
  private:
   Vertex_handle insert_in_edge(const Point& p, std::size_t id, int ei) {
     auto it = id_to_vh_.find(id);
