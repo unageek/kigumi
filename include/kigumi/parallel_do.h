@@ -33,6 +33,7 @@ void parallel_do(RandomAccessIterator first, RandomAccessIterator last, State st
   std::mutex mutex;
   std::exception_ptr exception_ptr;
 
+  threads.reserve(num_threads);
   for (std::size_t tid = 0; tid < num_threads; ++tid) {
     threads.emplace_back([&] {
       auto local_state = state;
@@ -92,6 +93,7 @@ void parallel_do(RandomAccessIterator first, RandomAccessIterator last, Body bod
   std::mutex mutex;
   std::exception_ptr exception_ptr;
 
+  threads.reserve(num_threads);
   for (std::size_t tid = 0; tid < num_threads; ++tid) {
     threads.emplace_back([&] {
       try {
