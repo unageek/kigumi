@@ -14,9 +14,18 @@ class Point_list {
  public:
   const Point& at(std::size_t i) const { return points_.at(i); }
 
+  auto begin() const { return points_.begin(); }
+
+  auto end() const { return points_.end(); }
+
   std::size_t insert(const Point& p) { return insert(Point{p}); }
 
   std::size_t insert(Point&& p) {
+    if (!check_uniqueness_) {
+      points_.push_back(std::move(p));
+      return points_.size() - 1;
+    }
+
     auto [it, inserted] = point_to_index_.emplace(p, points_.size());
 
     if (inserted) {
@@ -30,10 +39,21 @@ class Point_list {
 
   void reserve(std::size_t capacity) {
     points_.reserve(capacity);
+    if (!check_uniqueness_) {
+      return;
+    }
+
     point_to_index_.reserve(capacity);
   }
 
   std::size_t size() const { return points_.size(); }
+
+  void start_uniqueness_check() { check_uniqueness_ = true; }
+
+  void stop_uniqueness_check() {
+    check_uniqueness_ = false;
+    point_to_index_ = {};
+  }
 
  private:
   struct Point_hash {
@@ -51,6 +71,7 @@ class Point_list {
 
   std::vector<Point> points_;
   std::unordered_map<Point, std::size_t, Point_hash> point_to_index_;
+  bool check_uniqueness_{};
 };
 
 }  // namespace kigumi

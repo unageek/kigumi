@@ -38,6 +38,7 @@ class Corefine {
   Corefine(const Triangle_soup& left, const Triangle_soup& right) : left_{left}, right_{right} {
     std::cout << "Finding face pairs..." << std::endl;
 
+    points_.start_uniqueness_check();
     points_.reserve(left_.num_vertices() + right_.num_vertices());
     for (auto vh : left_.vertices()) {
       left_point_ids_.push_back(points_.insert(left_.point(vh)));
@@ -45,6 +46,7 @@ class Corefine {
     for (auto vh : right_.vertices()) {
       right_point_ids_.push_back(points_.insert(right_.point(vh)));
     }
+    points_.stop_uniqueness_check();
 
     auto cop = Find_coplanar_faces{}(left_, right_, left_point_ids_, right_point_ids_);
     std::unordered_set<Face_handle> left_faces_to_ignore;
@@ -96,7 +98,9 @@ class Corefine {
 
     std::cout << "Constructing intersection points..." << std::endl;
 
-    points_.reserve(points_.size() + num_intersections / 2);
+    auto num_points_before_insertion = points_.size();
+
+    points_.reserve(num_points_before_insertion + num_intersections / 2);
     Intersection_point_inserter inserter(points_);
     for (auto& info : infos) {
       const auto& left_face = left_.face(info.left_fh);
@@ -114,6 +118,9 @@ class Corefine {
         info.intersections.push_back(id);
       }
     }
+
+    parallel_do(points_.begin() + num_points_before_insertion, points_.end(),
+                [](const auto& p) { p.exact(); });
 
     std::cout << "Triangulating..." << std::endl;
 
