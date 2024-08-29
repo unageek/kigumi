@@ -117,9 +117,16 @@ class Corefine {
 
     std::cout << "Triangulating..." << std::endl;
 
-    for (const auto& info : infos) {
-      if (!left_triangulators_.contains(info.left_fh)) {
-        auto fh = info.left_fh;
+    auto left_fh_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
+      return a.left_fh < b.left_fh;
+    };
+    std::sort(infos.begin(), infos.end(), left_fh_less);
+
+    std::vector<boost::iterator_range<typename decltype(infos)::const_iterator>> ranges;
+    {
+      auto first = infos.begin();
+      while (first != infos.end()) {
+        auto fh = first->left_fh;
         const auto& f = left_.face(fh);
         auto a = left_point_ids_.at(f[0].i);
         auto b = left_point_ids_.at(f[1].i);
@@ -129,32 +136,8 @@ class Corefine {
         const auto& pc = points_.at(c);
         left_triangulators_.emplace(fh,
                                     Triangulator{Triangle_region::LeftFace, pa, pb, pc, a, b, c});
-      }
-      if (!right_triangulators_.contains(info.right_fh)) {
-        auto fh = info.right_fh;
-        const auto& f = right_.face(fh);
-        auto a = right_point_ids_.at(f[0].i);
-        auto b = right_point_ids_.at(f[1].i);
-        auto c = right_point_ids_.at(f[2].i);
-        const auto& pa = points_.at(a);
-        const auto& pb = points_.at(b);
-        const auto& pc = points_.at(c);
-        right_triangulators_.emplace(fh,
-                                     Triangulator{Triangle_region::RightFace, pa, pb, pc, a, b, c});
-      }
-    }
 
-    auto left_fh_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
-      return a.left_fh < b.left_fh;
-    };
-    std::sort(infos.begin(), infos.end(), left_fh_less);
-
-    std::vector<boost::iterator_range<typename decltype(infos)::const_iterator>> ranges;
-    {
-      auto first = infos.begin();
-      auto last = infos.begin();
-      while (last != infos.end()) {
-        last = std::upper_bound(last, infos.end(), *last, left_fh_less);
+        auto last = std::upper_bound(first, infos.end(), *first, left_fh_less);
         ranges.emplace_back(first, last);
         first = last;
       }
@@ -180,9 +163,19 @@ class Corefine {
     ranges.clear();
     {
       auto first = infos.begin();
-      auto last = infos.begin();
-      while (last != infos.end()) {
-        last = std::upper_bound(last, infos.end(), *last, right_fh_less);
+      while (first != infos.end()) {
+        auto fh = first->right_fh;
+        const auto& f = right_.face(fh);
+        auto a = right_point_ids_.at(f[0].i);
+        auto b = right_point_ids_.at(f[1].i);
+        auto c = right_point_ids_.at(f[2].i);
+        const auto& pa = points_.at(a);
+        const auto& pb = points_.at(b);
+        const auto& pc = points_.at(c);
+        right_triangulators_.emplace(fh,
+                                     Triangulator{Triangle_region::RightFace, pa, pb, pc, a, b, c});
+
+        auto last = std::upper_bound(first, infos.end(), *first, right_fh_less);
         ranges.emplace_back(first, last);
         first = last;
       }
