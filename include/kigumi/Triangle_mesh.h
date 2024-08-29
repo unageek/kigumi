@@ -6,6 +6,7 @@
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Triangle_soup.h>
+#include <kigumi/parallel_sort.h>
 
 #include <algorithm>
 #include <boost/range/iterator_range.hpp>
@@ -113,7 +114,7 @@ class Triangle_mesh {
       ++face_index;
     }
 
-    std::sort(map.begin(), map.end());
+    parallel_sort(map.begin(), map.end());
 
     std::size_t index{};
     std::ptrdiff_t prev_vi{-1};
