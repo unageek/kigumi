@@ -8,7 +8,6 @@
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/parallel_sort.h>
 
-#include <algorithm>
 #include <boost/range/iterator_range.hpp>
 #include <memory>
 #include <unordered_set>

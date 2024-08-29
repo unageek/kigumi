@@ -15,7 +15,6 @@ namespace kigumi {
 template <class K>
 class Triangulator {
   using Point = typename K::Point_3;
-  using Triangle = typename K::Triangle_3;
   using CDT_traits = CGAL::Projection_traits_3<K>;
   using Vb = CGAL::Triangulation_vertex_base_with_info_2<std::size_t, CDT_traits>;
   using Fb = CGAL::Constrained_triangulation_face_base_2<CDT_traits>;
@@ -125,7 +124,7 @@ class Triangulator {
     return vh;
   }
 
-  CDT_traits make_cdt_traits(const Point& pa, const Point& pb, const Point& pc) {
+  static CDT_traits make_cdt_traits(const Point& pa, const Point& pb, const Point& pc) {
     return CDT_traits{CGAL::normal(pa, pb, pc)};
   }
 

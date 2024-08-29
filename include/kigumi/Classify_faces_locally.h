@@ -1,6 +1,7 @@
 #pragma once
 
 #include <CGAL/Kernel/global_functions.h>
+#include <CGAL/enum.h>
 #include <CGAL/number_utils.h>
 #include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
