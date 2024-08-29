@@ -19,9 +19,6 @@ class AABB_tree {
   using Bbox = CGAL::Bbox_3;
   using Node = AABB_node<Leaf>;
   using Node_iterator = typename std::vector<Node>::iterator;
-  using Leaf_iterator = typename std::vector<Leaf>::const_iterator;
-  using Leaf_ptr = const Leaf*;
-  using Leaf_ptr_iterator = typename std::vector<Leaf_ptr>::iterator;
 
  public:
   explicit AABB_tree(std::vector<Leaf> leaves) : leaves_{std::move(leaves)} {
@@ -31,22 +28,17 @@ class AABB_tree {
     }
 
     if (num_leaves == 1) {
-      root_ = &leaves_.at(0);
+      root_ = &leaves_.front();
       return;
     }
 
     nodes_.resize(num_leaves - 1);
-    std::vector<Leaf_ptr> leaf_ptrs;
-    leaf_ptrs.reserve(num_leaves);
-    for (auto& leaf : leaves_) {
-      leaf_ptrs.push_back(&leaf);
-    }
 
-    auto root = &nodes_.at(0);
+    auto* root = &nodes_.front();
     root->set_bbox(bbox_from_leaves(leaves_.begin(), leaves_.end()));
     root_ = root;
 
-    build(nodes_.begin(), leaf_ptrs.begin(), leaf_ptrs.end(), 0);
+    build(nodes_.begin(), leaves_.begin(), leaves_.end(), 0);
   }
 
   template <class OutputIterator, class Query>
@@ -71,59 +63,60 @@ class AABB_tree {
 
  private:
   // NOLINTNEXTLINE(misc-no-recursion)
-  void build(Node_iterator node_it, Leaf_ptr_iterator leaves_begin, Leaf_ptr_iterator leaves_end,
+  template <class RandomAccessIterator>
+  void build(Node_iterator node_it, RandomAccessIterator first, RandomAccessIterator last,
              int node_depth) {
-    auto num_leaves = static_cast<std::size_t>(std::distance(leaves_begin, leaves_end));
+    auto num_leaves = static_cast<std::size_t>(std::distance(first, last));
 
     switch (num_leaves) {
-      case 2:  // left: leaf, right: leaf
-        node_it->set_left_leaf(*leaves_begin);
-        node_it->set_right_leaf(*(leaves_begin + 1));
+      case 2:  // (leaf, leaf)
+        node_it->set_left_leaf(&*first);
+        node_it->set_right_leaf(&*(first + 1));
 
         node_it->set_bbox(node_it->left_leaf()->bbox() + node_it->right_leaf()->bbox());
         break;
 
-      case 3:  // left: leaf, right: node
+      case 3:  // (leaf, node)
       {
         auto right_node_it = node_it + 1;
         auto split_axis = bbox_longest_axis(node_it->bbox());
-        std::sort(leaves_begin, leaves_end, [split_axis](auto a, auto b) {
-          return bbox_center(a->bbox()).at(split_axis) < bbox_center(b->bbox()).at(split_axis);
+        std::sort(first, last, [split_axis](const auto& a, const auto& b) {
+          return bbox_center(a.bbox()).at(split_axis) < bbox_center(b.bbox()).at(split_axis);
         });
 
-        node_it->set_left_leaf(*leaves_begin);
+        node_it->set_left_leaf(&*first);
         node_it->set_right_node(&*right_node_it);
 
-        build(right_node_it, leaves_begin + 1, leaves_end, node_depth + 1);
+        build(right_node_it, first + 1, last, node_depth + 1);
         node_it->set_bbox(node_it->left_leaf()->bbox() + node_it->right_node()->bbox());
         break;
       }
 
-      default:  // left: node, right: node
+      default:  // (node, node)
       {
         auto num_left_leaves = num_leaves / 2;
+        auto middle = first + num_left_leaves;
         auto left_node_it = node_it + 1;
         // The left tree requires (num_left_leaves - 1) nodes.
         auto right_node_it = node_it + num_left_leaves;
         auto split_axis = bbox_longest_axis(node_it->bbox());
-        std::nth_element(
-            leaves_begin, leaves_begin + num_left_leaves, leaves_end, [split_axis](auto a, auto b) {
-              return bbox_center(a->bbox()).at(split_axis) < bbox_center(b->bbox()).at(split_axis);
-            });
+        std::nth_element(first, middle, last, [split_axis](const auto& a, const auto& b) {
+          return bbox_center(a.bbox()).at(split_axis) < bbox_center(b.bbox()).at(split_axis);
+        });
 
         node_it->set_left_node(&*left_node_it);
         node_it->set_right_node(&*right_node_it);
 
         if (node_depth < concurrency_depth_limit_) {
-          std::thread left_thread(&AABB_tree::build, this, left_node_it, leaves_begin,
-                                  leaves_begin + num_left_leaves, node_depth + 1);
-          std::thread right_thread(&AABB_tree::build, this, right_node_it,
-                                   leaves_begin + num_left_leaves, leaves_end, node_depth + 1);
+          std::thread left_thread(&AABB_tree::build<RandomAccessIterator>, this, left_node_it,
+                                  first, middle, node_depth + 1);
+          std::thread right_thread(&AABB_tree::build<RandomAccessIterator>, this, right_node_it,
+                                   middle, last, node_depth + 1);
           left_thread.join();
           right_thread.join();
         } else {
-          build(left_node_it, leaves_begin, leaves_begin + num_left_leaves, node_depth + 1);
-          build(right_node_it, leaves_begin + num_left_leaves, leaves_end, node_depth + 1);
+          build(left_node_it, first, middle, node_depth + 1);
+          build(right_node_it, middle, last, node_depth + 1);
         }
 
         node_it->set_bbox(node_it->left_node()->bbox() + node_it->right_node()->bbox());
@@ -137,7 +130,7 @@ class AABB_tree {
   void traverse(OutputIterator leaves, std::size_t num_leaves, const Query& query,
                 const Node* node) const {
     switch (num_leaves) {
-      case 2:  // left: leaf, right: leaf
+      case 2:  // (leaf, leaf)
         if (CGAL::do_intersect(node->left_leaf()->bbox(), query)) {
           *leaves++ = node->left_leaf();
         }
@@ -146,7 +139,7 @@ class AABB_tree {
         }
         break;
 
-      case 3:  // left: leaf, right: node
+      case 3:  // (leaf, node)
         if (CGAL::do_intersect(node->left_leaf()->bbox(), query)) {
           *leaves++ = node->left_leaf();
         }
@@ -155,7 +148,7 @@ class AABB_tree {
         }
         break;
 
-      default:  // left: node, right: node
+      default:  // (node, node)
       {
         auto num_left_leaves = num_leaves / 2;
         if (CGAL::do_intersect(node->left_node()->bbox(), query)) {
@@ -178,10 +171,11 @@ class AABB_tree {
             (bbox.zmax() + bbox.zmin()) / 2.0};
   }
 
-  Bbox bbox_from_leaves(Leaf_iterator leaves_begin, Leaf_iterator leaves_end) {
-    auto bbox = leaves_begin->bbox();
-    for (auto it = leaves_begin + 1; it != leaves_end; ++it) {
-      bbox = bbox + it->bbox();
+  template <class InputIterator>
+  static Bbox bbox_from_leaves(InputIterator first, InputIterator last) {
+    Bbox bbox;
+    for (auto it = first; it != last; ++it) {
+      bbox += it->bbox();
     }
     return bbox;
   }
@@ -193,9 +187,8 @@ class AABB_tree {
         std::distance(lengths.begin(), std::max_element(lengths.begin(), lengths.end())));
   }
 
-  const int concurrency_depth_limit_{
-      static_cast<int>(std::log2(std::thread::hardware_concurrency()))};
-  const std::vector<Leaf> leaves_;
+  int concurrency_depth_limit_{static_cast<int>(std::log2(std::thread::hardware_concurrency()))};
+  std::vector<Leaf> leaves_;
   std::vector<Node> nodes_;
   const void* root_{nullptr};
 };

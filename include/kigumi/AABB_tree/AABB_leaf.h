@@ -13,7 +13,7 @@ class AABB_leaf {
   const Bbox& bbox() const { return bbox_; }
 
  private:
-  const Bbox bbox_;
+  Bbox bbox_;
 };
 
 }  // namespace kigumi
