@@ -17,15 +17,13 @@ class Point_list {
   std::size_t insert(const Point& p) { return insert(Point{p}); }
 
   std::size_t insert(Point&& p) {
-    auto it = point_to_index_.find(p);
-    if (it != point_to_index_.end()) {
-      return it->second;
+    auto [it, inserted] = point_to_index_.emplace(p, points_.size());
+
+    if (inserted) {
+      points_.push_back(std::move(p));
     }
 
-    auto i = points_.size();
-    points_.push_back(p);
-    point_to_index_.emplace(std::move(p), i);
-    return i;
+    return it->second;
   }
 
   std::vector<Point> take_points() { return std::move(points_); }

@@ -6,6 +6,7 @@
 
 #include <array>
 #include <boost/container_hash/hash.hpp>
+#include <limits>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -78,20 +79,21 @@ class Intersection_point_inserter {
     }
 
     Line_line_intersection_key key{a, b, p, q};
-    if (auto it = line_line_intersection_cache_.find(key);
-        it != line_line_intersection_cache_.end()) {
-      return it->second;
+    auto [it, inserted] =
+        line_line_intersection_cache_.emplace(key, std::numeric_limits<std::size_t>::max());
+
+    if (inserted) {
+      const auto& pa = points_.at(a);
+      const auto& pb = points_.at(b);
+      const auto& pp = points_.at(p);
+      const auto& pq = points_.at(q);
+
+      auto point = typename K::Construct_line_line_intersection_point_3{}(pa, pb, pp, pq);
+      auto id = points_.insert(std::move(point));
+      it->second = id;
     }
 
-    const auto& pa = points_.at(a);
-    const auto& pb = points_.at(b);
-    const auto& pp = points_.at(p);
-    const auto& pq = points_.at(q);
-
-    auto point = typename K::Construct_line_line_intersection_point_3{}(pa, pb, pp, pq);
-    auto id = points_.insert(std::move(point));
-    line_line_intersection_cache_.emplace(key, id);
-    return id;
+    return it->second;
   }
 
   std::size_t insert_plane_line_intersection(std::size_t a, std::size_t b, std::size_t c,
@@ -110,21 +112,22 @@ class Intersection_point_inserter {
     }
 
     Plane_line_intersection_key key{a, b, c, p, q};
-    if (auto it = plane_line_intersection_cache_.find(key);
-        it != plane_line_intersection_cache_.end()) {
-      return it->second;
+    auto [it, inserted] =
+        plane_line_intersection_cache_.emplace(key, std::numeric_limits<std::size_t>::max());
+
+    if (inserted) {
+      const auto& pa = points_.at(a);
+      const auto& pb = points_.at(b);
+      const auto& pc = points_.at(c);
+      const auto& pp = points_.at(p);
+      const auto& pq = points_.at(q);
+
+      auto point = typename K::Construct_plane_line_intersection_point_3{}(pa, pb, pc, pp, pq);
+      auto id = points_.insert(std::move(point));
+      it->second = id;
     }
 
-    const auto& pa = points_.at(a);
-    const auto& pb = points_.at(b);
-    const auto& pc = points_.at(c);
-    const auto& pp = points_.at(p);
-    const auto& pq = points_.at(q);
-
-    auto point = typename K::Construct_plane_line_intersection_point_3{}(pa, pb, pc, pp, pq);
-    auto id = points_.insert(std::move(point));
-    plane_line_intersection_cache_.emplace(key, id);
-    return id;
+    return it->second;
   }
 
   Point_list& points_;

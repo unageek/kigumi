@@ -89,39 +89,39 @@ class Triangulator {
 
  private:
   Vertex_handle insert_in_edge(const Point& p, std::size_t id, int ei) {
-    auto it = id_to_vh_.find(id);
-    if (it != id_to_vh_.end()) {
-      return it->second;
+    auto [it, inserted] = id_to_vh_.emplace(id, Vertex_handle{});
+
+    if (inserted) {
+      Vertex_handle vh;
+      Face_handle fh;
+      if (cdt_.is_edge(vhs_.at(ei), vhs_.at((ei + 1) % 3), fh, ei)) {
+        vh = cdt_.insert(p, CDT::EDGE, fh, ei);
+      } else {
+        vh = cdt_.insert(p);
+      }
+      vh->info() = id;
+      it->second = vh;
     }
 
-    Vertex_handle vh;
-    Face_handle fh;
-    if (cdt_.is_edge(vhs_.at(ei), vhs_.at((ei + 1) % 3), fh, ei)) {
-      vh = cdt_.insert(p, CDT::EDGE, fh, ei);
-    } else {
-      vh = cdt_.insert(p);
-    }
-    vh->info() = id;
-    id_to_vh_.emplace(id, vh);
-    return vh;
+    return it->second;
   }
 
   Vertex_handle insert_in_face(const Point& p, std::size_t id) {
-    auto it = id_to_vh_.find(id);
-    if (it != id_to_vh_.end()) {
-      return it->second;
+    auto [it, inserted] = id_to_vh_.emplace(id, Vertex_handle{});
+
+    if (inserted) {
+      Vertex_handle vh;
+      Face_handle fh;
+      if (cdt_.is_face(vhs_[0], vhs_[1], vhs_[2], fh)) {
+        vh = cdt_.insert(p, CDT::FACE, fh, -1);
+      } else {
+        vh = cdt_.insert(p);
+      }
+      vh->info() = id;
+      it->second = vh;
     }
 
-    Vertex_handle vh;
-    Face_handle fh;
-    if (cdt_.is_face(vhs_[0], vhs_[1], vhs_[2], fh)) {
-      vh = cdt_.insert(p, CDT::FACE, fh, -1);
-    } else {
-      vh = cdt_.insert(p);
-    }
-    vh->info() = id;
-    id_to_vh_.emplace(id, vh);
-    return vh;
+    return it->second;
   }
 
   static CDT_traits make_cdt_traits(const Point& pa, const Point& pb, const Point& pc) {

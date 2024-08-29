@@ -27,9 +27,9 @@ class Face_face_intersection {
   explicit Face_face_intersection(const Point_list& points) : points_(points) {}
 
   boost::container::static_vector<Triangle_region, 6> operator()(std::size_t a, std::size_t b,
-                                                                std::size_t c, std::size_t p,
-                                                                std::size_t q,
-                                                                std::size_t r) const {
+                                                                 std::size_t c, std::size_t p,
+                                                                 std::size_t q,
+                                                                 std::size_t r) const {
     intersections_.clear();
     orientation_3_cache_.clear();
 
@@ -106,9 +106,9 @@ class Face_face_intersection {
   //    while the cases where vp, vq, or vr is in the interior of eab are not.
   // 3. Intersections between regions of the same dimension are handled only if
   //    eab and fpqr are left and right regions, respectively.
-  void edge_face_intersection(Triangle_region eab, std::size_t a, std::size_t b, Triangle_region fpqr,
-                              std::size_t p, std::size_t q, std::size_t r, CGAL::Orientation apqr,
-                              CGAL::Orientation bpqr) const {
+  void edge_face_intersection(Triangle_region eab, std::size_t a, std::size_t b,
+                              Triangle_region fpqr, std::size_t p, std::size_t q, std::size_t r,
+                              CGAL::Orientation apqr, CGAL::Orientation bpqr) const {
     if (apqr * bpqr > 0) {
       // No intersections.
       return;
@@ -318,19 +318,19 @@ class Face_face_intersection {
   CGAL::Orientation orientation(std::size_t a, std::size_t b, std::size_t c, std::size_t d) const {
     Orientation_3_key key{a, b, c, d};
     auto parity = sort(key);
+    auto [it, inserted] = orientation_3_cache_.emplace(key, CGAL::ZERO);
 
-    if (auto it = orientation_3_cache_.find(key); it != orientation_3_cache_.end()) {
-      return parity * it->second;
+    if (inserted) {
+      const auto& pa = points_.at(key[0]);
+      const auto& pb = points_.at(key[1]);
+      const auto& pc = points_.at(key[2]);
+      const auto& pd = points_.at(key[3]);
+
+      auto o = CGAL::orientation(pa, pb, pc, pd);
+      it->second = o;
     }
 
-    const auto& pa = points_.at(key[0]);
-    const auto& pb = points_.at(key[1]);
-    const auto& pc = points_.at(key[2]);
-    const auto& pd = points_.at(key[3]);
-
-    auto o = CGAL::orientation(pa, pb, pc, pd);
-    orientation_3_cache_.emplace(key, o);
-    return parity * o;
+    return parity * it->second;
   }
 
   void insert(Triangle_region first, Triangle_region second) const {

@@ -6,6 +6,7 @@
 #include <kigumi/Triangle_soup.h>
 
 #include <unordered_map>
+#include <utility>
 
 namespace kigumi {
 
@@ -53,15 +54,24 @@ class Extract {
       }
 
       const auto& f = m.face(fh);
-      for (auto vh : f) {
-        const auto& p = m.point(vh);
-        if (!map.contains(vh)) {
-          map.emplace(vh, soup.add_vertex(p));
+      Face new_f;
+      for (std::size_t i = 0; i < 3; ++i) {
+        auto vh = f.at(i);
+        auto [it, inserted] = map.emplace(vh, Vertex_handle{});
+
+        if (inserted) {
+          const auto& p = m.point(vh);
+          it->second = soup.add_vertex(p);
         }
+
+        new_f.at(i) = it->second;
       }
 
-      auto new_fh = output_inv ? soup.add_face({map.at(f[0]), map.at(f[2]), map.at(f[1])})
-                               : soup.add_face({map.at(f[0]), map.at(f[1]), map.at(f[2])});
+      if (output_inv) {
+        std::swap(new_f[1], new_f[2]);
+      }
+
+      auto new_fh = soup.add_face(new_f);
       soup.data(new_fh) = m.data(fh).data;
     }
 
