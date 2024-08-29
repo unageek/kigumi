@@ -62,7 +62,7 @@ class Mix {
 
     std::cout << "Local classification..." << std::endl;
 
-    auto border_edges = Find_border_edges{}(m);
+    auto border_edges = Find_border_edges{}(m, left, right);
     Warnings warnings{};
 
     std::vector<Edge> edges(border_edges.begin(), border_edges.end());
