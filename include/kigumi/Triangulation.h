@@ -13,7 +13,7 @@
 namespace kigumi {
 
 template <class K>
-class Triangulator {
+class Triangulation {
   using Point = typename K::Point_3;
   using CDT_traits = CGAL::Projection_traits_3<K>;
   using Vb = CGAL::Triangulation_vertex_base_with_info_2<std::size_t, CDT_traits>;
@@ -26,8 +26,8 @@ class Triangulator {
   using Intersection_of_constraints_exception = typename CDT::Intersection_of_constraints_exception;
   using Vertex_handle = typename CDT::Vertex_handle;
 
-  Triangulator(Triangle_region f, const Point& pa, const Point& pb, const Point& pc, std::size_t a,
-               std::size_t b, std::size_t c)
+  Triangulation(Triangle_region f, const Point& pa, const Point& pb, const Point& pc, std::size_t a,
+                std::size_t b, std::size_t c)
       : f_{f}, cdt_{make_cdt_traits(pa, pb, pc)} {
     // To keep id_to_vh_ small, we do not insert these vertices into it.
     vhs_[0] = cdt_.insert_outside_affine_hull(pa);

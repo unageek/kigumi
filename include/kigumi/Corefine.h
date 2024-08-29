@@ -8,7 +8,7 @@
 #include <kigumi/Point_list.h>
 #include <kigumi/Triangle_region.h>
 #include <kigumi/Triangle_soup.h>
-#include <kigumi/Triangulator.h>
+#include <kigumi/Triangulation.h>
 #include <kigumi/parallel_do.h>
 
 #include <algorithm>
@@ -32,7 +32,7 @@ class Corefine {
   using Point = typename K::Point_3;
   using Point_list = Point_list<K>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
-  using Triangulator = Triangulator<K>;
+  using Triangulation = Triangulation<K>;
 
  public:
   Corefine(const Triangle_soup& left, const Triangle_soup& right) : left_{left}, right_{right} {
@@ -134,8 +134,8 @@ class Corefine {
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
-        left_triangulators_.emplace(fh,
-                                    Triangulator{Triangle_region::LeftFace, pa, pb, pc, a, b, c});
+        left_triangulations_.emplace(fh,
+                                     Triangulation{Triangle_region::LeftFace, pa, pb, pc, a, b, c});
 
         auto last = std::upper_bound(first, infos.end(), *first, left_fh_less);
         ranges.emplace_back(first, last);
@@ -146,12 +146,12 @@ class Corefine {
     try {
       parallel_do(ranges.begin(), ranges.end(), [&](const auto& range) {
         const auto& any_info = range.front();
-        auto& triangulator = left_triangulators_.at(any_info.left_fh);
+        auto& triangulation = left_triangulations_.at(any_info.left_fh);
         for (const auto& info : range) {
-          insert_intersection(triangulator, info);
+          insert_intersection(triangulation, info);
         }
       });
-    } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
+    } catch (const typename Triangulation::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the second mesh has self-intersections");
     }
 
@@ -172,8 +172,8 @@ class Corefine {
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
-        right_triangulators_.emplace(fh,
-                                     Triangulator{Triangle_region::RightFace, pa, pb, pc, a, b, c});
+        right_triangulations_.emplace(
+            fh, Triangulation{Triangle_region::RightFace, pa, pb, pc, a, b, c});
 
         auto last = std::upper_bound(first, infos.end(), *first, right_fh_less);
         ranges.emplace_back(first, last);
@@ -184,24 +184,24 @@ class Corefine {
     try {
       parallel_do(ranges.begin(), ranges.end(), [&](const auto& range) {
         const auto& any_info = range.front();
-        auto& triangulator = right_triangulators_.at(any_info.right_fh);
+        auto& triangulation = right_triangulations_.at(any_info.right_fh);
         for (const auto& info : range) {
-          insert_intersection(triangulator, info);
+          insert_intersection(triangulation, info);
         }
       });
-    } catch (const typename Triangulator::Intersection_of_constraints_exception&) {
+    } catch (const typename Triangulation::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the first mesh has self-intersections");
     }
   }
 
   template <class OutputIterator>
   void get_left_triangles(Face_handle fh, OutputIterator tris) const {
-    get_triangles(left_, fh, left_triangulators_, left_point_ids_, tris);
+    get_triangles(left_, fh, left_triangulations_, left_point_ids_, tris);
   }
 
   template <class OutputIterator>
   void get_right_triangles(Face_handle fh, OutputIterator tris) const {
-    get_triangles(right_, fh, right_triangulators_, right_point_ids_, tris);
+    get_triangles(right_, fh, right_triangulations_, right_point_ids_, tris);
   }
 
   std::vector<Point> take_points() { return points_.take_points(); }
@@ -216,10 +216,10 @@ class Corefine {
 
   template <class OutputIterator>
   void get_triangles(const Triangle_soup& soup, Face_handle fh,
-                     const std::unordered_map<Face_handle, Triangulator>& triangulators,
+                     const std::unordered_map<Face_handle, Triangulation>& triangulations,
                      const std::vector<std::size_t>& point_ids, OutputIterator tris) const {
-    auto it = triangulators.find(fh);
-    if (it == triangulators.end()) {
+    auto it = triangulations.find(fh);
+    if (it == triangulations.end()) {
       const auto& f = soup.face(fh);
       auto a = point_ids.at(f[0].i);
       auto b = point_ids.at(f[1].i);
@@ -230,16 +230,16 @@ class Corefine {
     }
   }
 
-  void insert_intersection(Triangulator& triangulator, const Intersection_info& info) {
-    typename Triangulator::Vertex_handle null_vh;
+  void insert_intersection(Triangulation& triangulation, const Intersection_info& info) {
+    typename Triangulation::Vertex_handle null_vh;
     auto first = null_vh;
     auto prev = null_vh;
     for (std::size_t i = 0; i < info.intersections.size(); ++i) {
       auto id = info.intersections.at(i);
       auto sym = info.symbolic_intersections.at(i);
-      auto cur = triangulator.insert(points_.at(id), id, sym);
+      auto cur = triangulation.insert(points_.at(id), id, sym);
       if (prev != null_vh) {
-        triangulator.insert_constraint(prev, cur);
+        triangulation.insert_constraint(prev, cur);
       }
       if (first == null_vh) {
         first = cur;
@@ -247,14 +247,14 @@ class Corefine {
       prev = cur;
     }
     if (info.intersections.size() > 2) {
-      triangulator.insert_constraint(prev, first);
+      triangulation.insert_constraint(prev, first);
     }
   }
 
   const Triangle_soup& left_;
-  std::unordered_map<Face_handle, Triangulator> left_triangulators_;
+  std::unordered_map<Face_handle, Triangulation> left_triangulations_;
   const Triangle_soup& right_;
-  std::unordered_map<Face_handle, Triangulator> right_triangulators_;
+  std::unordered_map<Face_handle, Triangulation> right_triangulations_;
   Point_list points_;
   std::vector<std::size_t> left_point_ids_;
   std::vector<std::size_t> right_point_ids_;
