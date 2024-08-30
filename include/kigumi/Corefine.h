@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kigumi/Face_face_intersection.h>
+#include <kigumi/Face_tag.h>
 #include <kigumi/Find_coplanar_faces.h>
 #include <kigumi/Find_possibly_intersecting_faces.h>
 #include <kigumi/Intersection_point_inserter.h>
@@ -16,6 +17,7 @@
 #include <boost/range/iterator_range.hpp>
 #include <iostream>
 #include <stdexcept>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -47,10 +49,11 @@ class Corefine {
     }
     points_.stop_uniqueness_check();
 
-    auto [left_face_tags, right_face_tags] =
+    std::tie(left_face_tags_, right_face_tags_) =
         Find_coplanar_faces{}(left_, right_, left_point_ids_, right_point_ids_);
 
-    auto pairs = Find_possibly_intersecting_faces{}(left_, right_, left_face_tags, right_face_tags);
+    auto pairs =
+        Find_possibly_intersecting_faces{}(left_, right_, left_face_tags_, right_face_tags_);
 
     std::cout << "Finding symbolic intersections..." << std::endl;
 
@@ -195,13 +198,15 @@ class Corefine {
   }
 
   template <class OutputIterator>
-  void get_left_triangles(Face_handle fh, OutputIterator tris) const {
+  Face_tag get_left_triangles(Face_handle fh, OutputIterator tris) const {
     get_triangles(left_, fh, left_triangulations_, left_point_ids_, tris);
+    return left_face_tags_.at(fh.i);
   }
 
   template <class OutputIterator>
-  void get_right_triangles(Face_handle fh, OutputIterator tris) const {
+  Face_tag get_right_triangles(Face_handle fh, OutputIterator tris) const {
     get_triangles(right_, fh, right_triangulations_, right_point_ids_, tris);
+    return right_face_tags_.at(fh.i);
   }
 
   std::vector<Point> take_points() { return points_.take_points(); }
@@ -258,6 +263,8 @@ class Corefine {
   Point_list points_;
   std::vector<std::size_t> left_point_ids_;
   std::vector<std::size_t> right_point_ids_;
+  std::vector<Face_tag> left_face_tags_;
+  std::vector<Face_tag> right_face_tags_;
 };
 
 }  // namespace kigumi

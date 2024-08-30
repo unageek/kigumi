@@ -38,22 +38,24 @@ class Mix {
     std::vector<std::array<std::size_t, 3>> tris;
     for (auto fh : left.faces()) {
       tris.clear();
-      corefine.get_left_triangles(fh, std::back_inserter(tris));
+      auto tag = corefine.get_left_triangles(fh, std::back_inserter(tris));
       for (const auto& tri : tris) {
         auto new_fh =
             m.add_face({Vertex_handle{tri[0]}, Vertex_handle{tri[1]}, Vertex_handle{tri[2]}});
         m.data(new_fh).from_left = true;
+        m.data(new_fh).tag = tag;
         m.data(new_fh).data = left.data(fh);
       }
     }
 
     for (auto fh : right.faces()) {
       tris.clear();
-      corefine.get_right_triangles(fh, std::back_inserter(tris));
+      auto tag = corefine.get_right_triangles(fh, std::back_inserter(tris));
       for (const auto& tri : tris) {
         auto new_fh =
             m.add_face({Vertex_handle{tri[0]}, Vertex_handle{tri[1]}, Vertex_handle{tri[2]}});
         m.data(new_fh).from_left = false;
+        m.data(new_fh).tag = tag;
         m.data(new_fh).data = right.data(fh);
       }
     }
