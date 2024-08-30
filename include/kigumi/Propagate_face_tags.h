@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Mixed.h>

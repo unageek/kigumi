@@ -2,6 +2,7 @@
 
 #include <CGAL/enum.h>
 #include <kigumi/Extract.h>
+#include <kigumi/Face_tag.h>
 #include <kigumi/Mix.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Null_data.h>

@@ -17,7 +17,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -48,16 +47,10 @@ class Corefine {
     }
     points_.stop_uniqueness_check();
 
-    auto cop = Find_coplanar_faces{}(left_, right_, left_point_ids_, right_point_ids_);
-    std::unordered_set<Face_handle> left_faces_to_ignore;
-    left_faces_to_ignore.insert(cop.left_coplanar_faces.begin(), cop.left_coplanar_faces.end());
-    left_faces_to_ignore.insert(cop.left_opposite_faces.begin(), cop.left_opposite_faces.end());
-    std::unordered_set<Face_handle> right_faces_to_ignore;
-    right_faces_to_ignore.insert(cop.right_coplanar_faces.begin(), cop.right_coplanar_faces.end());
-    right_faces_to_ignore.insert(cop.right_opposite_faces.begin(), cop.right_opposite_faces.end());
+    auto [left_face_tags, right_face_tags] =
+        Find_coplanar_faces{}(left_, right_, left_point_ids_, right_point_ids_);
 
-    auto pairs = Find_possibly_intersecting_faces{}(left_, right_, left_faces_to_ignore,
-                                                    right_faces_to_ignore);
+    auto pairs = Find_possibly_intersecting_faces{}(left_, right_, left_face_tags, right_face_tags);
 
     std::cout << "Finding symbolic intersections..." << std::endl;
 

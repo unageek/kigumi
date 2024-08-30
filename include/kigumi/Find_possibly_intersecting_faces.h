@@ -1,12 +1,12 @@
 #pragma once
 
+#include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/mesh_utility.h>
 #include <kigumi/parallel_do.h>
 
 #include <iterator>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -19,17 +19,16 @@ class Find_possibly_intersecting_faces {
   using Leaf = typename Triangle_soup::Leaf;
 
  public:
-  std::vector<Face_handle_pair> operator()(
-      const Triangle_soup& left, const Triangle_soup& right,
-      const std::unordered_set<Face_handle>& left_faces_to_ignore,
-      const std::unordered_set<Face_handle>& right_faces_to_ignore) const {
+  std::vector<Face_handle_pair> operator()(const Triangle_soup& left, const Triangle_soup& right,
+                                           const std::vector<Face_tag>& left_face_tags,
+                                           const std::vector<Face_tag>& right_face_tags) const {
     std::vector<Face_handle_pair> pairs;
 
     auto left_is_a = left.num_faces() < right.num_faces();
     const auto& a = left_is_a ? left : right;
     const auto& b = left_is_a ? right : left;
-    const auto& a_faces_to_ignore = left_is_a ? left_faces_to_ignore : right_faces_to_ignore;
-    const auto& b_faces_to_ignore = left_is_a ? right_faces_to_ignore : left_faces_to_ignore;
+    const auto& a_face_tags = left_is_a ? left_face_tags : right_face_tags;
+    const auto& b_face_tags = left_is_a ? right_face_tags : left_face_tags;
     const auto& a_tree = a.aabb_tree();
 
     parallel_do(
@@ -38,7 +37,7 @@ class Find_possibly_intersecting_faces {
         [&](auto b_fh, auto& local_state) {
           auto& [local_pairs, leaves] = local_state;
 
-          if (b_faces_to_ignore.contains(b_fh)) {
+          if (b_face_tags.at(b_fh.i) != Face_tag::Unknown) {
             return;
           }
 
@@ -47,7 +46,7 @@ class Find_possibly_intersecting_faces {
 
           for (const auto* leaf : leaves) {
             auto a_fh = leaf->face_handle();
-            if (a_faces_to_ignore.contains(a_fh)) {
+            if (a_face_tags.at(a_fh.i) != Face_tag::Unknown) {
               continue;
             }
 
