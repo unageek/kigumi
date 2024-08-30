@@ -5,8 +5,8 @@
 #include <kigumi/Operator.h>
 #include <kigumi/Triangle_soup.h>
 
-#include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace kigumi {
 
@@ -18,7 +18,7 @@ class Extract {
  public:
   Triangle_soup operator()(const Mixed_triangle_soup& m, Operator op, bool prefer_first) const {
     Triangle_soup soup;
-    std::unordered_map<Vertex_handle, Vertex_handle> map;
+    std::vector<Vertex_handle> map(m.num_vertices());
 
     auto u_mask = union_mask(op);
     auto i_mask = intersection_mask(op);
@@ -57,14 +57,12 @@ class Extract {
       Face new_f;
       for (std::size_t i = 0; i < 3; ++i) {
         auto vh = f.at(i);
-        auto [it, inserted] = map.emplace(vh, Vertex_handle{});
-
-        if (inserted) {
+        auto& new_vh = map.at(vh.i);
+        if (new_vh == Vertex_handle{}) {
           const auto& p = m.point(vh);
-          it->second = soup.add_vertex(p);
+          new_vh = soup.add_vertex(p);
         }
-
-        new_f.at(i) = it->second;
+        new_f.at(i) = new_vh;
       }
 
       if (output_inv) {
