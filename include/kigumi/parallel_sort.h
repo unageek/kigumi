@@ -47,7 +47,7 @@ void parallel_sort(RandomAccessIterator first, RandomAccessIterator last, Compar
             barrier.arrive_and_wait();
             if (tid % (2 * sorted_distance) == 0) {
               auto first = thread_first;
-              auto middle = partitions.at(tid + sorted_distance);
+              auto middle = partitions.at(std::min(tid + sorted_distance, num_threads));
               auto last = partitions.at(std::min(tid + 2 * sorted_distance, num_threads));
               std::inplace_merge(first, middle, last, comp);
             }
