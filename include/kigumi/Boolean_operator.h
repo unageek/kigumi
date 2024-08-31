@@ -30,7 +30,7 @@ namespace kigumi {
 // A & B: Output both A and B.
 // A | B: Output either A or B.
 
-enum class Operator : std::uint8_t {
+enum class Boolean_operator : std::uint8_t {
   // Bochenski notation
   V,  // The universe
   A,  // A \cup B
@@ -72,84 +72,84 @@ inline Mask operator&(Mask a, Mask b) {
   return static_cast<Mask>(static_cast<std::uint8_t>(a) & static_cast<std::uint8_t>(b));
 }
 
-inline Mask union_mask(Operator op) {
+inline Mask union_mask(Boolean_operator op) {
   switch (op) {
-    case Operator::I:
-    case Operator::L:
+    case Boolean_operator::I:
+    case Boolean_operator::L:
       return Mask::A;
-    case Operator::H:
-    case Operator::M:
+    case Boolean_operator::H:
+    case Boolean_operator::M:
       return Mask::B;
-    case Operator::A:
-    case Operator::J:
+    case Boolean_operator::A:
+    case Boolean_operator::J:
       return Mask::A | Mask::B;
-    case Operator::C:
-    case Operator::F:
+    case Boolean_operator::C:
+    case Boolean_operator::F:
       return Mask::AInv;
-    case Operator::B:
-    case Operator::G:
+    case Boolean_operator::B:
+    case Boolean_operator::G:
       return Mask::BInv;
-    case Operator::E:
-    case Operator::X:
+    case Boolean_operator::E:
+    case Boolean_operator::X:
       return Mask::AInv | Mask::BInv;
     default:
       return Mask::None;
   }
 }
 
-inline Mask intersection_mask(Operator op) {
+inline Mask intersection_mask(Boolean_operator op) {
   switch (op) {
-    case Operator::B:
-    case Operator::I:
+    case Boolean_operator::B:
+    case Boolean_operator::I:
       return Mask::A;
-    case Operator::C:
-    case Operator::H:
+    case Boolean_operator::C:
+    case Boolean_operator::H:
       return Mask::B;
-    case Operator::E:
-    case Operator::K:
+    case Boolean_operator::E:
+    case Boolean_operator::K:
       return Mask::A | Mask::B;
-    case Operator::F:
-    case Operator::M:
+    case Boolean_operator::F:
+    case Boolean_operator::M:
       return Mask::AInv;
-    case Operator::G:
-    case Operator::L:
+    case Boolean_operator::G:
+    case Boolean_operator::L:
       return Mask::BInv;
-    case Operator::D:
-    case Operator::J:
+    case Boolean_operator::D:
+    case Boolean_operator::J:
       return Mask::AInv | Mask::BInv;
     default:
       return Mask::None;
   }
 }
 
-inline Mask coplanar_mask(Operator op, bool prefer_a) {
+inline Mask coplanar_mask(Boolean_operator op, bool prefer_a) {
   switch (op) {
-    case Operator::A:
-    case Operator::H:
-    case Operator::I:
-    case Operator::K:
+    case Boolean_operator::A:
+    case Boolean_operator::H:
+    case Boolean_operator::I:
+    case Boolean_operator::K:
       return prefer_a ? Mask::A : Mask::B;
-    case Operator::D:
-    case Operator::F:
-    case Operator::G:
-    case Operator::X:
+    case Boolean_operator::D:
+    case Boolean_operator::F:
+    case Boolean_operator::G:
+    case Boolean_operator::X:
       return prefer_a ? Mask::AInv : Mask::BInv;
     default:
       return Mask::None;
   }
 }
 
-inline Mask opposite_mask(Operator op, bool prefer_a) {
+inline Mask opposite_mask(Boolean_operator op, bool prefer_a) {
   switch (op) {
-    case Operator::B:
-    case Operator::G:
-    case Operator::I:
-    case Operator::L:
+    case Boolean_operator::B:
+    case Boolean_operator::G:
+    case Boolean_operator::I:
+    case Boolean_operator::L:
       return prefer_a ? Mask::A : Mask::BInv;
-    case Operator::C:
-    case Operator::F:
-    case Operator::H:
-    case Operator::M:
+    case Boolean_operator::C:
+    case Boolean_operator::F:
+    case Boolean_operator::H:
+    case Boolean_operator::M:
       return prefer_a ? Mask::AInv : Mask::B;
     default:
       return Mask::None;

@@ -1,14 +1,14 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/enum.h>
 #include <gtest/gtest.h>
-#include <kigumi/Kigumi_mesh.h>
+#include <kigumi/Region.h>
 
 #include <utility>
 
 #include "make_cube.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
-using M = kigumi::Kigumi_mesh<K>;
+using M = kigumi::Region<K>;
 using kigumi::Triangle_soup;
 
 TEST(SideOfMeshTest, Cube) {
@@ -18,14 +18,14 @@ TEST(SideOfMeshTest, Cube) {
     for (auto y : {-1.0, 0.0, 0.5, 1.0, 2.0}) {
       for (auto z : {-1.0, 0.0, 0.5, 1.0, 2.0}) {
         auto p = K::Point_3{x, y, z};
-        auto side = m.side_of_mesh(p);
+        auto side = m.bounded_side(p);
 
         if (x < 0.0 || y < 0.0 || z < 0.0 || x > 1.0 || y > 1.0 || z > 1.0) {
-          ASSERT_EQ(side, CGAL::ON_POSITIVE_SIDE);
+          ASSERT_EQ(side, CGAL::ON_UNBOUNDED_SIDE);
         } else if (x == 0.0 || y == 0.0 || z == 0.0 || x == 1.0 || y == 1.0 || z == 1.0) {
-          ASSERT_EQ(side, CGAL::ON_ORIENTED_BOUNDARY);
+          ASSERT_EQ(side, CGAL::ON_BOUNDARY);
         } else {
-          ASSERT_EQ(side, CGAL::ON_NEGATIVE_SIDE);
+          ASSERT_EQ(side, CGAL::ON_BOUNDED_SIDE);
         }
       }
     }
@@ -39,14 +39,14 @@ TEST(SideOfMeshTest, InvertedCube) {
     for (auto y : {-1.0, 0.0, 0.5, 1.0, 2.0}) {
       for (auto z : {-1.0, 0.0, 0.5, 1.0, 2.0}) {
         auto p = K::Point_3{x, y, z};
-        auto side = m.side_of_mesh(p);
+        auto side = m.bounded_side(p);
 
         if (x < 0.0 || y < 0.0 || z < 0.0 || x > 1.0 || y > 1.0 || z > 1.0) {
-          ASSERT_EQ(side, CGAL::ON_NEGATIVE_SIDE);
+          ASSERT_EQ(side, CGAL::ON_BOUNDED_SIDE);
         } else if (x == 0.0 || y == 0.0 || z == 0.0 || x == 1.0 || y == 1.0 || z == 1.0) {
-          ASSERT_EQ(side, CGAL::ON_ORIENTED_BOUNDARY);
+          ASSERT_EQ(side, CGAL::ON_BOUNDARY);
         } else {
-          ASSERT_EQ(side, CGAL::ON_POSITIVE_SIDE);
+          ASSERT_EQ(side, CGAL::ON_UNBOUNDED_SIDE);
         }
       }
     }
@@ -56,13 +56,13 @@ TEST(SideOfMeshTest, InvertedCube) {
 TEST(SideOfMeshTest, Empty) {
   auto m = M::empty();
 
-  ASSERT_EQ(m.side_of_mesh({0, 0, 0}), CGAL::ON_POSITIVE_SIDE);
+  ASSERT_EQ(m.bounded_side({0, 0, 0}), CGAL::ON_UNBOUNDED_SIDE);
 }
 
-TEST(SideOfMeshTest, Entire) {
-  auto m = M::entire();
+TEST(SideOfMeshTest, Full) {
+  auto m = M::full();
 
-  ASSERT_EQ(m.side_of_mesh({0, 0, 0}), CGAL::ON_NEGATIVE_SIDE);
+  ASSERT_EQ(m.bounded_side({0, 0, 0}), CGAL::ON_BOUNDED_SIDE);
 }
 
 TEST(SideOfMeshTest, Plane) {
@@ -80,14 +80,14 @@ TEST(SideOfMeshTest, Plane) {
     for (auto y : {0.0, 0.5, 1.0}) {
       for (auto z : {0.0, 0.5, 1.0}) {
         auto p = K::Point_3{x, y, z};
-        auto side = m.side_of_mesh(p);
+        auto side = m.bounded_side(p);
 
         if (z < 0.5) {
-          ASSERT_EQ(side, CGAL::ON_NEGATIVE_SIDE);
+          ASSERT_EQ(side, CGAL::ON_BOUNDED_SIDE);
         } else if (z == 0.5) {
-          ASSERT_EQ(side, CGAL::ON_ORIENTED_BOUNDARY);
+          ASSERT_EQ(side, CGAL::ON_BOUNDARY);
         } else {
-          ASSERT_EQ(side, CGAL::ON_POSITIVE_SIDE);
+          ASSERT_EQ(side, CGAL::ON_UNBOUNDED_SIDE);
         }
       }
     }

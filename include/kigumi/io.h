@@ -2,10 +2,8 @@
 
 #include <boost/endian/conversion.hpp>
 #include <cstdint>
-#include <fstream>
 #include <iostream>
 #include <stdexcept>
-#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -185,25 +183,5 @@ struct Read<mpq_class> {
 };
 
 #endif
-
-template <class T>
-void save(const std::string& filename, const T& t) {
-  std::ofstream out(filename, std::ios::binary);
-  if (!out) {
-    throw std::runtime_error{"failed to open file '" + filename + "'"};
-  }
-
-  kigumi_write<T>(out, t);
-}
-
-template <class T>
-void load(const std::string& filename, T& t) {
-  std::ifstream in(filename, std::ios::binary);
-  if (!in) {
-    throw std::runtime_error{"failed to open file '" + filename + "'"};
-  }
-
-  kigumi_read<T>(in, t);
-}
 
 }  // namespace kigumi

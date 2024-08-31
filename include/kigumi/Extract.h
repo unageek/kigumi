@@ -1,9 +1,9 @@
 #pragma once
 
+#include <kigumi/Boolean_operator.h>
 #include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Mixed.h>
-#include <kigumi/Operator.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <utility>
@@ -17,7 +17,7 @@ class Extract {
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
  public:
-  Triangle_soup operator()(const Mixed_triangle_soup& m, Operator op, bool prefer_first) const {
+  Triangle_soup operator()(const Mixed_triangle_soup& m, Boolean_operator op, bool prefer_first) const {
     Triangle_soup soup;
     std::vector<Vertex_handle> map(m.num_vertices());
 

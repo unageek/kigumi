@@ -9,12 +9,12 @@
 #include <unordered_set>
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
+using Classify_faces_locally = kigumi::Classify_faces_locally<K, kigumi::Null_data>;
+using Mixed_triangle_mesh = kigumi::Mixed_triangle_mesh<K, kigumi::Null_data>;
 using Point = K::Point_3;
 using kigumi::Edge;
 using kigumi::Face_tag;
-using Classify_faces_locally = kigumi::Classify_faces_locally<K, kigumi::Null_data>;
 using kigumi::make_edge;
-using kigumi::Mixed_triangle_mesh;
 
 //                  f1 (Ext.)
 //                    //|
@@ -28,7 +28,7 @@ using kigumi::Mixed_triangle_mesh;
 //                    //|
 //                  f3 (Int.)
 TEST(ClassifyFacesLocallyTest, NonOverlapping) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -59,7 +59,7 @@ TEST(ClassifyFacesLocallyTest, NonOverlapping) {
 //     //+--------- f0 (????)
 //     ////////////
 TEST(ClassifyFacesLocallyTest, NonOverlappingUnknown) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -77,7 +77,7 @@ TEST(ClassifyFacesLocallyTest, NonOverlappingUnknown) {
 }
 
 TEST(ClassifyFacesLocallyTest, Coplanar) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r = m.add_vertex({1, 0, 0});
@@ -94,7 +94,7 @@ TEST(ClassifyFacesLocallyTest, Coplanar) {
 }
 
 TEST(ClassifyFacesLocallyTest, Opposite) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r = m.add_vertex({1, 0, 0});
@@ -118,7 +118,7 @@ TEST(ClassifyFacesLocallyTest, Opposite) {
 //   f2 (Int.) ---------+--------- f0 (????)
 //             ///////////////////
 TEST(ClassifyFacesLocallyTest, Inconsistent1) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -145,7 +145,7 @@ TEST(ClassifyFacesLocallyTest, Inconsistent1) {
 //                      |//
 //                  f2 (Int.)
 TEST(ClassifyFacesLocallyTest, Inconsistent2) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});

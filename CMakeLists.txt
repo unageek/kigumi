@@ -10,8 +10,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Boost REQUIRED COMPONENTS container container_hash endian iterator program_options range)
 find_package(CGAL CONFIG REQUIRED)
+find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-add_subdirectory(examples)
+add_subdirectory(cli)
+
 enable_testing()
 add_subdirectory(tests)

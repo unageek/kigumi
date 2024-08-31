@@ -1,11 +1,8 @@
 #pragma once
 
 #include <CGAL/Bbox_3.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_rational.h>
-#include <CGAL/IO/polygon_soup_io.h>
 #include <CGAL/Lazy_exact_nt.h>
-#include <CGAL/number_utils.h>
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_entities.h>
@@ -15,12 +12,11 @@
 #include <kigumi/io.h>
 #include <kigumi/mesh_utility.h>
 
-#include <array>
 #include <boost/range/iterator_range.hpp>
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -77,28 +73,6 @@ class Triangle_soup {
     return *this;
   }
 
-  explicit Triangle_soup(const std::string& filename) {
-    std::vector<std::vector<std::size_t>> faces;
-    CGAL::IO::read_polygon_soup(filename, points_, faces);
-
-    faces_.reserve(faces.size());
-    face_data_.reserve(faces.size());
-
-    for (const auto& f : faces) {
-      if (f.size() < 3) {
-        continue;
-      }
-
-      for (std::size_t i = 0; i < f.size() - 2; ++i) {
-        faces_.push_back({Vertex_handle{f[0]}, Vertex_handle{f[i + 1]}, Vertex_handle{f[i + 2]}});
-        face_data_.emplace_back();
-      }
-    }
-
-    faces_.shrink_to_fit();
-    face_data_.shrink_to_fit();
-  }
-
   Triangle_soup(std::vector<Point> points, std::vector<Face> faces, std::vector<FaceData> face_data)
       : points_{std::move(points)}, faces_{std::move(faces)}, face_data_{std::move(face_data)} {}
 
@@ -111,24 +85,6 @@ class Triangle_soup {
     faces_.push_back(face);
     face_data_.emplace_back();
     return {faces_.size() - 1};
-  }
-
-  void save(const std::string& filename) const {
-    using Epick = CGAL::Exact_predicates_inexact_constructions_kernel;
-
-    std::vector<Epick::Point_3> points;
-    points.reserve(points_.size());
-    for (const auto& p : points_) {
-      points.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()), CGAL::to_double(p.z()));
-    }
-
-    std::vector<std::array<std::size_t, 3>> faces;
-    faces.reserve(faces_.size());
-    for (const auto& f : faces_) {
-      faces.push_back({f[0].i, f[1].i, f[2].i});
-    }
-
-    CGAL::IO::write_polygon_soup(filename, points, faces, CGAL::parameters::stream_precision(17));
   }
 
   std::size_t num_vertices() const { return points_.size(); }

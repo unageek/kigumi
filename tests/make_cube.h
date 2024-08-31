@@ -1,15 +1,15 @@
 #pragma once
 
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <kigumi/Kigumi_mesh.h>
 #include <kigumi/Mesh_entities.h>
 #include <kigumi/Null_data.h>
+#include <kigumi/Region.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <utility>
 
 template <class K, class FaceData = kigumi::Null_data>
-kigumi::Kigumi_mesh<K, FaceData> make_cube(const typename K::Point_3& min,
+kigumi::Region<K, FaceData> make_cube(const typename K::Point_3& min,
                                            const typename K::Point_3& max, const FaceData& data,
                                            bool invert = false) {
   auto make_face = [invert](const kigumi::Face& f) {
@@ -44,5 +44,5 @@ kigumi::Kigumi_mesh<K, FaceData> make_cube(const typename K::Point_3& min,
     soup.data(fh) = data;
   }
 
-  return kigumi::Kigumi_mesh<K, FaceData>{std::move(soup)};
+  return kigumi::Region<K, FaceData>{std::move(soup)};
 }

@@ -2,6 +2,7 @@
 
 #include <kigumi/io.h>
 
+#include <cstdint>
 #include <functional>
 #include <limits>
 
