@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace kigumi {
@@ -84,16 +85,16 @@ struct Read<bool> {
 template <>
 struct Write<boost::multiprecision::cpp_rational> {
   void operator()(std::ostream& out, const boost::multiprecision::cpp_rational& t) const {
+    thread_local std::vector<std::uint8_t> buf;
+
     kigumi_write<bool>(out, t < 0);
 
-    std::vector<std::uint8_t> buf;
-
+    buf.clear();
     export_bits(numerator(t), std::back_inserter(buf), 8);
     kigumi_write<std::int32_t>(out, buf.size());
     out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(buf.size()));
 
     buf.clear();
-
     export_bits(denominator(t), std::back_inserter(buf), 8);
     kigumi_write<std::int32_t>(out, buf.size());
     out.write(reinterpret_cast<const char*>(buf.data()), static_cast<std::streamsize>(buf.size()));
@@ -103,13 +104,14 @@ struct Write<boost::multiprecision::cpp_rational> {
 template <>
 struct Read<boost::multiprecision::cpp_rational> {
   void operator()(std::istream& in, boost::multiprecision::cpp_rational& t) const {
+    thread_local std::vector<std::uint8_t> buf;
+
     bool neg{};
     kigumi_read<bool>(in, neg);
 
     boost::multiprecision::cpp_int num;
     boost::multiprecision::cpp_int den;
     std::size_t count{};
-    std::vector<std::uint8_t> buf;
 
     kigumi_read<std::int32_t>(in, count);
     buf.resize(count);
@@ -121,9 +123,9 @@ struct Read<boost::multiprecision::cpp_rational> {
     in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
     import_bits(den, buf.begin(), buf.end());
 
-    t = boost::multiprecision::cpp_rational{num, den};
+    t = boost::multiprecision::cpp_rational{std::move(num), std::move(den)};
     if (neg) {
-      t = -t;
+      t = -std::move(t);
     }
   }
 };
@@ -137,10 +139,11 @@ struct Read<boost::multiprecision::cpp_rational> {
 template <>
 struct Write<mpq_class> {
   void operator()(std::ostream& out, const mpq_class& t) const {
+    thread_local std::vector<std::uint8_t> buf;
+
     kigumi_write<bool>(out, t < 0);
 
     std::size_t count{};
-    std::vector<std::uint8_t> buf;
 
     buf.resize((mpz_sizeinbase(t.get_num().get_mpz_t(), 2) + 7) / 8);
     mpz_export(buf.data(), &count, 1, 1, 0, 0, t.get_num().get_mpz_t());
@@ -157,13 +160,14 @@ struct Write<mpq_class> {
 template <>
 struct Read<mpq_class> {
   void operator()(std::istream& in, mpq_class& t) const {
+    thread_local std::vector<std::uint8_t> buf;
+
     bool neg{};
     kigumi_read<bool>(in, neg);
 
     mpz_class num;
     mpz_class den;
     std::size_t count{};
-    std::vector<std::uint8_t> buf;
 
     kigumi_read<std::int32_t>(in, count);
     buf.resize(count);
@@ -175,9 +179,9 @@ struct Read<mpq_class> {
     in.read(reinterpret_cast<char*>(buf.data()), static_cast<std::streamsize>(count));
     mpz_import(den.get_mpz_t(), count, 1, 1, 0, 0, buf.data());
 
-    t = mpq_class{num} / mpq_class{den};
+    t = mpq_class{std::move(num)} / mpq_class{std::move(den)};
     if (neg) {
-      t = -t;
+      t = -std::move(t);
     }
   }
 };
