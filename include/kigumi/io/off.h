@@ -7,6 +7,7 @@
 #include <kigumi/io/ascii.h>
 #include <kigumi/io/validate_region.h>
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -56,7 +57,7 @@ inline std::istream& operator>>(std::istream& in, Off_signature& sig) {
   return in >> opt_hash_comment_eof;
 }
 
-enum class Off_reading_state {
+enum class Off_reading_state : std::uint8_t {
   READING_SIGNATURE,
   READING_NUMBERS,
   READING_VERTICES,

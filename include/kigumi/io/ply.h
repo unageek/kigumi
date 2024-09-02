@@ -7,6 +7,7 @@
 #include <kigumi/io/ascii.h>
 #include <kigumi/io/validate_region.h>
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -16,7 +17,12 @@
 
 namespace kigumi::io {
 
-enum class Ply_reading_state { READING_SIGNATURE, READING_VERSION, READING_ELEMENTS, READING_BODY };
+enum class Ply_reading_state : std::uint8_t {
+  READING_SIGNATURE,
+  READING_VERSION,
+  READING_ELEMENTS,
+  READING_BODY,
+};
 
 struct Ply_property {
   std::string type;
