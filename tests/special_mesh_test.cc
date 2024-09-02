@@ -11,8 +11,8 @@ using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Point = K::Point_3;
 using Triangle = K::Triangle_3;
 using M = kigumi::Region<K>;
-using kigumi::Boolean_region_builder;
 using kigumi::Boolean_operator;
+using kigumi::Boolean_region_builder;
 using kigumi::Triangle_soup;
 
 #define ASSERT_EMPTY(X) ASSERT_TRUE(X.is_empty())
@@ -141,7 +141,7 @@ bool is_inverse(const M& m) {
 #define ASSERT_NORMAL(X) ASSERT_TRUE(is_normal(X))
 #define ASSERT_INVERSE(X) ASSERT_TRUE(is_inverse(X))
 
-TEST(SpwcialMeshTest, EmptyNormal) {
+TEST(SpecialMeshTest, EmptyNormal) {
   Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -170,7 +170,7 @@ TEST(SpwcialMeshTest, EmptyNormal) {
   ASSERT_EMPTY(b(Boolean_operator::O));
 }
 
-TEST(SpwcialMeshTest, NormalEmpty) {
+TEST(SpecialMeshTest, NormalEmpty) {
   Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -199,7 +199,7 @@ TEST(SpwcialMeshTest, NormalEmpty) {
   ASSERT_EMPTY(b(Boolean_operator::O));
 }
 
-TEST(SpwcialMeshTest, FullNormal) {
+TEST(SpecialMeshTest, FullNormal) {
   Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -228,7 +228,7 @@ TEST(SpwcialMeshTest, FullNormal) {
   ASSERT_EMPTY(b(Boolean_operator::O));
 }
 
-TEST(SpwcialMeshTest, NormalFull) {
+TEST(SpecialMeshTest, NormalFull) {
   Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -257,7 +257,7 @@ TEST(SpwcialMeshTest, NormalFull) {
   ASSERT_EMPTY(b(Boolean_operator::O));
 }
 
-TEST(SpwcialMeshTest, Equivalent) {
+TEST(SpecialMeshTest, Equivalent) {
   Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0});
   auto vh2 = soup.add_vertex({1, 0, 0});
@@ -288,7 +288,7 @@ TEST(SpwcialMeshTest, Equivalent) {
   ASSERT_EMPTY(b(Boolean_operator::O));
 }
 
-TEST(SpwcialMeshTest, Complementary) {
+TEST(SpecialMeshTest, Complementary) {
   Triangle_soup<K> soup;
   {
     auto vh1 = soup.add_vertex({0, 0, 0});

@@ -1,13 +1,13 @@
 set(TARGET kigumi-test)
 
 add_executable(${TARGET}
-    Classify_faces_locally_test.cc
-    face_data.cc
-    Face_face_intersection_tests.cc
-    io_tests.cc
-    side_of_mesh.cc
-    special.cc
-    special_results.cc
+    bounded_side_test.cc
+    classify_faces_locally_test.cc
+    face_data_test.cc
+    face_face_intersection_test.cc
+    io_test.cc
+    special_mesh_test.cc
+    special_result_test.cc
 )
 
 if(UNIX)

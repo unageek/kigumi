@@ -11,7 +11,7 @@ using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using M = kigumi::Region<K>;
 using kigumi::Triangle_soup;
 
-TEST(SideOfMeshTest, Cube) {
+TEST(BoundedSideTest, Cube) {
   auto m = make_cube<K>({0, 0, 0}, {1, 1, 1}, {});
 
   for (auto x : {-1.0, 0.0, 0.5, 1.0, 2.0}) {
@@ -32,7 +32,7 @@ TEST(SideOfMeshTest, Cube) {
   }
 }
 
-TEST(SideOfMeshTest, InvertedCube) {
+TEST(BoundedSideTest, InvertedCube) {
   auto m = make_cube<K>({0, 0, 0}, {1, 1, 1}, {}, true);
 
   for (auto x : {-1.0, 0.0, 0.5, 1.0, 2.0}) {
@@ -53,19 +53,19 @@ TEST(SideOfMeshTest, InvertedCube) {
   }
 }
 
-TEST(SideOfMeshTest, Empty) {
+TEST(BoundedSideTest, Empty) {
   auto m = M::empty();
 
   ASSERT_EQ(m.bounded_side({0, 0, 0}), CGAL::ON_UNBOUNDED_SIDE);
 }
 
-TEST(SideOfMeshTest, Full) {
+TEST(BoundedSideTest, Full) {
   auto m = M::full();
 
   ASSERT_EQ(m.bounded_side({0, 0, 0}), CGAL::ON_BOUNDED_SIDE);
 }
 
-TEST(SideOfMeshTest, Plane) {
+TEST(BoundedSideTest, Plane) {
   Triangle_soup<K> soup;
   auto vh1 = soup.add_vertex({0, 0, 0.5});
   auto vh2 = soup.add_vertex({1, 0, 0.5});
