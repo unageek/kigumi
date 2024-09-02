@@ -122,6 +122,12 @@ bool read_off(std::istream& is, Region<K, FaceData>& region) {
           return false;
         }
         state = Off_reading_state::READING_VERTICES;
+        if (num_vertices == 0) {
+          state = Off_reading_state::READING_FACES;
+          if (num_faces == 0) {
+            state = Off_reading_state::END;
+          }
+        }
         break;
       }
       case Off_reading_state::READING_VERTICES: {
@@ -136,6 +142,9 @@ bool read_off(std::istream& is, Region<K, FaceData>& region) {
         --num_vertices;
         if (num_vertices == 0) {
           state = Off_reading_state::READING_FACES;
+          if (num_faces == 0) {
+            state = Off_reading_state::END;
+          }
         }
         break;
       }
@@ -212,16 +221,15 @@ bool write_off(std::ostream& os, const Region<K, FaceData>& region) {
 
   const auto& soup = region.boundary();
 
-  os << "OFF\n";
-  os << soup.num_vertices() << ' ' << soup.num_faces() << " 0\n";
+  os << "OFF\n"  //
+     << soup.num_vertices() << ' ' << soup.num_faces() << " 0\n";
 
   if (region.is_empty()) {
     os << "# empty_region\n";
-    return os.good();
   }
+
   if (region.is_full()) {
     os << "# full_region\n";
-    return os.good();
   }
 
   for (auto vh : soup.vertices()) {
@@ -232,6 +240,7 @@ bool write_off(std::ostream& os, const Region<K, FaceData>& region) {
     Double z{CGAL::to_double(p.z())};
     os << x << ' ' << y << ' ' << z << '\n';
   }
+
   for (auto fh : soup.faces()) {
     const auto& f = soup.face(fh);
     os << "3 " << f[0].i << ' ' << f[1].i << ' ' << f[2].i << '\n';

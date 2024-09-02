@@ -58,12 +58,12 @@ bool read_obj(std::istream& is, Region<K, FaceData>& region) {
       soup.add_vertex({x.value, y.value, z.value});
     } else if (s == "f") {
       face.clear();
-      std::ptrdiff_t i{};
-      while (iss >> i) {
-        if (i > 0) {
-          face.push_back(Vertex_handle{static_cast<std::size_t>(i) - 1});
-        } else if (i < 0) {
-          face.push_back(Vertex_handle{soup.num_vertices() + i});
+      std::ptrdiff_t v{};
+      while (iss >> v) {
+        if (v > 0) {
+          face.push_back(Vertex_handle{static_cast<std::size_t>(v) - 1});
+        } else if (v < 0) {
+          face.push_back(Vertex_handle{soup.num_vertices() + v});
         } else {
           std::cerr << "invalid face line: " << line << std::endl;
           return false;

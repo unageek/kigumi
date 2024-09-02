@@ -61,12 +61,13 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
 
     iss >> s;
     if (s == "comment") {
-      // Handle special comments.
-      std::getline(iss, s);
-      if (s == "empty_region") {
-        empty = true;
-      } else if (s == "full_region") {
-        full = true;
+      if (iss >> s >> eof) {
+        // Handle special comments.
+        if (s == "empty_region") {
+          empty = true;
+        } else if (s == "full_region") {
+          full = true;
+        }
       }
       continue;
     }
@@ -99,9 +100,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
             std::cerr << "unexpected line: " << line << std::endl;
             return false;
           }
-          if (element.count > 0) {
-            elements.push_back(std::move(element));
-          }
+          elements.push_back(std::move(element));
         } else if (s == "property") {
           if (elements.empty()) {
             std::cerr << "unexpected line: " << line << std::endl;
@@ -202,7 +201,15 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
 
   // Read body.
   auto element_it = elements.begin();
+  while (element_it != elements.end() && element_it->count == 0) {
+    ++element_it;
+  }
   while (std::getline(is, line)) {
+    if (element_it == elements.end()) {
+      std::cerr << "unexpected line: " << line << std::endl;
+      return false;
+    }
+
     std::istringstream iss{line};
 
     auto& properties = element_it->properties;
@@ -265,11 +272,8 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
     }
 
     --element_it->count;
-    if (element_it->count == 0) {
+    while (element_it != elements.end() && element_it->count == 0) {
       ++element_it;
-    }
-    if (element_it == elements.end()) {
-      break;
     }
   }
 
@@ -327,11 +331,10 @@ bool write_ply(std::ostream& os, const Region<K, FaceData>& region) {
 
   if (region.is_empty()) {
     os << "comment empty_region\n";
-    return os.good();
   }
+
   if (region.is_full()) {
     os << "comment full_region\n";
-    return os.good();
   }
 
   os << "end_header\n";
@@ -344,6 +347,7 @@ bool write_ply(std::ostream& os, const Region<K, FaceData>& region) {
     Double z{CGAL::to_double(p.z())};
     os << x << ' ' << y << ' ' << z << '\n';
   }
+
   for (auto fh : soup.faces()) {
     const auto& f = soup.face(fh);
     os << "3 " << f[0].i << ' ' << f[1].i << ' ' << f[2].i << '\n';

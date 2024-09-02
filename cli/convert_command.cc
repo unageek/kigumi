@@ -50,7 +50,7 @@ void Convert_command::operator()(const std::vector<std::string>& args) const {
                   .run(),
               vm);
     po::notify(vm);
-  } catch (std::exception& e) {
+  } catch (const std::exception&) {
     std::cerr << "usage: kigumi convert [--from] <file> [--to] <file>\n" << opts_desc;
     throw;
   }
