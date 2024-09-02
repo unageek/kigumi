@@ -100,7 +100,7 @@ bool read_off(std::istream& is, Region<K, FaceData>& region) {
       case Off_reading_state::READING_SIGNATURE: {
         Off_signature sig;
         if (!(iss >> sig)) {
-          std::cerr << "unexpected line: " << line << std::endl;
+          std::cerr << "invalid header line: " << line << std::endl;
           return false;
         }
         if (sig.binary) {
@@ -112,7 +112,7 @@ bool read_off(std::istream& is, Region<K, FaceData>& region) {
       }
       case Off_reading_state::READING_NUMBERS: {
         if (!(iss >> num_vertices >> num_faces)) {
-          std::cerr << "unexpected line: " << line << std::endl;
+          std::cerr << "invalid header line: " << line << std::endl;
           return false;
         }
         state = Off_reading_state::READING_VERTICES;

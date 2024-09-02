@@ -81,7 +81,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
     switch (state) {
       case Ply_reading_state::READING_SIGNATURE: {
         if (s != "ply" || !(iss >> eof)) {
-          std::cerr << "unexpected line: " << line << std::endl;
+          std::cerr << "invalid header line: " << line << std::endl;
           return false;
         }
         state = Ply_reading_state::READING_VERSION;
@@ -89,7 +89,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
       }
       case Ply_reading_state::READING_VERSION: {
         if (s != "format") {
-          std::cerr << "unexpected line: " << line << std::endl;
+          std::cerr << "invalid header line: " << line << std::endl;
           return false;
         }
         if (!(iss >> "ascii"_c >> "1.0"_c >> eof)) {
@@ -103,29 +103,29 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
         if (s == "element") {
           Ply_element element;
           if (!(iss >> element.name >> element.count >> eof)) {
-            std::cerr << "unexpected line: " << line << std::endl;
+            std::cerr << "invalid header line: " << line << std::endl;
             return false;
           }
           elements.push_back(std::move(element));
         } else if (s == "property") {
           if (elements.empty()) {
-            std::cerr << "unexpected line: " << line << std::endl;
+            std::cerr << "invalid header line: " << line << std::endl;
             return false;
           }
           Ply_property property;
           if (!(iss >> property.type)) {
-            std::cerr << "unexpected line: " << line << std::endl;
+            std::cerr << "invalid header line: " << line << std::endl;
             return false;
           }
           if (property.type == "list") {
             if (!(iss >> property.list_count_type >> property.list_element_type >> property.name >>
                   eof)) {
-              std::cerr << "unexpected line: " << line << std::endl;
+              std::cerr << "invalid header line: " << line << std::endl;
               return false;
             }
           } else {
             if (!(iss >> property.name >> eof)) {
-              std::cerr << "unexpected line: " << line << std::endl;
+              std::cerr << "invalid header line: " << line << std::endl;
               return false;
             }
           }
@@ -133,7 +133,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
         } else if (s == "end_header") {
           state = Ply_reading_state::READING_BODY;
         } else {
-          std::cerr << "unexpected line: " << line << std::endl;
+          std::cerr << "invalid header line: " << line << std::endl;
           return false;
         }
         break;
