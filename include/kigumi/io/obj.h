@@ -22,9 +22,14 @@ bool read_obj(std::istream& is, Region<K, FaceData>& region) {
   using Region = Region<K, FaceData>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
+  if (!is) {
+    return false;
+  }
+
   Triangle_soup soup;
   auto empty = false;
   auto full = false;
+  Opt_hash_comment_end_of_file opt_comment_eof{empty, full};
 
   std::string line;
   std::string s;
@@ -33,18 +38,10 @@ bool read_obj(std::istream& is, Region<K, FaceData>& region) {
   while (std::getline(is, line)) {
     std::istringstream iss{line};
 
-    if (iss >> eof) {
+    if (iss >> opt_comment_eof) {
       continue;
     }
     iss.clear();
-
-    if (iss.peek() == '#') {
-      Hash_comment comment;
-      iss >> comment;
-      empty = empty || comment.empty_region;
-      full = full || comment.full_region;
-      continue;
-    }
 
     iss >> s;
     if (s == "v") {

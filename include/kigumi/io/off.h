@@ -44,7 +44,7 @@ inline std::istream& operator>>(std::istream& in, Off_signature& sig) {
     return in;
   }
 
-  if (in >> eof) {
+  if (in >> opt_hash_comment_eof) {
     return in;
   }
   in.clear();
@@ -53,7 +53,7 @@ inline std::istream& operator>>(std::istream& in, Off_signature& sig) {
     sig.binary = true;
   }
 
-  return in >> eof;
+  return in >> opt_hash_comment_eof;
 }
 
 enum class Off_reading_state {
@@ -77,6 +77,7 @@ bool read_off(std::istream& is, Region<K, FaceData>& region) {
   Triangle_soup soup;
   auto empty = false;
   auto full = false;
+  Opt_hash_comment_end_of_file opt_comment_eof{empty, full};
 
   std::size_t num_vertices{};
   std::size_t num_faces{};
@@ -89,18 +90,10 @@ bool read_off(std::istream& is, Region<K, FaceData>& region) {
   while (std::getline(is, line)) {
     std::istringstream iss{line};
 
-    if (iss >> eof) {
+    if (iss >> opt_comment_eof) {
       continue;
     }
     iss.clear();
-
-    if (iss.peek() == '#') {
-      Hash_comment comment;
-      iss >> comment;
-      empty = empty || comment.empty_region;
-      full = full || comment.full_region;
-      continue;
-    }
 
     switch (state) {
       case Off_reading_state::READING_SIGNATURE: {
