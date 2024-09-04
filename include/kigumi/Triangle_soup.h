@@ -200,9 +200,9 @@ struct Read<Triangle_soup<K, FaceData>> {
         kigumi_read<CGAL::Exact_rational>(in, x);
         kigumi_read<CGAL::Exact_rational>(in, y);
         kigumi_read<CGAL::Exact_rational>(in, z);
-        t.add_vertex({CGAL::Lazy_exact_nt<CGAL::Exact_rational>{x},
-                      CGAL::Lazy_exact_nt<CGAL::Exact_rational>{y},
-                      CGAL::Lazy_exact_nt<CGAL::Exact_rational>{z}});
+        t.add_vertex({CGAL::Lazy_exact_nt<CGAL::Exact_rational>{std::move(x)},
+                      CGAL::Lazy_exact_nt<CGAL::Exact_rational>{std::move(y)},
+                      CGAL::Lazy_exact_nt<CGAL::Exact_rational>{std::move(z)}});
       }
     }
 
