@@ -11,8 +11,7 @@
 #include "commands.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
-using Face_data = int;
-using Region = kigumi::Region<K, Face_data>;
+using Region = kigumi::Region<K>;
 using kigumi::read_region;
 using kigumi::write_region;
 
