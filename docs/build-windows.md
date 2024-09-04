@@ -36,4 +36,4 @@ git pull --recurse-submodules
 ./run build      # or ./run b
 ```
 
-# [Running example programs](run.md)
+# [Using kigumi CLI](cli.md)

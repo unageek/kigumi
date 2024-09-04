@@ -89,6 +89,7 @@ void Boolean_command::operator()(const std::vector<std::string>& args) const {
   } catch (const std::exception&) {
     std::cerr << "usage: kigumi boolean [--first] <file> [--second] <file> [--int <file>]\n"
                  "                      [--uni <file>] [--dif <file>] [--sym <file>]\n"
+                 "\n"
               << opts_desc;
     throw;
   }
