@@ -37,7 +37,7 @@ class Find_possibly_intersecting_faces {
         [&](auto b_fh, auto& local_state) {
           auto& [local_pairs, leaves] = local_state;
 
-          if (b_face_tags.at(b_fh.i) != Face_tag::Unknown) {
+          if (b_face_tags.at(b_fh.i) != Face_tag::UNKNOWN) {
             return;
           }
 
@@ -46,7 +46,7 @@ class Find_possibly_intersecting_faces {
 
           for (const auto* leaf : leaves) {
             auto a_fh = leaf->face_handle();
-            if (a_face_tags.at(a_fh.i) != Face_tag::Unknown) {
+            if (a_face_tags.at(a_fh.i) != Face_tag::UNKNOWN) {
               continue;
             }
 

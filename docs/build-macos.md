@@ -34,4 +34,4 @@ export CXX=$(brew --prefix)/opt/llvm/bin/clang++
 ./run build      # or ./run b
 ```
 
-## [Running example programs](run.md)
+## [Using kigumi CLI](cli.md)

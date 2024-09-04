@@ -33,8 +33,8 @@ class Face_face_intersection {
     intersections_.clear();
     orientation_3_cache_.clear();
 
-    auto fabc = Triangle_region::LeftFace;
-    auto fpqr = Triangle_region::RightFace;
+    auto fabc = Triangle_region::LEFT_FACE;
+    auto fpqr = Triangle_region::RIGHT_FACE;
 
     auto [eab, ebc, eca] = face_edges(fabc);
     auto [epq, eqr, erp] = face_edges(fpqr);

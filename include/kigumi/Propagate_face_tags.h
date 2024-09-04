@@ -23,7 +23,7 @@ class Propagate_face_tags {
     auto from_left = data.from_left;
     auto tag = data.tag;
 
-    if (tag != Face_tag::Interior && tag != Face_tag::Exterior) {
+    if (tag != Face_tag::INTERIOR && tag != Face_tag::EXTERIOR) {
       throw std::runtime_error("the seed face must be tagged as either interior or exterior");
     }
 
@@ -36,14 +36,14 @@ class Propagate_face_tags {
 
       for (auto fh2 : m.faces_around_face(fh, border_edges)) {
         auto& tag2 = m.data(fh2).tag;
-        if (tag2 == Face_tag::Unknown) {
+        if (tag2 == Face_tag::UNKNOWN) {
           tag2 = tag;
           queue_.push(fh2);
         } else if (tag2 != tag) {
           if (from_left) {
-            warnings |= Warnings::FirstMeshPartiallyIntersectsWithSecondMesh;
+            warnings |= Warnings::FIRST_MESH_PARTIALLY_INTERSECTS_WITH_SECOND_MESH;
           } else {
-            warnings |= Warnings::SecondMeshPartiallyIntersectsWithFirstMesh;
+            warnings |= Warnings::SECOND_MESH_PARTIALLY_INTERSECTS_WITH_FIRST_MESH;
           }
         }
       }

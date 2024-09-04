@@ -9,12 +9,12 @@
 #include <unordered_set>
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
+using Classify_faces_locally = kigumi::Classify_faces_locally<K, kigumi::Null_data>;
+using Mixed_triangle_mesh = kigumi::Mixed_triangle_mesh<K, kigumi::Null_data>;
 using Point = K::Point_3;
 using kigumi::Edge;
 using kigumi::Face_tag;
-using Classify_faces_locally = kigumi::Classify_faces_locally<K, kigumi::Null_data>;
 using kigumi::make_edge;
-using kigumi::Mixed_triangle_mesh;
 
 //                  f1 (Ext.)
 //                    //|
@@ -28,7 +28,7 @@ using kigumi::Mixed_triangle_mesh;
 //                    //|
 //                  f3 (Int.)
 TEST(ClassifyFacesLocallyTest, NonOverlapping) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -45,10 +45,10 @@ TEST(ClassifyFacesLocallyTest, NonOverlapping) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Exterior);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Exterior);
-  ASSERT_EQ(m.data(f2).tag, Face_tag::Interior);
-  ASSERT_EQ(m.data(f3).tag, Face_tag::Interior);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::EXTERIOR);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::EXTERIOR);
+  ASSERT_EQ(m.data(f2).tag, Face_tag::INTERIOR);
+  ASSERT_EQ(m.data(f3).tag, Face_tag::INTERIOR);
 }
 
 //   f1 (????)
@@ -59,7 +59,7 @@ TEST(ClassifyFacesLocallyTest, NonOverlapping) {
 //     //+--------- f0 (????)
 //     ////////////
 TEST(ClassifyFacesLocallyTest, NonOverlappingUnknown) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -72,12 +72,12 @@ TEST(ClassifyFacesLocallyTest, NonOverlappingUnknown) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Unknown);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Unknown);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::UNKNOWN);
 }
 
 TEST(ClassifyFacesLocallyTest, Coplanar) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r = m.add_vertex({1, 0, 0});
@@ -89,12 +89,12 @@ TEST(ClassifyFacesLocallyTest, Coplanar) {
   std::unordered_set<Edge> border;
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Coplanar);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Coplanar);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::COPLANAR);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::COPLANAR);
 }
 
 TEST(ClassifyFacesLocallyTest, Opposite) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r = m.add_vertex({1, 0, 0});
@@ -106,8 +106,8 @@ TEST(ClassifyFacesLocallyTest, Opposite) {
   std::unordered_set<Edge> border;
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Opposite);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Opposite);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::OPPOSITE);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::OPPOSITE);
 }
 
 //                  f1 (Ext.)
@@ -118,7 +118,7 @@ TEST(ClassifyFacesLocallyTest, Opposite) {
 //   f2 (Int.) ---------+--------- f0 (????)
 //             ///////////////////
 TEST(ClassifyFacesLocallyTest, Inconsistent1) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -133,9 +133,9 @@ TEST(ClassifyFacesLocallyTest, Inconsistent1) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  EXPECT_EQ(m.data(f0).tag, Face_tag::Unknown);
-  EXPECT_EQ(m.data(f1).tag, Face_tag::Exterior);
-  EXPECT_EQ(m.data(f2).tag, Face_tag::Interior);
+  EXPECT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
+  EXPECT_EQ(m.data(f1).tag, Face_tag::EXTERIOR);
+  EXPECT_EQ(m.data(f2).tag, Face_tag::INTERIOR);
 }
 
 //   f1 (Ext.) ---------+--------- f0 (????)
@@ -145,7 +145,7 @@ TEST(ClassifyFacesLocallyTest, Inconsistent1) {
 //                      |//
 //                  f2 (Int.)
 TEST(ClassifyFacesLocallyTest, Inconsistent2) {
-  Mixed_triangle_mesh<K> m;
+  Mixed_triangle_mesh m;
   auto p = m.add_vertex({0, 0, 0});
   auto q = m.add_vertex({0, 0, 1});
   auto r0 = m.add_vertex({1, 0, 0});
@@ -160,7 +160,7 @@ TEST(ClassifyFacesLocallyTest, Inconsistent2) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  EXPECT_EQ(m.data(f0).tag, Face_tag::Unknown);
-  EXPECT_EQ(m.data(f1).tag, Face_tag::Exterior);
-  EXPECT_EQ(m.data(f2).tag, Face_tag::Interior);
+  EXPECT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
+  EXPECT_EQ(m.data(f1).tag, Face_tag::EXTERIOR);
+  EXPECT_EQ(m.data(f2).tag, Face_tag::INTERIOR);
 }

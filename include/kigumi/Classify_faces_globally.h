@@ -46,7 +46,7 @@ class Classify_faces_globally {
             throw std::runtime_error(
                 "local classification must be performed before global classification");
           }
-          f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::Exterior : Face_tag::Interior;
+          f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::EXTERIOR : Face_tag::INTERIOR;
           local_warnings |= propagate_face_tags(m, border_edges, fh_src);
         },
         [&](const auto& local_warnings) { warnings |= local_warnings; });
@@ -72,7 +72,7 @@ class Classify_faces_globally {
         }
 
         visited.at(fh.i) = true;
-        if (m.data(fh).tag == Face_tag::Unknown) {
+        if (m.data(fh).tag == Face_tag::UNKNOWN) {
           queue.push(fh);
           representative_faces.push_back(fh);
           begin = ++it;

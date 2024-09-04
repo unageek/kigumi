@@ -6,17 +6,6 @@ if [ $# -lt 1 ]; then
   exit 1
 fi
 
-get_external_args() {
-  while [ $# -gt 0 ]; do
-    if [ "$1" = '--' ]; then
-      shift
-      break
-    fi
-    shift
-  done
-  echo "$@"
-}
-
 cd "$(dirname "$0")"
 
 case $1 in
@@ -26,14 +15,8 @@ case $1 in
   'b'|'build' )
     cmake --build build
     ;;
-  'r'|'run' )
-    ./build/"$2" $(get_external_args "$@")
-    ;;
   't'|'test' )
     ctest -V --test-dir build
-    ;;
-  'lint' )
-    clang-tidy -p build examples/mix/main.cc examples/extract/main.cc
     ;;
   * )
     echo "Unrecognized task: $1" >&2

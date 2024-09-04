@@ -22,12 +22,6 @@ if ($args.Length -lt 1) {
     throw 'No task is specified.'
 }
 
-$externalArgs = @()
-$i = [array]::indexof($args, "--")
-if ( $i -ne -1 ) {
-    $__, $externalArgs = $args[$i..($args.length - 1)]
-}
-
 Set-Location $PSScriptRoot
 
 switch -regex ($args[0]) {
@@ -39,11 +33,6 @@ switch -regex ($args[0]) {
     '^b(uild)?$' {
         loadBuildEnvironment
         Exec { cmake --build build }
-        break
-    }
-    '^r(un)?$' {
-        $bin = $args[1]
-        Exec { & .\build\$bin $externalArgs }
         break
     }
     '^t(est)?$' {

@@ -1,8 +1,9 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/number_utils.h>
 #include <gtest/gtest.h>
-#include <kigumi/Kigumi_mesh.h>
-#include <kigumi/Operator.h>
+#include <kigumi/Boolean_operator.h>
+#include <kigumi/Boolean_region_builder.h>
+#include <kigumi/Region.h>
 
 #include <cmath>
 #include <utility>
@@ -14,13 +15,14 @@ using Point = K::Point_3;
 struct Face_data {
   int i{};
 };
-using M = kigumi::Kigumi_mesh<K, Face_data>;
-using kigumi::Operator;
+using M = kigumi::Region<K, Face_data>;
+using kigumi::Boolean_region_builder;
+using kigumi::Boolean_operator;
 
 namespace {
 
 std::pair<double, double> get_areas(const M& m) {
-  const auto& soup = m.soup();
+  const auto& soup = m.boundary();
   auto area1 = 0.0;
   auto area2 = 0.0;
   for (auto fh : soup.faces()) {
@@ -39,8 +41,8 @@ std::pair<double, double> get_areas(const M& m) {
 TEST(FaceDataTest, EmptyNormal) {
   auto m1 = M::empty();
   auto m2 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {2});
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Union);
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::UNION);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 0.0);
   ASSERT_EQ(area2, 6.0);
@@ -49,28 +51,28 @@ TEST(FaceDataTest, EmptyNormal) {
 TEST(FaceDataTest, NormalEmpty) {
   auto m1 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {1});
   auto m2 = M::empty();
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Union);
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::UNION);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 6.0);
   ASSERT_EQ(area2, 0.0);
 }
 
-TEST(FaceDataTest, EntireNormal) {
-  auto m1 = M::entire();
+TEST(FaceDataTest, FullNormal) {
+  auto m1 = M::full();
   auto m2 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {2});
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Intersection);
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::INTERSECTION);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 0.0);
   ASSERT_EQ(area2, 6.0);
 }
 
-TEST(FaceDataTest, NormalEntire) {
+TEST(FaceDataTest, NormalFull) {
   auto m1 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {1});
-  auto m2 = M::entire();
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Intersection);
+  auto m2 = M::full();
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::INTERSECTION);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 6.0);
   ASSERT_EQ(area2, 0.0);
@@ -79,8 +81,8 @@ TEST(FaceDataTest, NormalEntire) {
 TEST(FaceDataTest, IntersectingPreferFirst) {
   auto m1 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {1});
   auto m2 = make_cube<K, Face_data>({0.5, 0, 0}, {1.5, 1, 1}, {2});
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Union);
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::UNION);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 5.0);
   ASSERT_EQ(area2, 3.0);
@@ -89,8 +91,8 @@ TEST(FaceDataTest, IntersectingPreferFirst) {
 TEST(FaceDataTest, IntersectingPreferSecond) {
   auto m1 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {1});
   auto m2 = make_cube<K, Face_data>({0.5, 0, 0}, {1.5, 1, 1}, {2});
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Union, false);
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::UNION, false);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 3.0);
   ASSERT_EQ(area2, 5.0);
@@ -99,8 +101,8 @@ TEST(FaceDataTest, IntersectingPreferSecond) {
 TEST(FaceDataTest, NonIntersecting) {
   auto m1 = make_cube<K, Face_data>({0, 0, 0}, {1, 1, 1}, {1});
   auto m2 = make_cube<K, Face_data>({2, 0, 0}, {3, 1, 1}, {2});
-  auto [b, warnings] = m1.boolean(m2);
-  auto m = b.apply(Operator::Union);
+  Boolean_region_builder b{m1, m2};
+  auto m = b(Boolean_operator::UNION);
   auto [area1, area2] = get_areas(m);
   ASSERT_EQ(area1, 6.0);
   ASSERT_EQ(area2, 6.0);
