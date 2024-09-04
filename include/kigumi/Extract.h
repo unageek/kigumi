@@ -27,29 +27,29 @@ class Extract {
     auto o_mask = opposite_mask(op, prefer_first);
 
     for (auto fh : m.faces()) {
-      auto mask = Mask::None;
+      auto mask = Mask::NONE;
       switch (m.data(fh).tag) {
-        case Face_tag::Exterior:
+        case Face_tag::EXTERIOR:
           mask = u_mask;
           break;
-        case Face_tag::Interior:
+        case Face_tag::INTERIOR:
           mask = i_mask;
           break;
-        case Face_tag::Coplanar:
+        case Face_tag::COPLANAR:
           mask = c_mask;
           break;
-        case Face_tag::Opposite:
+        case Face_tag::OPPOSITE:
           mask = o_mask;
           break;
-        case Face_tag::Unknown:
+        case Face_tag::UNKNOWN:
           break;
       }
 
       auto from_left = m.data(fh).from_left;
-      auto output_id = from_left ? (mask & Mask::A) != Mask::None  //
-                                 : (mask & Mask::B) != Mask::None;
-      auto output_inv = from_left ? (mask & Mask::AInv) != Mask::None  //
-                                  : (mask & Mask::BInv) != Mask::None;
+      auto output_id = from_left ? (mask & Mask::A) != Mask::NONE  //
+                                 : (mask & Mask::B) != Mask::NONE;
+      auto output_inv = from_left ? (mask & Mask::A_INV) != Mask::NONE  //
+                                  : (mask & Mask::B_INV) != Mask::NONE;
       if (!output_id && !output_inv) {
         continue;
       }

@@ -28,7 +28,7 @@ class Classify_faces_locally {
                       const std::unordered_set<Edge>& border_edges) const {
     bool found_untagged_face{};
     for (auto fh : m.faces_around_edge(edge)) {
-      if (m.data(fh).tag == Face_tag::Unknown) {
+      if (m.data(fh).tag == Face_tag::UNKNOWN) {
         found_untagged_face = true;
         break;
       }
@@ -81,7 +81,7 @@ class Classify_faces_locally {
       auto& fj_data = m.data(fj.fh);
 
       if (fi.vh_r == fj.vh_r) {
-        auto tag = fi.orientation == fj.orientation ? Face_tag::Coplanar : Face_tag::Opposite;
+        auto tag = fi.orientation == fj.orientation ? Face_tag::COPLANAR : Face_tag::OPPOSITE;
         fi_data.tag = tag;
         fj_data.tag = tag;
       }
@@ -99,8 +99,8 @@ class Classify_faces_locally {
       const auto& fj = faces_.at(j);
       auto& fj_data = m.data(fj.fh);
 
-      if (fi_data.tag == Face_tag::Coplanar || fi_data.tag == Face_tag::Opposite ||
-          fj_data.tag == Face_tag::Coplanar || fj_data.tag == Face_tag::Opposite) {
+      if (fi_data.tag == Face_tag::COPLANAR || fi_data.tag == Face_tag::OPPOSITE ||
+          fj_data.tag == Face_tag::COPLANAR || fj_data.tag == Face_tag::OPPOSITE) {
         continue;
       }
 
@@ -108,11 +108,11 @@ class Classify_faces_locally {
 
       if (fi.orientation == fj.orientation) {
         if (fi.orientation == CGAL::COUNTERCLOCKWISE) {
-          fi_data.tag = Face_tag::Interior;
-          fj_data.tag = Face_tag::Exterior;
+          fi_data.tag = Face_tag::INTERIOR;
+          fj_data.tag = Face_tag::EXTERIOR;
         } else {
-          fi_data.tag = Face_tag::Exterior;
-          fj_data.tag = Face_tag::Interior;
+          fi_data.tag = Face_tag::EXTERIOR;
+          fj_data.tag = Face_tag::INTERIOR;
         }
         is_undefined_configuration = false;
         k = j;
@@ -146,15 +146,15 @@ class Classify_faces_locally {
         auto& f_data = m.data(f.fh);
 
         if (f.orientation == orientation) {
-          tag = tag == Face_tag::Exterior ? Face_tag::Interior : Face_tag::Exterior;
+          tag = tag == Face_tag::EXTERIOR ? Face_tag::INTERIOR : Face_tag::EXTERIOR;
         }
         orientation = f.orientation;
 
-        if (f_data.tag == Face_tag::Unknown) {
+        if (f_data.tag == Face_tag::UNKNOWN) {
           if (!dry_run) {
             f_data.tag = tag;
           }
-        } else if ((f_data.tag == Face_tag::Exterior || f_data.tag == Face_tag::Interior) &&
+        } else if ((f_data.tag == Face_tag::EXTERIOR || f_data.tag == Face_tag::INTERIOR) &&
                    f_data.tag != tag) {
           consistent = false;
           break;
@@ -174,7 +174,7 @@ class Classify_faces_locally {
     for (const auto& f : faces_) {
       auto fh = f.fh;
       auto f_tag = m.data(fh).tag;
-      if (f_tag == Face_tag::Exterior || f_tag == Face_tag::Interior) {
+      if (f_tag == Face_tag::EXTERIOR || f_tag == Face_tag::INTERIOR) {
         warnings |= propagate_face_tags_(m, border_edges, fh);
       }
     }

@@ -50,32 +50,32 @@ class Triangulation {
 
   Vertex_handle insert(const Point& p, std::size_t id, Triangle_region region) {
     switch (intersection(region, f_)) {
-      case Triangle_region::LeftVertex0:
-      case Triangle_region::RightVertex0:
+      case Triangle_region::LEFT_VERTEX_0:
+      case Triangle_region::RIGHT_VERTEX_0:
         return vhs_[0];
 
-      case Triangle_region::LeftVertex1:
-      case Triangle_region::RightVertex1:
+      case Triangle_region::LEFT_VERTEX_1:
+      case Triangle_region::RIGHT_VERTEX_1:
         return vhs_[1];
 
-      case Triangle_region::LeftVertex2:
-      case Triangle_region::RightVertex2:
+      case Triangle_region::LEFT_VERTEX_2:
+      case Triangle_region::RIGHT_VERTEX_2:
         return vhs_[2];
 
-      case Triangle_region::LeftEdge01:
-      case Triangle_region::RightEdge01:
+      case Triangle_region::LEFT_EDGE_01:
+      case Triangle_region::RIGHT_EDGE_01:
         return insert_in_edge(p, id, 0);
 
-      case Triangle_region::LeftEdge12:
-      case Triangle_region::RightEdge12:
+      case Triangle_region::LEFT_EDGE_12:
+      case Triangle_region::RIGHT_EDGE_12:
         return insert_in_edge(p, id, 1);
 
-      case Triangle_region::LeftEdge20:
-      case Triangle_region::RightEdge20:
+      case Triangle_region::LEFT_EDGE_20:
+      case Triangle_region::RIGHT_EDGE_20:
         return insert_in_edge(p, id, 2);
 
-      case Triangle_region::LeftFace:
-      case Triangle_region::RightFace:
+      case Triangle_region::LEFT_FACE:
+      case Triangle_region::RIGHT_FACE:
         return insert_in_face(p, id);
 
       default:

@@ -13,9 +13,9 @@
 namespace kigumi {
 
 enum class Region_kind : std::uint8_t {
-  Empty,
-  Full,
-  Normal,
+  EMPTY,
+  FULL,
+  BOUNDARY_DEFINED,
 };
 
 template <>
@@ -48,7 +48,7 @@ class Region {
   Region() = default;
 
   explicit Region(Triangle_soup boundary)
-      : kind_{Region_kind::Normal}, boundary_{std::move(boundary)} {
+      : kind_{Region_kind::BOUNDARY_DEFINED}, boundary_{std::move(boundary)} {
     if (boundary_.num_faces() == 0) {
       throw std::invalid_argument("region boundary must not be empty");
     }
@@ -74,15 +74,15 @@ class Region {
     }
   }
 
-  static Region empty() { return Region{Region_kind::Empty}; }
+  static Region empty() { return Region{Region_kind::EMPTY}; }
 
-  static Region full() { return Region{Region_kind::Full}; }
+  static Region full() { return Region{Region_kind::FULL}; }
 
-  bool is_empty() const { return kind_ == Region_kind::Empty; }
+  bool is_empty() const { return kind_ == Region_kind::EMPTY; }
 
   bool is_empty_or_full() const { return is_empty() || is_full(); }
 
-  bool is_full() const { return kind_ == Region_kind::Full; }
+  bool is_full() const { return kind_ == Region_kind::FULL; }
 
  private:
   friend Boolean_region_builder;
@@ -91,7 +91,7 @@ class Region {
 
   explicit Region(Region_kind kind) : kind_{kind} {}
 
-  Region_kind kind_{Region_kind::Empty};
+  Region_kind kind_{Region_kind::EMPTY};
   Triangle_soup boundary_;
 };
 

@@ -108,8 +108,8 @@ class Corefine {
       auto q = right_point_ids_.at(right_face[1].i);
       auto r = right_point_ids_.at(right_face[2].i);
       for (auto sym_inter : info.symbolic_intersections) {
-        auto left_region = intersection(sym_inter, Triangle_region::LeftFace);
-        auto right_region = intersection(sym_inter, Triangle_region::RightFace);
+        auto left_region = intersection(sym_inter, Triangle_region::LEFT_FACE);
+        auto right_region = intersection(sym_inter, Triangle_region::RIGHT_FACE);
         auto id = inserter.insert(left_region, a, b, c, right_region, p, q, r);
         info.intersections.push_back(id);
       }
@@ -138,7 +138,7 @@ class Corefine {
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
         left_triangulations_.emplace(fh,
-                                     Triangulation{Triangle_region::LeftFace, pa, pb, pc, a, b, c});
+                                     Triangulation{Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c});
 
         auto last = std::upper_bound(first, infos.end(), *first, left_fh_less);
         ranges.emplace_back(first, last);
@@ -176,7 +176,7 @@ class Corefine {
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
         right_triangulations_.emplace(
-            fh, Triangulation{Triangle_region::RightFace, pa, pb, pc, a, b, c});
+            fh, Triangulation{Triangle_region::RIGHT_FACE, pa, pb, pc, a, b, c});
 
         auto last = std::upper_bound(first, infos.end(), *first, right_fh_less);
         ranges.emplace_back(first, last);

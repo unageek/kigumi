@@ -54,8 +54,8 @@ class Boolean_region_builder {
       Face_tag first_tag{};
       Face_tag second_tag{};
       std::tie(first_tag, second_tag) =
-          a.is_empty() || b.is_full() ? std::make_pair(Face_tag::Interior, Face_tag::Exterior)
-                                      : std::make_pair(Face_tag::Exterior, Face_tag::Interior);
+          a.is_empty() || b.is_full() ? std::make_pair(Face_tag::INTERIOR, Face_tag::EXTERIOR)
+                                      : std::make_pair(Face_tag::EXTERIOR, Face_tag::INTERIOR);
 
       std::vector<Mixed_face_data> face_data;
       face_data.reserve(faces.size());
@@ -81,15 +81,15 @@ class Boolean_region_builder {
       return Region{std::move(soup)};
     }
 
-    if (first_kind_ == Region_kind::Empty || second_kind_ == Region_kind::Empty) {
-      auto a = first_kind_ != Region_kind::Empty;
-      auto b = second_kind_ != Region_kind::Empty;
+    if (first_kind_ == Region_kind::EMPTY || second_kind_ == Region_kind::EMPTY) {
+      auto a = first_kind_ != Region_kind::EMPTY;
+      auto b = second_kind_ != Region_kind::EMPTY;
       return apply(op, a, b) ? Region::full() : Region::empty();
     }
 
-    if (first_kind_ == Region_kind::Full || second_kind_ == Region_kind::Full) {
-      auto a = first_kind_ == Region_kind::Full;
-      auto b = second_kind_ == Region_kind::Full;
+    if (first_kind_ == Region_kind::FULL || second_kind_ == Region_kind::FULL) {
+      auto a = first_kind_ == Region_kind::FULL;
+      auto b = second_kind_ == Region_kind::FULL;
       return apply(op, a, b) ? Region::full() : Region::empty();
     }
 
@@ -114,12 +114,12 @@ class Boolean_region_builder {
 
     if (op == Boolean_operator::E || op == Boolean_operator::J) {
       if (std::all_of(m_.faces_begin(), m_.faces_end(),
-                      [&](auto fh) { return m_.data(fh).tag == Face_tag::Coplanar; })) {
+                      [&](auto fh) { return m_.data(fh).tag == Face_tag::COPLANAR; })) {
         return apply(op, false, false) ? Region::full() : Region::empty();
       }
 
       if (std::all_of(m_.faces_begin(), m_.faces_end(),
-                      [&](auto fh) { return m_.data(fh).tag == Face_tag::Opposite; })) {
+                      [&](auto fh) { return m_.data(fh).tag == Face_tag::OPPOSITE; })) {
         return apply(op, false, true) ? Region::full() : Region::empty();
       }
     }

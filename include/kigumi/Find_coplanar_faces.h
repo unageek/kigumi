@@ -48,15 +48,15 @@ class Find_coplanar_faces {
 
       auto it = triangle_to_fh.find(tri);
       if (it != triangle_to_fh.end()) {
-        a_face_tags.at(it->second.i) = Face_tag::Coplanar;
-        b_face_tags.at(fh.i) = Face_tag::Coplanar;
+        a_face_tags.at(it->second.i) = Face_tag::COPLANAR;
+        b_face_tags.at(fh.i) = Face_tag::COPLANAR;
         continue;
       }
 
       it = triangle_to_fh.find(opposite(tri));
       if (it != triangle_to_fh.end()) {
-        a_face_tags.at(it->second.i) = Face_tag::Opposite;
-        b_face_tags.at(fh.i) = Face_tag::Opposite;
+        a_face_tags.at(it->second.i) = Face_tag::OPPOSITE;
+        b_face_tags.at(fh.i) = Face_tag::OPPOSITE;
       }
     }
 

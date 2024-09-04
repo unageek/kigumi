@@ -3,11 +3,11 @@
 namespace kigumi {
 
 enum class Face_tag : std::uint8_t {
-  Unknown,
-  Exterior,
-  Interior,
-  Coplanar,
-  Opposite,
+  UNKNOWN,
+  EXTERIOR,
+  INTERIOR,
+  COPLANAR,
+  OPPOSITE,
 };
 
 }  // namespace kigumi

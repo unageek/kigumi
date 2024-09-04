@@ -50,18 +50,18 @@ enum class Boolean_operator : std::uint8_t {
   O,  // The empty set
 
   // Aliases
-  Union = A,
-  SymmetricDifference = J,
-  Intersection = K,
-  Difference = L,
+  UNION = A,
+  SYMMETRIC_DIFFERENCE = J,
+  INTERSECTION = K,
+  DIFFERENCE = L,
 };
 
 enum class Mask : std::uint8_t {
-  None = 0,
+  NONE = 0,
   A = 1,
   B = 2,
-  AInv = 4,
-  BInv = 8,
+  A_INV = 4,
+  B_INV = 8,
 };
 
 inline Mask operator|(Mask a, Mask b) {
@@ -85,15 +85,15 @@ inline Mask union_mask(Boolean_operator op) {
       return Mask::A | Mask::B;
     case Boolean_operator::C:
     case Boolean_operator::F:
-      return Mask::AInv;
+      return Mask::A_INV;
     case Boolean_operator::B:
     case Boolean_operator::G:
-      return Mask::BInv;
+      return Mask::B_INV;
     case Boolean_operator::E:
     case Boolean_operator::X:
-      return Mask::AInv | Mask::BInv;
+      return Mask::A_INV | Mask::B_INV;
     default:
-      return Mask::None;
+      return Mask::NONE;
   }
 }
 
@@ -110,15 +110,15 @@ inline Mask intersection_mask(Boolean_operator op) {
       return Mask::A | Mask::B;
     case Boolean_operator::F:
     case Boolean_operator::M:
-      return Mask::AInv;
+      return Mask::A_INV;
     case Boolean_operator::G:
     case Boolean_operator::L:
-      return Mask::BInv;
+      return Mask::B_INV;
     case Boolean_operator::D:
     case Boolean_operator::J:
-      return Mask::AInv | Mask::BInv;
+      return Mask::A_INV | Mask::B_INV;
     default:
-      return Mask::None;
+      return Mask::NONE;
   }
 }
 
@@ -133,9 +133,9 @@ inline Mask coplanar_mask(Boolean_operator op, bool prefer_a) {
     case Boolean_operator::F:
     case Boolean_operator::G:
     case Boolean_operator::X:
-      return prefer_a ? Mask::AInv : Mask::BInv;
+      return prefer_a ? Mask::A_INV : Mask::B_INV;
     default:
-      return Mask::None;
+      return Mask::NONE;
   }
 }
 
@@ -145,14 +145,14 @@ inline Mask opposite_mask(Boolean_operator op, bool prefer_a) {
     case Boolean_operator::G:
     case Boolean_operator::I:
     case Boolean_operator::L:
-      return prefer_a ? Mask::A : Mask::BInv;
+      return prefer_a ? Mask::A : Mask::B_INV;
     case Boolean_operator::C:
     case Boolean_operator::F:
     case Boolean_operator::H:
     case Boolean_operator::M:
-      return prefer_a ? Mask::AInv : Mask::B;
+      return prefer_a ? Mask::A_INV : Mask::B;
     default:
-      return Mask::None;
+      return Mask::NONE;
   }
 }
 

@@ -5,9 +5,9 @@
 namespace kigumi {
 
 enum class Warnings : std::uint8_t {
-  None = 0,
-  FirstMeshPartiallyIntersectsWithSecondMesh = 1,
-  SecondMeshPartiallyIntersectsWithFirstMesh = 2,
+  NONE = 0,
+  FIRST_MESH_PARTIALLY_INTERSECTS_WITH_SECOND_MESH = 1,
+  SECOND_MESH_PARTIALLY_INTERSECTS_WITH_FIRST_MESH = 2,
 };
 
 inline Warnings operator|(Warnings a, Warnings b) {

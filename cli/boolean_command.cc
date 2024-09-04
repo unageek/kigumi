@@ -106,20 +106,20 @@ void Boolean_command::operator()(const std::vector<std::string>& args) const {
   Boolean_region_builder builder{first, second};
 
   auto warnings = builder.warnings();
-  if ((warnings & kigumi::Warnings::FirstMeshPartiallyIntersectsWithSecondMesh) !=
-      kigumi::Warnings::None) {
+  if ((warnings & kigumi::Warnings::FIRST_MESH_PARTIALLY_INTERSECTS_WITH_SECOND_MESH) !=
+      kigumi::Warnings::NONE) {
     std::cerr << "warning: the first mesh partially intersects with the second mesh" << std::endl;
   }
-  if ((warnings & kigumi::Warnings::SecondMeshPartiallyIntersectsWithFirstMesh) !=
-      kigumi::Warnings::None) {
+  if ((warnings & kigumi::Warnings::SECOND_MESH_PARTIALLY_INTERSECTS_WITH_FIRST_MESH) !=
+      kigumi::Warnings::NONE) {
     std::cerr << "warning: the second mesh partially intersects with the first mesh" << std::endl;
   }
 
   std::vector<std::pair<kigumi::Boolean_operator, std::optional<std::string>>> outputs{
-      {kigumi::Boolean_operator::Intersection, opts.output_int},
-      {kigumi::Boolean_operator::Union, opts.output_uni},
-      {kigumi::Boolean_operator::Difference, opts.output_dif},
-      {kigumi::Boolean_operator::SymmetricDifference, opts.output_sym},
+      {kigumi::Boolean_operator::INTERSECTION, opts.output_int},
+      {kigumi::Boolean_operator::UNION, opts.output_uni},
+      {kigumi::Boolean_operator::DIFFERENCE, opts.output_dif},
+      {kigumi::Boolean_operator::SYMMETRIC_DIFFERENCE, opts.output_sym},
   };
 
   for (const auto& [op, file] : outputs) {

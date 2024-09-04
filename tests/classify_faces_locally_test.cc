@@ -45,10 +45,10 @@ TEST(ClassifyFacesLocallyTest, NonOverlapping) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Exterior);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Exterior);
-  ASSERT_EQ(m.data(f2).tag, Face_tag::Interior);
-  ASSERT_EQ(m.data(f3).tag, Face_tag::Interior);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::EXTERIOR);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::EXTERIOR);
+  ASSERT_EQ(m.data(f2).tag, Face_tag::INTERIOR);
+  ASSERT_EQ(m.data(f3).tag, Face_tag::INTERIOR);
 }
 
 //   f1 (????)
@@ -72,8 +72,8 @@ TEST(ClassifyFacesLocallyTest, NonOverlappingUnknown) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Unknown);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Unknown);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::UNKNOWN);
 }
 
 TEST(ClassifyFacesLocallyTest, Coplanar) {
@@ -89,8 +89,8 @@ TEST(ClassifyFacesLocallyTest, Coplanar) {
   std::unordered_set<Edge> border;
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Coplanar);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Coplanar);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::COPLANAR);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::COPLANAR);
 }
 
 TEST(ClassifyFacesLocallyTest, Opposite) {
@@ -106,8 +106,8 @@ TEST(ClassifyFacesLocallyTest, Opposite) {
   std::unordered_set<Edge> border;
 
   Classify_faces_locally{}(m, pq, border);
-  ASSERT_EQ(m.data(f0).tag, Face_tag::Opposite);
-  ASSERT_EQ(m.data(f1).tag, Face_tag::Opposite);
+  ASSERT_EQ(m.data(f0).tag, Face_tag::OPPOSITE);
+  ASSERT_EQ(m.data(f1).tag, Face_tag::OPPOSITE);
 }
 
 //                  f1 (Ext.)
@@ -133,9 +133,9 @@ TEST(ClassifyFacesLocallyTest, Inconsistent1) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  EXPECT_EQ(m.data(f0).tag, Face_tag::Unknown);
-  EXPECT_EQ(m.data(f1).tag, Face_tag::Exterior);
-  EXPECT_EQ(m.data(f2).tag, Face_tag::Interior);
+  EXPECT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
+  EXPECT_EQ(m.data(f1).tag, Face_tag::EXTERIOR);
+  EXPECT_EQ(m.data(f2).tag, Face_tag::INTERIOR);
 }
 
 //   f1 (Ext.) ---------+--------- f0 (????)
@@ -160,7 +160,7 @@ TEST(ClassifyFacesLocallyTest, Inconsistent2) {
   std::unordered_set<Edge> border{pq};
 
   Classify_faces_locally{}(m, pq, border);
-  EXPECT_EQ(m.data(f0).tag, Face_tag::Unknown);
-  EXPECT_EQ(m.data(f1).tag, Face_tag::Exterior);
-  EXPECT_EQ(m.data(f2).tag, Face_tag::Interior);
+  EXPECT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
+  EXPECT_EQ(m.data(f1).tag, Face_tag::EXTERIOR);
+  EXPECT_EQ(m.data(f2).tag, Face_tag::INTERIOR);
 }
