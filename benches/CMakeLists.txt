@@ -1,0 +1,2 @@
+add_subdirectory(corefinement)
+add_subdirectory(kigumi_bench)

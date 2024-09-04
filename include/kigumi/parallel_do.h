@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kigumi/Global_options.h>
+
 #include <algorithm>
 #include <atomic>
 #include <exception>
@@ -18,8 +20,7 @@ void parallel_do(RandomAccessIterator first, RandomAccessIterator last, State st
     return;
   }
 
-  auto num_threads = std::clamp(static_cast<std::size_t>(std::thread::hardware_concurrency()),
-                                std::size_t{1}, size);
+  auto num_threads = std::min(static_cast<std::size_t>(Global_options::num_threads()), size);
   if (num_threads == 1) {
     for (auto it = first; it != last; ++it) {
       body(*it, state);

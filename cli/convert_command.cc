@@ -5,6 +5,7 @@
 #include <boost/program_options.hpp>
 #include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kigumi/Global_options.h>
+
 #include <algorithm>
 #include <barrier>
 #include <functional>
@@ -16,8 +18,8 @@ void parallel_sort(RandomAccessIterator first, RandomAccessIterator last, Compar
     return;
   }
 
-  auto num_threads = std::clamp(static_cast<std::size_t>(std::thread::hardware_concurrency()),
-                                std::size_t{1}, (size + 1023) / 1024);
+  auto num_threads =
+      std::min(static_cast<std::size_t>(Global_options::num_threads()), (size + 1023) / 1024);
   if (num_threads == 1) {
     std::sort(first, last, comp);
     return;

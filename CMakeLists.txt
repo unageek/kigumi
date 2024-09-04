@@ -13,6 +13,8 @@ find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
+add_subdirectory(benches)
+
 add_subdirectory(cli)
 
 enable_testing()

@@ -3,6 +3,7 @@
 #include <CGAL/Bbox_3.h>
 #include <CGAL/intersections.h>
 #include <kigumi/AABB_tree/AABB_node.h>
+#include <kigumi/Global_options.h>
 
 #include <algorithm>
 #include <array>
@@ -187,7 +188,7 @@ class AABB_tree {
         std::distance(lengths.begin(), std::max_element(lengths.begin(), lengths.end())));
   }
 
-  int concurrency_depth_limit_{static_cast<int>(std::log2(std::thread::hardware_concurrency()))};
+  int concurrency_depth_limit_{static_cast<int>(std::log2(Global_options::num_threads()))};
   std::vector<Leaf> leaves_;
   std::vector<Node> nodes_;
   const void* root_{nullptr};
