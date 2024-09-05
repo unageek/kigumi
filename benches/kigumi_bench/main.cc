@@ -1,9 +1,9 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Boolean_operator.h>
 #include <kigumi/Boolean_region_builder.h>
-#include <kigumi/Global_options.h>
 #include <kigumi/Region.h>
 #include <kigumi/Region_io.h>
+#include <kigumi/contexts.h>
 
 #include <chrono>
 #include <cstdlib>
@@ -17,21 +17,22 @@ using Face_data = int;
 using Region = kigumi::Region<K, Face_data>;
 using kigumi::Boolean_operator;
 using kigumi::Boolean_region_builder;
-using kigumi::Global_options;
+using kigumi::Num_threads;
 using kigumi::read_region;
 using kigumi::write_region;
 
 int main(int argc, char* argv[]) {
   try {
-    std::vector<std::string> args(argv + 1, argv + argc);
-
-    const auto* env_num_threads = std::getenv("KIGUMI_NUM_THREADS");
+    const auto* env_num_threads = std::getenv("NUM_THREADS");
+    std::size_t num_threads = Num_threads::current();
     if (env_num_threads != nullptr) {
-      auto num_threads = std::atoi(env_num_threads);
-      Global_options::set_num_threads(num_threads);
+      num_threads = static_cast<std::size_t>(std::atoi(env_num_threads));
     }
-    std::cout << "num_threads: " << Global_options::num_threads()
-              << " (can be set by KIGUMI_NUM_THREADS)" << std::endl;
+    Num_threads with_num_threads{num_threads};
+    std::cout << "num_threads: " << Num_threads::current() << " (can be set by NUM_THREADS)"
+              << std::endl;
+
+    std::vector<std::string> args(argv + 1, argv + argc);
 
     Region first;
     Region second;

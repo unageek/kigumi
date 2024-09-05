@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kigumi/Global_options.h>
+#include <kigumi/contexts.h>
 
 #include <algorithm>
 #include <barrier>
@@ -18,8 +18,7 @@ void parallel_sort(RandomAccessIterator first, RandomAccessIterator last, Compar
     return;
   }
 
-  auto num_threads =
-      std::min(static_cast<std::size_t>(Global_options::num_threads()), (size + 1023) / 1024);
+  auto num_threads = std::min(Num_threads::current(), (size + 1023) / 1024);
   if (num_threads == 1) {
     std::sort(first, last, comp);
     return;
@@ -38,24 +37,25 @@ void parallel_sort(RandomAccessIterator first, RandomAccessIterator last, Compar
 
   threads.reserve(num_threads);
   for (std::size_t tid = 0; tid < num_threads; ++tid) {
-    auto thread_first = partitions.at(tid);
-    auto thread_last = partitions.at(tid + 1);
-    threads.emplace_back(
-        [&barrier, &comp, num_threads, &partitions, thread_first, thread_last, tid] {
-          std::sort(thread_first, thread_last, comp);
+    threads.emplace_back([&barrier, &comp, num_threads, &partitions, tid] {
+      {
+        auto first = partitions.at(tid);
+        auto last = partitions.at(tid + 1);
+        std::sort(first, last, comp);
+      }
 
-          std::size_t sorted_distance{1};
-          while (sorted_distance < num_threads) {
-            barrier.arrive_and_wait();
-            if (tid % (2 * sorted_distance) == 0) {
-              auto first = thread_first;
-              auto middle = partitions.at(std::min(tid + sorted_distance, num_threads));
-              auto last = partitions.at(std::min(tid + 2 * sorted_distance, num_threads));
-              std::inplace_merge(first, middle, last, comp);
-            }
-            sorted_distance *= 2;
-          }
-        });
+      std::size_t sorted_distance{1};
+      while (sorted_distance < num_threads) {
+        barrier.arrive_and_wait();
+        if (tid % (2 * sorted_distance) == 0) {
+          auto first = partitions.at(tid);
+          auto middle = partitions.at(std::min(tid + sorted_distance, num_threads));
+          auto last = partitions.at(std::min(tid + 2 * sorted_distance, num_threads));
+          std::inplace_merge(first, middle, last, comp);
+        }
+        sorted_distance *= 2;
+      }
+    });
   }
 
   for (auto& thread : threads) {
