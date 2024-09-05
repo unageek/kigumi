@@ -30,7 +30,8 @@ int main(int argc, char* argv[]) {
       auto num_threads = std::atoi(env_num_threads);
       Global_options::set_num_threads(num_threads);
     }
-    std::cout << "num_threads: " << Global_options::num_threads() << std::endl;
+    std::cout << "num_threads: " << Global_options::num_threads()
+              << " (can be set by KIGUMI_NUM_THREADS)" << std::endl;
 
     Region first;
     Region second;
