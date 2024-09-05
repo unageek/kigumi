@@ -12,6 +12,7 @@ find_package(Boost REQUIRED COMPONENTS container container_hash endian iterator 
 find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
+find_package(manifold CONFIG)
 
 add_subdirectory(benches)
 
