@@ -1,11 +1,11 @@
-set(TARGET kigumi_bench_corefinement)
+set(TARGET kigumi_bench_manifold)
 
 add_executable(${TARGET}
     main.cc
 )
 
 set_target_properties(${TARGET} PROPERTIES
-    OUTPUT_NAME corefinement
+    OUTPUT_NAME manifold
 )
 
 if(UNIX)
@@ -15,5 +15,7 @@ elseif(MSVC)
 endif()
 
 target_link_libraries(${TARGET} PRIVATE
-    CGAL::CGAL
+    manifold
+    meshIO
+    TBB::tbb
 )

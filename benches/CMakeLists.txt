@@ -1,5 +1,4 @@
 add_subdirectory(corefinement)
-add_subdirectory(kigumi_bench)
-if(manifold_FOUND)
-    add_subdirectory(manifold_bench)
-endif()
+add_subdirectory(geogram)
+add_subdirectory(kigumi)
+add_subdirectory(manifold)

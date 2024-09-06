@@ -1,7 +1,11 @@
-set(TARGET kigumi_bench)
+set(TARGET kigumi_bench_kigumi)
 
 add_executable(${TARGET}
     main.cc
+)
+
+set_target_properties(${TARGET} PROPERTIES
+    OUTPUT_NAME kigumi
 )
 
 if(UNIX)

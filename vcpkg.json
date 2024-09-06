@@ -12,5 +12,14 @@
     "cgal",
     "fast-float",
     "gtest"
-  ]
+  ],
+  "features": {
+    "benches": {
+      "description": "Build benchmark programs",
+      "dependencies": [
+        "glm",
+        "tbb"
+      ]
+    }
+  }
 }

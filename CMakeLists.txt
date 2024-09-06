@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.18)
 
+option(KIGUMI_BUILD_BENCHES "Build benchmark programs" OFF)
+option(KIGUMI_BUILD_CLI "Build command-line interface" ON)
+option(KIGUMI_BUILD_TESTS "Build unit tests" ON)
+
+if(KIGUMI_BUILD_BENCHES)
+    list(APPEND VCPKG_MANIFEST_FEATURES "benches")
+endif()
+
 project(kigumi CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -8,15 +16,58 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Boost REQUIRED COMPONENTS container container_hash endian iterator program_options range)
+find_package(boost_container CONFIG REQUIRED)
+find_package(boost_container_hash CONFIG REQUIRED)
+find_package(boost_endian CONFIG REQUIRED)
+find_package(boost_iterator CONFIG REQUIRED)
+find_package(boost_program_options CONFIG REQUIRED)
+find_package(boost_program_options CONFIG REQUIRED)
+find_package(boost_range CONFIG REQUIRED)
 find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
-find_package(manifold CONFIG)
 
-add_subdirectory(benches)
+if(KIGUMI_BUILD_BENCHES)
+    find_package(glm CONFIG REQUIRED)
+    find_package(TBB CONFIG REQUIRED)
 
-add_subdirectory(cli)
+    include(FetchContent)
 
-enable_testing()
-add_subdirectory(tests)
+    FetchContent_Declare(
+        geogram
+        GIT_REPOSITORY https://github.com/BrunoLevy/geogram.git
+        GIT_TAG main
+        GIT_SHALLOW ON
+    )
+    set(GEOGRAM_LIB_ONLY ON)
+    set(GEOGRAM_WITH_GRAPHICS OFF)
+    set(GEOGRAM_WITH_HLBFGS OFF)
+    set(GEOGRAM_WITH_LEGACY_NUMERICS OFF)
+    set(GEOGRAM_WITH_LUA OFF)
+    set(GEOGRAM_WITH_TBB ON)
+    set(GEOGRAM_WITH_TETGEN OFF)
+    set(GEOGRAM_WITH_TRIANGLE OFF)
+    FetchContent_MakeAvailable(geogram)
+
+    FetchContent_Declare(
+        manifold
+        GIT_REPOSITORY https://github.com/elalish/manifold.git
+        GIT_TAG master
+        GIT_SHALLOW ON
+    )
+    set(MANIFOLD_EXPORT ON)
+    set(MANIFOLD_PAR "TBB" CACHE STRING "")
+    set(MANIFOLD_TEST OFF)
+    FetchContent_MakeAvailable(manifold)
+
+    add_subdirectory(benches)
+endif()
+
+if(KIGUMI_BUILD_CLI)
+    add_subdirectory(cli)
+endif()
+
+if(KIGUMI_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

@@ -1,8 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define TBB_PREVIEW_GLOBAL_CONTROL
 
-#include <manifold/manifold.h>
-#include <manifold/meshIO.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#include <geogram/basic/common.h>
+#include <geogram/mesh/mesh.h>
+#include <geogram/mesh/mesh_io.h>
+#include <geogram/mesh/mesh_surface_intersection.h>
+#pragma clang diagnostic pop
 #include <tbb/global_control.h>
 
 #include <algorithm>
@@ -12,10 +17,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-using manifold::ExportMesh;
-using manifold::ImportMesh;
-using manifold::Manifold;
 
 int main(int argc, char* argv[]) {
   try {
@@ -30,18 +31,23 @@ int main(int argc, char* argv[]) {
               << tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism)
               << " (can be set by NUM_THREADS)" << std::endl;
 
+    GEO::initialize(GEO::GEOGRAM_INSTALL_ALL);
+
     std::vector<std::string> args(argv + 1, argv + argc);
 
-    Manifold first{ImportMesh(args.at(0))};
-    Manifold second{ImportMesh(args.at(1))};
+    GEO::Mesh first;
+    GEO::Mesh second;
+    GEO::Mesh result;
+
+    GEO::mesh_load(args.at(0), first);
+    GEO::mesh_load(args.at(1), second);
 
     auto start = std::chrono::high_resolution_clock::now();
-    auto result = first.Boolean(second, manifold::OpType::Intersect);
-    result.Status();
+    GEO::mesh_intersection(result, first, second);
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start) << std::endl;
 
-    ExportMesh(args.at(2), result.GetMesh(), {});
+    GEO::mesh_save(result, args.at(2));
 
     return 0;
   } catch (const std::exception& e) {
