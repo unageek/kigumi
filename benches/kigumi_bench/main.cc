@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Boolean_operator.h>
 #include <kigumi/Boolean_region_builder.h>

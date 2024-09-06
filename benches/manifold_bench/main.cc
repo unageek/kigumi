@@ -1,4 +1,5 @@
-#define TBB_PREVIEW_GLOBAL_CONTROL 1
+#define _CRT_SECURE_NO_WARNINGS
+#define TBB_PREVIEW_GLOBAL_CONTROL
 
 #include <manifold/manifold.h>
 #include <manifold/meshIO.h>
