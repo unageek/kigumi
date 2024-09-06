@@ -27,6 +27,24 @@ find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
+set(TARGET kigumi)
+
+add_library(${TARGET} INTERFACE)
+
+target_include_directories(${TARGET} INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+target_link_libraries(${TARGET} INTERFACE
+    Boost::container
+    Boost::container_hash
+    Boost::endian
+    Boost::iterator
+    Boost::range
+    CGAL::CGAL
+    FastFloat::fast_float
+)
+
 if(KIGUMI_BUILD_BENCHES)
     find_package(glm CONFIG REQUIRED)
     find_package(TBB CONFIG REQUIRED)
