@@ -19,6 +19,8 @@ and [Boolean_region_builder.h](include/kigumi/Boolean_region_builder.h).
 
 ## Benchmarks
 
+Timing results for computing the Boolean intersection between two closed, manifold meshes with about 1.1M faces each:
+
 | Method                                                                                              |      Timing |
 |-----------------------------------------------------------------------------------------------------|------------:|
 | CGAL's [Corefinement](https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#Coref_section) |   298,675ms |
