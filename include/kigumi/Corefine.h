@@ -137,8 +137,8 @@ class Corefine {
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
-        left_triangulations_.emplace(fh,
-                                     Triangulation{Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c});
+        left_triangulations_.emplace(
+            fh, Triangulation{Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c});
 
         auto last = std::upper_bound(first, infos.end(), *first, left_fh_less);
         ranges.emplace_back(first, last);

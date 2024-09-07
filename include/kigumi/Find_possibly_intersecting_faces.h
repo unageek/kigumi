@@ -32,10 +32,9 @@ class Find_possibly_intersecting_faces {
     const auto& a_tree = a.aabb_tree();
 
     parallel_do(
-        b.faces_begin(), b.faces_end(),
-        std::pair<std::vector<Face_handle_pair>, std::vector<const Leaf*>>{},
-        [&](auto b_fh, auto& local_state) {
-          auto& [local_pairs, leaves] = local_state;
+        b.faces_begin(), b.faces_end(), std::vector<Face_handle_pair>{},
+        [&](auto b_fh, auto& local_pairs) {
+          thread_local std::vector<const Leaf*> leaves;
 
           if (b_face_tags.at(b_fh.i) != Face_tag::UNKNOWN) {
             return;
@@ -57,9 +56,7 @@ class Find_possibly_intersecting_faces {
             }
           }
         },
-        [&](auto& local_state) {
-          auto& [local_pairs, leaves] = local_state;
-
+        [&](auto& local_pairs) {
           if (pairs.empty()) {
             pairs = std::move(local_pairs);
           } else {
