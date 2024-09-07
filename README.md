@@ -7,7 +7,7 @@ written in C++ and based on [CGAL](https://www.cgal.org).
 
 With **kigumi**, you can:
 
-- Handle regions defined by open and/or non-manifold meshes.
+- Handle regions defined by closed or open, manifold or non-manifold meshes.
 - Handle regions composed of disjoint components.
 - Handle special regions: the empty set and the universe.
 - Apply multiple Boolean operators simultaneously.
@@ -16,6 +16,24 @@ With **kigumi**, you can:
 
 For details of the API, check [Region.h](include/kigumi/Region.h)
 and [Boolean_region_builder.h](include/kigumi/Boolean_region_builder.h).
+
+## Benchmarks
+
+| Method                                                                                              |      Timing |
+|-----------------------------------------------------------------------------------------------------|------------:|
+| CGAL's [Corefinement](https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#Coref_section) |   298,675ms |
+| kigumi (1 thread)                                                                                   |     6,441ms |
+| kigumi (8 threads)                                                                                  | **3,511ms** |
+| [geogram](https://github.com/BrunoLevy/geogram)                                                     |      FAILED |
+| [manifold](https://github.com/elalish/manifold)                                                     |      FAILED |
+
+Benchmarks were performed on a MacBook Pro 13" (M1, 2020). Programs were built with Homebrew Clang 18.1.8. The following
+commands were used:
+
+```
+./tools/gen_bench_meshes.sh
+./tools/run_benches.sh meshes/cos_sin_closed.obj meshes/sin_cos_closed.obj
+```
 
 ## Build instructions
 

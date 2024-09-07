@@ -2,5 +2,7 @@
 .vscode/
 build/
 .DS_Store
-*.obj
-*.off
+meshes/*
+!meshes/box.obj
+!meshes/cos_sin.obj
+!meshes/sin_cos.obj
