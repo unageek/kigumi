@@ -14,6 +14,7 @@ int main(int argc, const char* argv[]) {
     std::vector<std::unique_ptr<Command>> commands;
     commands.emplace_back(std::make_unique<Boolean_command>());
     commands.emplace_back(std::make_unique<Convert_command>());
+    commands.emplace_back(std::make_unique<Defects_command>());
 
     if (args.empty()) {
       std::cerr << "usage: kigumi <command> [<args>]\n"

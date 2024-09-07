@@ -36,3 +36,12 @@ class Convert_command : public Command {
 
   void operator()(const std::vector<std::string>& args) const override;
 };
+
+class Defects_command : public Command {
+ public:
+  std::string name() const override;
+
+  std::string description() const override;
+
+  void operator()(const std::vector<std::string>& args) const override;
+};
