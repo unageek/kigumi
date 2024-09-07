@@ -36,7 +36,6 @@ class AABB_tree {
     nodes_.resize(num_leaves - 1);
 
     auto* root = &nodes_.front();
-    root->set_bbox(bbox_from_leaves(leaves_.begin(), leaves_.end()));
     root_ = root;
 
     build(nodes_.begin(), leaves_.begin(), leaves_.end(), 0);
@@ -67,14 +66,14 @@ class AABB_tree {
   template <class RandomAccessIterator>
   void build(Node_iterator node_it, RandomAccessIterator first, RandomAccessIterator last,
              int node_depth) {
+    node_it->set_bbox(bbox_from_leaves(first, last));
+
     auto num_leaves = static_cast<std::size_t>(std::distance(first, last));
 
     switch (num_leaves) {
       case 2:  // (leaf, leaf)
         node_it->set_left_leaf(&*first);
         node_it->set_right_leaf(&*(first + 1));
-
-        node_it->set_bbox(node_it->left_leaf()->bbox() + node_it->right_leaf()->bbox());
         break;
 
       case 3:  // (leaf, node)
@@ -89,7 +88,6 @@ class AABB_tree {
         node_it->set_right_node(&*right_node_it);
 
         build(right_node_it, first + 1, last, node_depth + 1);
-        node_it->set_bbox(node_it->left_leaf()->bbox() + node_it->right_node()->bbox());
         break;
       }
 
@@ -119,8 +117,6 @@ class AABB_tree {
           build(left_node_it, first, middle, node_depth + 1);
           build(right_node_it, middle, last, node_depth + 1);
         }
-
-        node_it->set_bbox(node_it->left_node()->bbox() + node_it->right_node()->bbox());
         break;
       }
     }
