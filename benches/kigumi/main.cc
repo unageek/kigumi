@@ -15,8 +15,7 @@
 #include <vector>
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
-using Face_data = int;
-using Region = kigumi::Region<K, Face_data>;
+using Region = kigumi::Region<K>;
 using kigumi::Boolean_operator;
 using kigumi::Boolean_region_builder;
 using kigumi::Num_threads;
@@ -43,8 +42,7 @@ int main(int argc, char* argv[]) {
     read_region(args.at(1), second);
 
     auto start = std::chrono::high_resolution_clock::now();
-    auto result =
-        Boolean_region_builder<K, Face_data>{first, second}(Boolean_operator::INTERSECTION);
+    auto result = Boolean_region_builder{first, second}(Boolean_operator::INTERSECTION);
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start) << std::endl;
 
