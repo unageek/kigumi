@@ -76,15 +76,16 @@ class Find_defects {
     points.start_uniqueness_check();
     for (auto vh : m.vertices()) {
       const auto& p = m.point(vh);
+      auto next_idx = points.size();
       auto idx = points.insert(p);
       vh_map.push_back(Vertex_handle{idx});
-      if (idx == points.size() - 1) {
+      if (idx == next_idx) {
         new_m.add_vertex(p);
       }
     }
 
     for (auto fh : m.faces()) {
-      auto f = m.face(fh);
+      const auto& f = m.face(fh);
       Face new_f{vh_map.at(f[0].i), vh_map.at(f[1].i), vh_map.at(f[2].i)};
       new_m.add_face(new_f);
     }
