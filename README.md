@@ -12,14 +12,16 @@ With **kigumi**, you can:
 - Handle special regions: the empty set and the universe.
 - Apply multiple Boolean operators simultaneously.
 - Attach custom data to mesh faces that propagate through Boolean operations.
-- Save regions in a portable binary format.
+- Save regions without losing precision in a portable binary format.
 
 For details of the API, check [Region.h](include/kigumi/Region.h)
 and [Boolean_region_builder.h](include/kigumi/Boolean_region_builder.h).
 
 ## Benchmarks
 
-Timing results for computing the Boolean intersection between two closed, manifold meshes with about 1.1M faces each:
+Here are the timing results for computing the Boolean intersection between two meshes, each with ~1.1M faces, excluding
+I/O time. The meshes are closed, connected, manifold, and have no self-intersections, and are thus expected to be
+handled well by all libraries that claim robustness.
 
 | Method                                                                                              |      Timing |
 |-----------------------------------------------------------------------------------------------------|------------:|
@@ -45,16 +47,15 @@ commands were used:
 
 ## Technical details
 
-The following conditions must be satisfied so that Boolean operations work properly. If some are not met, the result is
-undefined (may emit warnings, crash, or fail silently).
+Boundary meshes must satisfy the following conditions for Boolean operations to work properly. If any of these
+conditions are not met, the result is undefined and may emit warnings, crash, or fail silently.
 
-1. Boundary meshes must not have degenerate (zero-area) faces.
-1. Boundary meshes must not self-intersect, i.e., every pair of distinct faces must meet one of the following
-   conditions:
+1. Meshes must not have degenerate (zero-area) faces.
+1. Meshes must not self-intersect, i.e., every pair of distinct faces must meet one of the following conditions:
     - They share an edge but do not intersect elsewhere.
     - They share a vertex but do not intersect elsewhere.
     - They do not intersect at all.
-1. Open boundary meshes must be clipped with a common convex region.
+1. Open meshes must be clipped with a common convex region.
 
 Additional notes:
 
@@ -64,7 +65,8 @@ Additional notes:
 
 > [!NOTE]
 >
-> The result of each Boolean operation is regularized, i.e., the interior and then the closure of the result is taken.
+> The result of each Boolean operation is regularized, i.e., the interior of the result is taken first, followed by its
+> closure.
 
 | `Boolean_operator::`        | Set notation        | Venn diagram                              |
 |-----------------------------|---------------------|-------------------------------------------|

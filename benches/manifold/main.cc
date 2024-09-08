@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     tbb::global_control with_num_threads{tbb::global_control::max_allowed_parallelism, num_threads};
     std::cout << "num_threads: "
               << tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism)
-              << " (can be set by NUM_THREADS)" << std::endl;
+              << " (can be set with the environment variable NUM_THREADS)" << std::endl;
 
     std::vector<std::string> args(argv + 1, argv + argc);
 

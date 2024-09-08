@@ -32,8 +32,8 @@ int main(int argc, char* argv[]) {
       num_threads = static_cast<std::size_t>(std::atoi(env_num_threads));
     }
     Num_threads with_num_threads{num_threads};
-    std::cout << "num_threads: " << Num_threads::current() << " (can be set by NUM_THREADS)"
-              << std::endl;
+    std::cout << "num_threads: " << Num_threads::current()
+              << " (can be set with the environment variable NUM_THREADS)" << std::endl;
 
     std::vector<std::string> args(argv + 1, argv + argc);
 
