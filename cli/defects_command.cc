@@ -86,14 +86,9 @@ void Defects_command::operator()(const std::vector<std::string>& args) const {
     std::cout << non_manifold_edges.size() << " non-manifold edges" << std::endl;
   }
 
-  const auto& comb_degenerate_faces = defects.combinatorially_degenerate_faces();
-  if (!comb_degenerate_faces.empty()) {
-    std::cout << comb_degenerate_faces.size() << " combinatorially degenerate faces" << std::endl;
-  }
-
-  const auto& geom_degenerate_faces = defects.geometrically_degenerate_faces();
-  if (!geom_degenerate_faces.empty()) {
-    std::cout << geom_degenerate_faces.size() << " geometrically degenerate faces" << std::endl;
+  const auto& degenerate_faces = defects.degenerate_faces();
+  if (!degenerate_faces.empty()) {
+    std::cout << degenerate_faces.size() << " degenerate faces" << std::endl;
   }
 
   const auto& overlapping_faces = defects.overlapping_faces();

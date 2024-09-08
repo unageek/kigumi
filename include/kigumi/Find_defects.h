@@ -36,19 +36,12 @@ class Find_defects {
         boundary_edges_{boundary_edges(halfedges_)},
         inconsistent_edges_{inconsistent_edges(halfedges_)},
         non_manifold_edges_{non_manifold_edges(halfedges_)},
-        combinatorially_degenerate_faces_{combinatorially_degenerate_faces(m_)},
-        geometrically_degenerate_faces_{geometrically_degenerate_faces(m_)},
-        overlapping_faces_{overlapping_faces(m_, geometrically_degenerate_faces_)} {}
+        degenerate_faces_{degenerate_faces(m_)},
+        overlapping_faces_{overlapping_faces(m_, degenerate_faces_)} {}
 
   const std::vector<Edge>& boundary_edges() const { return boundary_edges_; }
 
-  const std::vector<Face_handle>& combinatorially_degenerate_faces() const {
-    return combinatorially_degenerate_faces_;
-  }
-
-  const std::vector<Face_handle>& geometrically_degenerate_faces() const {
-    return geometrically_degenerate_faces_;
-  }
+  const std::vector<Face_handle>& degenerate_faces() const { return degenerate_faces_; }
 
   const std::vector<Edge>& inconsistent_edges() const { return inconsistent_edges_; }
 
@@ -253,20 +246,7 @@ class Find_defects {
     return edges;
   }
 
-  static std::vector<Face_handle> combinatorially_degenerate_faces(const Triangle_soup& m) {
-    std::vector<Face_handle> fhs;
-
-    for (auto fh : m.faces()) {
-      const auto& f = m.face(fh);
-      if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
-        fhs.push_back(fh);
-      }
-    }
-
-    return fhs;
-  }
-
-  static std::vector<Face_handle> geometrically_degenerate_faces(const Triangle_soup& m) {
+  static std::vector<Face_handle> degenerate_faces(const Triangle_soup& m) {
     std::vector<Face_handle> fhs;
 
     parallel_do(
@@ -371,8 +351,7 @@ class Find_defects {
   std::vector<Edge> boundary_edges_;
   std::vector<Edge> inconsistent_edges_;
   std::vector<Edge> non_manifold_edges_;
-  std::vector<Face_handle> combinatorially_degenerate_faces_;
-  std::vector<Face_handle> geometrically_degenerate_faces_;
+  std::vector<Face_handle> degenerate_faces_;
   std::vector<Face_handle> overlapping_faces_;
 };
 
