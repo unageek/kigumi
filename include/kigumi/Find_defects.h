@@ -1,7 +1,7 @@
 #pragma once
 
-#include <CGAL/intersections.h>
 #include <kigumi/Dense_undirected_graph.h>
+#include <kigumi/Face_face_intersection.h>
 #include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_handles.h>
 #include <kigumi/Point_list.h>
@@ -23,10 +23,7 @@ namespace kigumi {
 template <class K, class FaceData>
 class Find_defects {
   using Halfedge = std::array<Vertex_handle, 2>;
-  using Point = typename K::Point_3;
   using Point_list = Point_list<K>;
-  using Segment = typename K::Segment_3;
-  using Triangle = typename K::Triangle_3;
   using Triangle_soup = Triangle_soup<K, FaceData>;
   using Leaf = typename Triangle_soup::Leaf;
 
@@ -274,9 +271,15 @@ class Find_defects {
     std::unordered_set<Face_handle> faces_to_ignore(degenerate_faces.begin(),
                                                     degenerate_faces.end());
 
+    Point_list points;
+    for (auto vh : m.vertices()) {
+      points.insert(m.point(vh));
+    }
+
     parallel_do(
         m.faces_begin(), m.faces_end(), std::vector<Face_handle>{},
         [&](auto fh, auto& local_fhs) {
+          thread_local Face_face_intersection face_face_intersection{points};
           thread_local std::vector<const Leaf*> leaves;
           thread_local std::vector<Vertex_handle> shared_vertices;
 
@@ -287,7 +290,6 @@ class Find_defects {
           leaves.clear();
           tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(m, fh));
 
-          auto tri = m.triangle(fh);
           auto f = m.face(fh);
           std::sort(f.begin(), f.end());
 
@@ -297,26 +299,25 @@ class Find_defects {
               continue;
             }
 
-            auto tri2 = m.triangle(fh2);
-            auto inter = CGAL::intersection(tri, tri2);
-            if (!inter) {
-              continue;
-            }
-
             auto f2 = m.face(fh2);
             std::sort(f2.begin(), f2.end());
+
+            auto inter = face_face_intersection(f[0].i, f[1].i, f[2].i, f2[0].i, f2[1].i, f2[2].i);
+            if (inter.empty()) {
+              continue;
+            }
 
             shared_vertices.clear();
             std::set_intersection(f.begin(), f.end(), f2.begin(), f2.end(),
                                   std::back_inserter(shared_vertices));
             auto num_shared_vertices = shared_vertices.size();
 
-            if (boost::get<Point>(&*inter)) {
+            if (inter.size() == 1) {
               if (num_shared_vertices < 1) {
                 local_fhs.push_back(fh);
                 return;
               }
-            } else if (boost::get<Segment>(&*inter)) {
+            } else if (inter.size() == 2) {
               if (num_shared_vertices < 2) {
                 local_fhs.push_back(fh);
                 return;
