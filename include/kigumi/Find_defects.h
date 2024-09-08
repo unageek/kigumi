@@ -36,12 +36,12 @@ class Find_defects {
         boundary_edges_{boundary_edges(halfedges_)},
         inconsistent_edges_{inconsistent_edges(halfedges_)},
         non_manifold_edges_{non_manifold_edges(halfedges_)},
-        degenerate_faces_{degenerate_faces(m_)},
-        overlapping_faces_{overlapping_faces(m_, degenerate_faces_)} {}
+        trivial_degenerate_faces_{trivial_degenerate_faces(m_)},
+        non_trivial_degenerate_faces_{non_trivial_degenerate_faces(m_)},
+        overlapping_faces_{
+            overlapping_faces(m_, trivial_degenerate_faces_, non_trivial_degenerate_faces_)} {}
 
   const std::vector<Edge>& boundary_edges() const { return boundary_edges_; }
-
-  const std::vector<Face_handle>& degenerate_faces() const { return degenerate_faces_; }
 
   const std::vector<Edge>& inconsistent_edges() const { return inconsistent_edges_; }
 
@@ -51,9 +51,17 @@ class Find_defects {
 
   const std::vector<Vertex_handle>& non_manifold_vertices() const { return non_manifold_vertices_; }
 
+  const std::vector<Face_handle>& non_trivial_degenerate_faces() const {
+    return non_trivial_degenerate_faces_;
+  }
+
   const std::vector<Face_handle>& overlapping_faces() const { return overlapping_faces_; }
 
   const Triangle_soup& triangle_soup() const { return m_; }
+
+  const std::vector<Face_handle>& trivial_degenerate_faces() const {
+    return trivial_degenerate_faces_;
+  }
 
  private:
   static Triangle_soup merge_duplicate_vertices(const Triangle_soup& m) {
@@ -246,12 +254,29 @@ class Find_defects {
     return edges;
   }
 
-  static std::vector<Face_handle> degenerate_faces(const Triangle_soup& m) {
+  static std::vector<Face_handle> trivial_degenerate_faces(const Triangle_soup& m) {
+    std::vector<Face_handle> fhs;
+
+    for (auto fh : m.faces()) {
+      const auto& f = m.face(fh);
+      if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
+        fhs.push_back(fh);
+      }
+    }
+
+    return fhs;
+  }
+
+  static std::vector<Face_handle> non_trivial_degenerate_faces(const Triangle_soup& m) {
     std::vector<Face_handle> fhs;
 
     parallel_do(
         m.faces_begin(), m.faces_end(), std::vector<Face_handle>{},
         [&](auto fh, auto& local_fhs) {
+          const auto& f = m.face(fh);
+          if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
+            return;
+          }
           auto tri = m.triangle(fh);
           if (tri.is_degenerate()) {
             local_fhs.push_back(fh);
@@ -269,17 +294,22 @@ class Find_defects {
   }
 
   static std::vector<Face_handle> overlapping_faces(
-      const Triangle_soup& m, const std::vector<Face_handle>& degenerate_faces) {
+      const Triangle_soup& m, const std::vector<Face_handle>& trivial_degenerate_faces,
+      const std::vector<Face_handle>& non_trivial_degenerate_faces) {
     std::vector<Face_handle> fhs;
 
-    const auto& tree = m.aabb_tree();
-    std::unordered_set<Face_handle> faces_to_ignore(degenerate_faces.begin(),
-                                                    degenerate_faces.end());
+    std::unordered_set<Face_handle> degenerate_faces;
+    degenerate_faces.reserve(trivial_degenerate_faces.size() + non_trivial_degenerate_faces.size());
+    degenerate_faces.insert(trivial_degenerate_faces.begin(), trivial_degenerate_faces.end());
+    degenerate_faces.insert(non_trivial_degenerate_faces.begin(),
+                            non_trivial_degenerate_faces.end());
 
     Point_list points;
     for (auto vh : m.vertices()) {
       points.insert(m.point(vh));
     }
+
+    const auto& tree = m.aabb_tree();
 
     parallel_do(
         m.faces_begin(), m.faces_end(), std::vector<Face_handle>{},
@@ -288,7 +318,7 @@ class Find_defects {
           thread_local std::vector<const Leaf*> leaves;
           thread_local std::vector<Vertex_handle> shared_vertices;
 
-          if (faces_to_ignore.contains(fh)) {
+          if (degenerate_faces.contains(fh)) {
             return;
           }
 
@@ -300,7 +330,7 @@ class Find_defects {
 
           for (const auto* leaf : leaves) {
             auto fh2 = leaf->face_handle();
-            if (fh2 <= fh || faces_to_ignore.contains(fh2)) {
+            if (fh2 <= fh || degenerate_faces.contains(fh2)) {
               continue;
             }
 
@@ -351,7 +381,8 @@ class Find_defects {
   std::vector<Edge> boundary_edges_;
   std::vector<Edge> inconsistent_edges_;
   std::vector<Edge> non_manifold_edges_;
-  std::vector<Face_handle> degenerate_faces_;
+  std::vector<Face_handle> trivial_degenerate_faces_;
+  std::vector<Face_handle> non_trivial_degenerate_faces_;
   std::vector<Face_handle> overlapping_faces_;
 };
 
