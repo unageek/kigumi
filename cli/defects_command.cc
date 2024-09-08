@@ -1,7 +1,6 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Find_defects.h>
 #include <kigumi/Region.h>
-#include <kigumi/Region_io.h>
 
 #include <boost/program_options.hpp>
 #include <exception>
@@ -11,11 +10,11 @@
 #include <vector>
 
 #include "commands.h"
+#include "utility.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Region = kigumi::Region<K>;
 using kigumi::Find_defects;
-using kigumi::read_region;
 
 namespace {
 
@@ -27,7 +26,7 @@ struct Options {
 
 std::string Defects_command::name() const { return "defects"; }
 
-std::string Defects_command::description() const { return "find defects in the given mesh"; }
+std::string Defects_command::description() const { return "find defects in a mesh"; }
 
 void Defects_command::operator()(const std::vector<std::string>& args) const {
   namespace po = boost::program_options;

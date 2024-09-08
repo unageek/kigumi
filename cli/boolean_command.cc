@@ -2,7 +2,6 @@
 #include <kigumi/Boolean_operator.h>
 #include <kigumi/Boolean_region_builder.h>
 #include <kigumi/Region.h>
-#include <kigumi/Region_io.h>
 #include <kigumi/Warnings.h>
 
 #include <boost/any.hpp>
@@ -15,12 +14,11 @@
 #include <vector>
 
 #include "commands.h"
+#include "utility.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Region = kigumi::Region<K>;
 using kigumi::Boolean_region_builder;
-using kigumi::read_region;
-using kigumi::write_region;
 
 namespace boost {
 
@@ -64,9 +62,9 @@ void Boolean_command::operator()(const std::vector<std::string>& args) const {
 
   po::options_description opts_desc("Options", 80, 50);
   opts_desc.add_options()  //
-      ("first", po::value(&opts.first)->required()->value_name("<file>"),
+      ("first", po::value(&opts.first)->required()->value_name("(<file> | :empty: | :full:)"),
        "the first input mesh")  //
-      ("second", po::value(&opts.second)->required()->value_name("<file>"),
+      ("second", po::value(&opts.second)->required()->value_name("(<file> | :empty: | :full:)"),
        "the second input mesh")  //
       ("int", po::value(&opts.output_int)->value_name("<file>"),
        "output the intersection of the two meshes")  //
@@ -87,8 +85,10 @@ void Boolean_command::operator()(const std::vector<std::string>& args) const {
               vm);
     po::notify(vm);
   } catch (const std::exception&) {
-    std::cerr << "usage: kigumi boolean [--first] <file> [--second] <file> [--int <file>]\n"
-                 "                      [--uni <file>] [--dif <file>] [--sym <file>]\n"
+    std::cerr << "usage: kigumi boolean [--first] (<file> | :empty: | :full:)\n"
+                 "                      [--second] (<file> | :empty: | :full:)\n"
+                 "                      [--int <file>] [--uni <file>] [--dif <file>]\n"
+                 "                      [--sym <file>]\n"
                  "\n"
               << opts_desc;
     throw;

@@ -54,27 +54,12 @@ inline std::istream& operator>>(std::istream& in, const End_of_file& /*eof*/) {
   return in;
 }
 
-class Opt_hash_comment_end_of_file {
- public:
-  Opt_hash_comment_end_of_file() = default;
-
-  Opt_hash_comment_end_of_file(bool& empty_region, bool& full_region)
-      : empty_region_{&empty_region}, full_region_{&full_region} {}
-
- private:
-  friend std::istream& operator>>(std::istream& /*in*/,
-                                  const Opt_hash_comment_end_of_file& /*opt_comment_eof*/);
-
-  bool* empty_region_{nullptr};
-  bool* full_region_{nullptr};
-};
+struct Opt_hash_comment_end_of_file {};
 
 inline const Opt_hash_comment_end_of_file opt_hash_comment_eof;
 
 inline std::istream& operator>>(std::istream& in,
-                                const Opt_hash_comment_end_of_file& opt_comment_eof) {
-  thread_local std::string s;
-
+                                const Opt_hash_comment_end_of_file& /*opt_hash_comment_eof*/) {
   if (!in || in >> eof) {
     return in;
   }
@@ -83,22 +68,6 @@ inline std::istream& operator>>(std::istream& in,
   if (in.peek() != '#') {
     in.setstate(std::ios::failbit);
     return in;
-  }
-
-  if (opt_comment_eof.empty_region_ != nullptr) {
-    while (in.peek() == '#') {
-      in.ignore();
-    }
-
-    if (in >> s >> eof) {
-      // Handle special comments.
-      if (s == "empty_region") {
-        *opt_comment_eof.empty_region_ = true;
-      } else if (s == "full_region") {
-        *opt_comment_eof.full_region_ = true;
-      }
-    }
-    in.clear();
   }
 
   in.ignore(std::numeric_limits<std::streamsize>::max());

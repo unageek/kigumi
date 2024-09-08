@@ -5,7 +5,6 @@ add_executable(${TARGET}
     classify_faces_locally_test.cc
     face_data_test.cc
     face_face_intersection_test.cc
-    io_test.cc
     special_mesh_test.cc
     special_result_test.cc
 )

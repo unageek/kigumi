@@ -2,10 +2,8 @@
 
 #include <CGAL/number_utils.h>
 #include <kigumi/Mesh_handles.h>
-#include <kigumi/Region.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/io/ascii.h>
-#include <kigumi/io/validate_region.h>
 
 #include <cstdint>
 #include <fstream>
@@ -38,17 +36,13 @@ struct Ply_element {
 };
 
 template <class K, class FaceData>
-bool read_ply(std::istream& is, Region<K, FaceData>& region) {
+bool read_ply(std::istream& is, Triangle_soup<K, FaceData>& soup) {
   using namespace kigumi::io::ascii;
-  using Region = Region<K, FaceData>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
   if (!is) {
     return false;
   }
-
-  auto empty = false;
-  auto full = false;
 
   std::string line;
   std::string s;
@@ -67,14 +61,6 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
 
     iss >> s;
     if (s == "comment") {
-      if (iss >> s >> eof) {
-        // Handle special comments.
-        if (s == "empty_region") {
-          empty = true;
-        } else if (s == "full_region") {
-          full = true;
-        }
-      }
       continue;
     }
 
@@ -202,7 +188,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
     return false;
   }
 
-  Triangle_soup soup;
+  Triangle_soup new_soup;
   std::vector<Vertex_handle> face;
 
   // Read body.
@@ -244,7 +230,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
         std::cerr << "invalid vertex line: " << line << std::endl;
         return false;
       }
-      soup.add_vertex({x.value, y.value, z.value});
+      new_soup.add_vertex({x.value, y.value, z.value});
     } else if (element_it == face_element_it) {
       face.clear();
       for (auto it = properties.begin(); it != properties.end(); ++it) {
@@ -272,7 +258,7 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
       }
       if (face.size() >= 3) {
         for (std::size_t i = 0; i < face.size() - 2; ++i) {
-          soup.add_face({face.at(0), face.at(i + 1), face.at(i + 2)});
+          new_soup.add_face({face.at(0), face.at(i + 1), face.at(i + 2)});
         }
       }
     }
@@ -288,43 +274,27 @@ bool read_ply(std::istream& is, Region<K, FaceData>& region) {
     return false;
   }
 
-  if (!validate_region(soup, empty, full)) {
-    return false;
-  }
-
-  if (empty) {
-    region = Region::empty();
-    return true;
-  }
-
-  if (full) {
-    region = Region::full();
-    return true;
-  }
-
-  region = Region{std::move(soup)};
+  soup = std::move(new_soup);
   return true;
 }
 
 template <class K, class FaceData>
-bool read_ply(const std::string& filename, Region<K, FaceData>& region) {
+bool read_ply(const std::string& filename, Triangle_soup<K, FaceData>& soup) {
   std::ifstream ifs{filename};
   if (!ifs) {
     std::cerr << "failed to open file: " << filename << std::endl;
     return false;
   }
-  return read_ply<K, FaceData>(ifs, region);
+  return read_ply<K, FaceData>(ifs, soup);
 }
 
 template <class K, class FaceData>
-bool write_ply(std::ostream& os, const Region<K, FaceData>& region) {
+bool write_ply(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
   using namespace kigumi::io::ascii;
 
   if (!os) {
     return false;
   }
-
-  const auto& soup = region.boundary();
 
   os << "ply\n"                                           //
      << "format ascii 1.0\n"                              //
@@ -334,14 +304,6 @@ bool write_ply(std::ostream& os, const Region<K, FaceData>& region) {
      << "property float z\n"                              //
      << "element face " << soup.num_faces() << '\n'       //
      << "property list uchar int vertex_index\n";
-
-  if (region.is_empty()) {
-    os << "comment empty_region\n";
-  }
-
-  if (region.is_full()) {
-    os << "comment full_region\n";
-  }
 
   os << "end_header\n";
 
@@ -363,13 +325,13 @@ bool write_ply(std::ostream& os, const Region<K, FaceData>& region) {
 }
 
 template <class K, class FaceData>
-bool write_ply(const std::string& filename, const Region<K, FaceData>& region) {
+bool write_ply(const std::string& filename, const Triangle_soup<K, FaceData>& soup) {
   std::ofstream ofs{filename};
   if (!ofs) {
     std::cerr << "failed to open file: " << filename << std::endl;
     return false;
   }
-  return write_ply<K, FaceData>(ofs, region);
+  return write_ply<K, FaceData>(ofs, soup);
 }
 
 }  // namespace kigumi::io

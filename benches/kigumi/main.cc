@@ -4,7 +4,7 @@
 #include <kigumi/Boolean_operator.h>
 #include <kigumi/Boolean_region_builder.h>
 #include <kigumi/Region.h>
-#include <kigumi/Region_io.h>
+#include <kigumi/Triangle_soup_io.h>
 #include <kigumi/contexts.h>
 
 #include <chrono>
@@ -14,13 +14,15 @@
 #include <string>
 #include <vector>
 
+#include "../cli/utility.h"
+
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Region = kigumi::Region<K>;
 using kigumi::Boolean_operator;
 using kigumi::Boolean_region_builder;
 using kigumi::Num_threads;
-using kigumi::read_region;
-using kigumi::write_region;
+using kigumi::read_triangle_soup;
+using kigumi::write_triangle_soup;
 
 int main(int argc, char* argv[]) {
   try {

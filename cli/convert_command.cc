@@ -1,6 +1,5 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <kigumi/Region.h>
-#include <kigumi/Region_io.h>
 
 #include <boost/program_options.hpp>
 #include <exception>
@@ -10,11 +9,10 @@
 #include <vector>
 
 #include "commands.h"
+#include "utility.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Region = kigumi::Region<K>;
-using kigumi::read_region;
-using kigumi::write_region;
 
 namespace {
 

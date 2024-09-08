@@ -84,6 +84,8 @@ class Region {
 
   bool is_full() const { return kind_ == Region_kind::FULL; }
 
+  Triangle_soup take_boundary() && { return std::move(boundary_); }
+
  private:
   friend Boolean_region_builder;
   friend Read<Region>;
