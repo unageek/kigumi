@@ -196,35 +196,60 @@ class Find_defects {
 
   static std::vector<Edge> boundary_edges(const std::unordered_multiset<Halfedge>& hes) {
     std::vector<Edge> edges;
+
+    Halfedge last_he;
     for (const auto& he : hes) {
+      if (he == last_he) {
+        continue;
+      }
+      last_he = he;
+
       if (hes.count(he) == 1 && !hes.contains(opposite(he))) {
         edges.push_back(to_edge(he));
       }
     }
+
     return edges;
   }
 
   static std::vector<Edge> inconsistent_edges(const std::unordered_multiset<Halfedge>& hes) {
     std::vector<Edge> edges;
+
+    Halfedge last_he;
     for (const auto& he : hes) {
+      if (he == last_he) {
+        continue;
+      }
+      last_he = he;
+
       if (hes.count(he) == 2 && !hes.contains(opposite(he))) {
         edges.push_back(to_edge(he));
       }
     }
+
     return edges;
   }
 
   static std::vector<Edge> non_manifold_edges(const std::unordered_multiset<Halfedge>& hes) {
     std::vector<Edge> edges;
+
+    Halfedge last_he;
     for (const auto& he : hes) {
+      if (he == last_he) {
+        continue;
+      }
+      last_he = he;
+
       if (he[0] > he[1] && hes.contains(opposite(he))) {
         // Prevent double counting.
         continue;
       }
+
       if (hes.count(he) + hes.count(opposite(he)) > 2) {
         edges.push_back(to_edge(he));
       }
     }
+
     return edges;
   }
 
