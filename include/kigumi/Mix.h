@@ -82,7 +82,7 @@ class Mix {
     Classify_faces_globally classify_globally;
     warnings |= classify_globally(m, border_edges, left, right);
 
-    return {m.into_Triangle_soup(), warnings};
+    return {m.take_triangle_soup(), warnings};
   }
 };
 

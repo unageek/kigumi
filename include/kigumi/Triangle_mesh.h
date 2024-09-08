@@ -186,7 +186,7 @@ class Triangle_mesh {
 
   Bbox bbox() const { return CGAL::bbox_3(points_.begin(), points_.end()); }
 
-  Triangle_soup<K, FaceData> into_Triangle_soup() {
+  Triangle_soup<K, FaceData> take_triangle_soup() {
     return {std::move(points_), std::move(faces_), std::move(face_data_)};
   }
 
