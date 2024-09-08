@@ -16,9 +16,12 @@ struct Face_handle {
   std::size_t i;
 };
 
-inline bool operator<(Face_handle a, Face_handle b) { return a.i < b.i; }
 inline bool operator==(Face_handle a, Face_handle b) { return a.i == b.i; }
 inline bool operator!=(Face_handle a, Face_handle b) { return a.i != b.i; }
+inline bool operator<(Face_handle a, Face_handle b) { return a.i < b.i; }
+inline bool operator<=(Face_handle a, Face_handle b) { return a.i <= b.i; }
+inline bool operator>(Face_handle a, Face_handle b) { return a.i > b.i; }
+inline bool operator>=(Face_handle a, Face_handle b) { return a.i >= b.i; }
 
 struct Vertex_handle {
   Vertex_handle() : i{std::numeric_limits<std::size_t>::max()} {}
@@ -28,9 +31,12 @@ struct Vertex_handle {
   std::size_t i;
 };
 
-inline bool operator<(Vertex_handle a, Vertex_handle b) { return a.i < b.i; }
 inline bool operator==(Vertex_handle a, Vertex_handle b) { return a.i == b.i; }
 inline bool operator!=(Vertex_handle a, Vertex_handle b) { return a.i != b.i; }
+inline bool operator<(Vertex_handle a, Vertex_handle b) { return a.i < b.i; }
+inline bool operator<=(Vertex_handle a, Vertex_handle b) { return a.i <= b.i; }
+inline bool operator>(Vertex_handle a, Vertex_handle b) { return a.i > b.i; }
+inline bool operator>=(Vertex_handle a, Vertex_handle b) { return a.i >= b.i; }
 
 template <>
 struct Write<Vertex_handle> {

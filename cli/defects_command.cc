@@ -1,9 +1,8 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#include <CGAL/Polygon_mesh_processing/self_intersections.h>
+#include <kigumi/Find_defects.h>
 #include <kigumi/Region.h>
 #include <kigumi/Region_io.h>
 
-#include <array>
 #include <boost/program_options.hpp>
 #include <exception>
 #include <iostream>
@@ -13,10 +12,9 @@
 
 #include "commands.h"
 
-namespace PMP = CGAL::Polygon_mesh_processing;
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
-using Point = typename K::Point_3;
 using Region = kigumi::Region<K>;
+using kigumi::Find_defects;
 using kigumi::read_region;
 
 namespace {
@@ -62,20 +60,30 @@ void Defects_command::operator()(const std::vector<std::string>& args) const {
     throw std::runtime_error("reading failed: " + opts.in);
   }
 
-  const auto& m = region.boundary();
+  Find_defects defects{region.boundary()};
 
-  std::vector<Point> points;
-  for (auto vh : m.vertices()) {
-    points.push_back(m.point(vh));
+  const auto& isolated_vertices = defects.isolated_vertices();
+  if (!isolated_vertices.empty()) {
+    std::cout << isolated_vertices.size() << " isolated vertices" << std::endl;
   }
 
-  std::vector<std::array<std::size_t, 3>> faces;
-  for (auto fh : m.faces()) {
-    const auto& f = m.face(fh);
-    faces.push_back({f[0].i, f[1].i, f[2].i});
+  const auto& non_manifold_vertices = defects.non_manifold_vertices();
+  if (!non_manifold_vertices.empty()) {
+    std::cout << non_manifold_vertices.size() << " non-manifold vertices" << std::endl;
   }
 
-  if (PMP::does_triangle_soup_self_intersect(points, faces)) {
-    std::cout << "self-intersecting" << std::endl;
+  const auto& comb_degenerate_faces = defects.combinatorially_degenerate_faces();
+  if (!comb_degenerate_faces.empty()) {
+    std::cout << comb_degenerate_faces.size() << " combinatorially degenerate faces" << std::endl;
+  }
+
+  const auto& geom_degenerate_faces = defects.geometrically_degenerate_faces();
+  if (!geom_degenerate_faces.empty()) {
+    std::cout << geom_degenerate_faces.size() << " geometrically degenerate faces" << std::endl;
+  }
+
+  const auto& overlapping_faces = defects.overlapping_faces();
+  if (!overlapping_faces.empty()) {
+    std::cout << overlapping_faces.size() << " overlapping faces" << std::endl;
   }
 }
