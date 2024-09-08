@@ -32,22 +32,22 @@ namespace kigumi {
 
 enum class Boolean_operator : std::uint8_t {
   // Bochenski notation
-  V,  // The universe
-  A,  // A \cup B
-  B,  // (B \setminus A)^c
-  C,  // (A \setminus B)^c
-  D,  // (A \cap B)^c
-  E,  // (A \triangle B)^c
-  F,  // A^c
-  G,  // B^c
-  H,  // B
-  I,  // A
-  J,  // A \triangle B
-  K,  // A \cap B
-  L,  // A \setminus B
-  M,  // B \setminus A
-  X,  // (A \cup B)^c
-  O,  // The empty set
+  V = 0,   // The universe
+  A = 1,   // A \cup B
+  B = 2,   // (B \setminus A)^c
+  C = 3,   // (A \setminus B)^c
+  D = 4,   // (A \cap B)^c
+  E = 5,   // (A \triangle B)^c
+  F = 6,   // A^c
+  G = 7,   // B^c
+  H = 8,   // B
+  I = 9,   // A
+  J = 10,  // A \triangle B
+  K = 11,  // A \cap B
+  L = 12,  // A \setminus B
+  M = 13,  // B \setminus A
+  X = 14,  // (A \cup B)^c
+  O = 15,  // The empty set
 
   // Aliases
   UNION = A,
