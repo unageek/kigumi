@@ -73,6 +73,7 @@ class Find_defects {
     vh_map.reserve(m.num_vertices());
 
     Point_list points;
+    points.start_uniqueness_check();
     for (auto vh : m.vertices()) {
       const auto& p = m.point(vh);
       auto idx = points.insert(p);
