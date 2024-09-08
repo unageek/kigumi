@@ -72,6 +72,21 @@ void Defects_command::operator()(const std::vector<std::string>& args) const {
     std::cout << non_manifold_vertices.size() << " non-manifold vertices" << std::endl;
   }
 
+  const auto& boundary_edges = defects.boundary_edges();
+  if (!boundary_edges.empty()) {
+    std::cout << boundary_edges.size() << " boundary edges" << std::endl;
+  }
+
+  const auto& inconsistent_edges = defects.inconsistent_edges();
+  if (!inconsistent_edges.empty()) {
+    std::cout << inconsistent_edges.size() << " inconsistent edges" << std::endl;
+  }
+
+  const auto& non_manifold_edges = defects.non_manifold_edges();
+  if (!non_manifold_edges.empty()) {
+    std::cout << non_manifold_edges.size() << " non-manifold edges" << std::endl;
+  }
+
   const auto& comb_degenerate_faces = defects.combinatorially_degenerate_faces();
   if (!comb_degenerate_faces.empty()) {
     std::cout << comb_degenerate_faces.size() << " combinatorially degenerate faces" << std::endl;

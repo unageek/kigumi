@@ -10,6 +10,7 @@
 #include <kigumi/parallel_do.h>
 
 #include <algorithm>
+#include <array>
 #include <boost/variant/get.hpp>
 #include <iterator>
 #include <unordered_map>
@@ -21,21 +22,28 @@ namespace kigumi {
 
 template <class K, class FaceData>
 class Find_defects {
-  using Triangle_soup = Triangle_soup<K, FaceData>;
-  using Leaf = typename Triangle_soup::Leaf;
+  using Halfedge = std::array<Vertex_handle, 2>;
   using Point = typename K::Point_3;
   using Point_list = Point_list<K>;
   using Segment = typename K::Segment_3;
   using Triangle = typename K::Triangle_3;
+  using Triangle_soup = Triangle_soup<K, FaceData>;
+  using Leaf = typename Triangle_soup::Leaf;
 
  public:
   explicit Find_defects(const Triangle_soup& m)
       : m_{merge_duplicate_vertices(m)},
         isolated_vertices_{isolated_vertices(m_)},
         non_manifold_vertices_{non_manifold_vertices(m_)},
+        halfedges_{collect_halfedges(m_)},
+        boundary_edges_{boundary_edges(halfedges_)},
+        inconsistent_edges_{inconsistent_edges(halfedges_)},
+        non_manifold_edges_{non_manifold_edges(halfedges_)},
         combinatorially_degenerate_faces_{combinatorially_degenerate_faces(m_)},
         geometrically_degenerate_faces_{geometrically_degenerate_faces(m_)},
         overlapping_faces_{overlapping_faces(m_, geometrically_degenerate_faces_)} {}
+
+  const std::vector<Edge>& boundary_edges() const { return boundary_edges_; }
 
   const std::vector<Face_handle>& combinatorially_degenerate_faces() const {
     return combinatorially_degenerate_faces_;
@@ -45,7 +53,11 @@ class Find_defects {
     return geometrically_degenerate_faces_;
   }
 
+  const std::vector<Edge>& inconsistent_edges() const { return inconsistent_edges_; }
+
   const std::vector<Vertex_handle>& isolated_vertices() const { return isolated_vertices_; }
+
+  const std::vector<Edge>& non_manifold_edges() const { return non_manifold_edges_; }
 
   const std::vector<Vertex_handle>& non_manifold_vertices() const { return non_manifold_vertices_; }
 
@@ -104,6 +116,9 @@ class Find_defects {
     std::vector<std::vector<Face_handle>> vf_map(m.num_vertices());
     for (auto fh : m.faces()) {
       const auto& f = m.face(fh);
+      if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
+        continue;
+      }
       vf_map.at(f[0].i).push_back(fh);
       vf_map.at(f[1].i).push_back(fh);
       vf_map.at(f[2].i).push_back(fh);
@@ -159,6 +174,59 @@ class Find_defects {
     }
 
     return vhs;
+  }
+
+  static Edge to_edge(const Halfedge& he) { return make_edge(he[0], he[1]); }
+
+  static Halfedge opposite(const Halfedge& he) { return {he[1], he[0]}; }
+
+  static std::unordered_multiset<Halfedge> collect_halfedges(const Triangle_soup& m) {
+    std::unordered_multiset<Halfedge> hes;
+    for (auto fh : m.faces()) {
+      const auto& f = m.face(fh);
+      if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
+        continue;
+      }
+      for (std::size_t i = 0; i < 3; ++i) {
+        auto he = Halfedge{f.at(i), f.at((i + 1) % 3)};
+        hes.insert(he);
+      }
+    }
+    return hes;
+  }
+
+  static std::vector<Edge> boundary_edges(const std::unordered_multiset<Halfedge>& hes) {
+    std::vector<Edge> edges;
+    for (const auto& he : hes) {
+      if (hes.count(he) == 1 && !hes.contains(opposite(he))) {
+        edges.push_back(to_edge(he));
+      }
+    }
+    return edges;
+  }
+
+  static std::vector<Edge> inconsistent_edges(const std::unordered_multiset<Halfedge>& hes) {
+    std::vector<Edge> edges;
+    for (const auto& he : hes) {
+      if (hes.count(he) == 2 && !hes.contains(opposite(he))) {
+        edges.push_back(to_edge(he));
+      }
+    }
+    return edges;
+  }
+
+  static std::vector<Edge> non_manifold_edges(const std::unordered_multiset<Halfedge>& hes) {
+    std::vector<Edge> edges;
+    for (const auto& he : hes) {
+      if (he[0] > he[1] && hes.contains(opposite(he))) {
+        // Prevent double counting.
+        continue;
+      }
+      if (hes.count(he) + hes.count(opposite(he)) > 2) {
+        edges.push_back(to_edge(he));
+      }
+    }
+    return edges;
   }
 
   static std::vector<Face_handle> combinatorially_degenerate_faces(const Triangle_soup& m) {
@@ -271,6 +339,10 @@ class Find_defects {
   Triangle_soup m_;
   std::vector<Vertex_handle> isolated_vertices_;
   std::vector<Vertex_handle> non_manifold_vertices_;
+  std::unordered_multiset<Halfedge> halfedges_;
+  std::vector<Edge> boundary_edges_;
+  std::vector<Edge> inconsistent_edges_;
+  std::vector<Edge> non_manifold_edges_;
   std::vector<Face_handle> combinatorially_degenerate_faces_;
   std::vector<Face_handle> geometrically_degenerate_faces_;
   std::vector<Face_handle> overlapping_faces_;
