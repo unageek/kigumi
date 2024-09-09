@@ -9,9 +9,9 @@ set_target_properties(${TARGET} PROPERTIES
 )
 
 if(UNIX)
-    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror)
+    target_compile_options(${TARGET} PRIVATE -Wall -Wextra)
 elseif(MSVC)
-    target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702)
+    target_compile_options(${TARGET} PRIVATE /W4 /wd4702)
 endif()
 
 target_link_libraries(${TARGET} PRIVATE

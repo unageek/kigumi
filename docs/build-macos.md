@@ -28,8 +28,6 @@ git pull --recurse-submodules
 ## Build
 
 ```bash
-export CC=$(brew --prefix)/opt/llvm/bin/clang
-export CXX=$(brew --prefix)/opt/llvm/bin/clang++
 ./run configure  # or ./run c
 ./run build      # or ./run b
 ```

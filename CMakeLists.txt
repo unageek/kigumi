@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
 
-option(KIGUMI_BUILD_BENCHES "Build benchmark programs" OFF)
-option(KIGUMI_BUILD_CLI "Build command-line interface" ON)
-option(KIGUMI_BUILD_TESTS "Build unit tests" ON)
+option(KIGUMI_BUILD_BENCHES "Build the benchmarks" OFF)
+option(KIGUMI_BUILD_CLI "Build the command-line interface" ON)
+option(KIGUMI_BUILD_TESTS "Build the unit tests" ON)
 
 if(KIGUMI_BUILD_BENCHES)
-    list(APPEND VCPKG_MANIFEST_FEATURES "benches")
+    list(APPEND VCPKG_MANIFEST_FEATURES "bench-geogram" "bench-manifold")
 endif()
 
 project(kigumi CXX)
@@ -46,7 +46,8 @@ target_link_libraries(${TARGET} INTERFACE
 )
 
 if(KIGUMI_BUILD_BENCHES)
-    find_package(glm CONFIG REQUIRED)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(Clipper2 REQUIRED IMPORTED_TARGET Clipper2)
     find_package(TBB CONFIG REQUIRED)
 
     include(FetchContent)

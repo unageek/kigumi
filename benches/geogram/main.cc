@@ -1,13 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define TBB_PREVIEW_GLOBAL_CONTROL
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <geogram/basic/common.h>
 #include <geogram/mesh/mesh.h>
 #include <geogram/mesh/mesh_io.h>
 #include <geogram/mesh/mesh_surface_intersection.h>
-#pragma clang diagnostic pop
 #include <tbb/global_control.h>
 
 #include <algorithm>

@@ -37,9 +37,6 @@ jobs:
 
       - name: Configure
         run: ./run configure
-        env:
-          CC: clang
-          CXX: clang++
 
       - name: Build
         run: ./run build
@@ -105,9 +102,6 @@ jobs:
 
       - name: Configure
         run: ./run configure
-        env:
-          CC: /opt/homebrew/opt/llvm/bin/clang
-          CXX: /opt/homebrew/opt/llvm/bin/clang++
 
       - name: Build
         run: ./run build
