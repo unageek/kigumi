@@ -56,6 +56,8 @@ class Region {
 
   const Triangle_soup& boundary() const { return boundary_; }
 
+  Triangle_soup& boundary_unsafe() { return boundary_; }
+
   // NOTE: CGAL::Oriented_side and CGAL::Bounded_side have opposite signs.
   CGAL::Bounded_side bounded_side(const Point& p) const {
     if (is_empty()) {
