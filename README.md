@@ -19,19 +19,16 @@ and [Boolean_region_builder.h](include/kigumi/Boolean_region_builder.h).
 
 ## Benchmarks
 
-Here are the timings (in seconds) for computing the Boolean intersection between two meshes, excluding I/O time. The
-meshes are connected, manifold, and have no self-intersections.
+Here are the timings (in seconds) for computing the Boolean intersection between meshes, excluding I/O time:
 
-| Method                                                                                                           | Open-open | Open-closed | Closed-closed |
-|------------------------------------------------------------------------------------------------------------------|----------:|------------:|--------------:|
-| CGAL's [corefinement](https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#Coref_section) (sequential) |       4.6 |      FAILED |          57.4 |
-| [geogram](https://github.com/BrunoLevy/geogram) (parallel)                                                       |    FAILED |        70.5 |        FAILED |
-| kigumi (sequential)<sup>1</sup>                                                                                  |       2.8 |         2.0 |           6.4 |
-| kigumi (parallel)                                                                                                |   **1.7** |     **1.3** |           3.5 |
-| [manifold](https://github.com/elalish/manifold) (sequential)                                                     |    FAILED |      FAILED |           8.9 |
-| [manifold](https://github.com/elalish/manifold) (parallel)<sup>2</sup>                                           |    FAILED |      FAILED |       **1.7** |
+| Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [manif.][manif] (seq.) | manif. (par.)² |
+|-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-----------------------:|---------------:|
+| **Open**          |                    4.6 |                    FAILED |            2.8 |           1.7 |                 FAILED |         FAILED |
+| **Open & closed** |                 FAILED |                      70.5 |            2.0 |           1.3 |                 FAILED |         FAILED |
+| **Closed**        |                   57.4 |                    FAILED |            6.4 |           3.5 |                    8.9 |            1.7 |
+| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                 FAILED |         FAILED |
 
-<sup>1</sup> Ran with `NUM_THREADS=1`. <sup>2</sup> Configured with `-DMANIFOLD_PAR=TBB`.
+¹ Ran with `NUM_THREADS=1`. ² Configured with `-DMANIFOLD_PAR=TBB`.
 
 Benchmarks were performed on a MacBook Pro 13" (M1, 2020). Programs were built with Homebrew Clang 18.1.8. The following
 commands were used:
@@ -98,3 +95,9 @@ An enhanced version of the algorithm described in [[1]](#1) is used.
 - <a id="1">[1]</a> Barki, H., Guennebaud, G., & Foufou, S. (2015). Exact, robust, and efficient regularized Booleans on
   general 3D meshes. _Computers & Mathematics With Applications_, _70_(6),
   1235–1254. [https://doi.org/10.1016/j.camwa.2015.06.016](https://doi.org/10.1016/j.camwa.2015.06.016)
+
+[coref]: https://doc.cgal.org/latest/Polygon_mesh_processing/index.html#Coref_section
+
+[geogram]: https://github.com/BrunoLevy/geogram
+
+[manif]: https://github.com/elalish/manifold

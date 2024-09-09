@@ -4,5 +4,8 @@ build/
 .DS_Store
 meshes/*
 !meshes/box.obj
+!meshes/checker.obj
 !meshes/cos_sin.obj
+!meshes/plate.obj
 !meshes/sin_cos.obj
+!meshes/text.obj
