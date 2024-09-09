@@ -5,7 +5,13 @@
 - Build tools
 
   ```bash
-  sudo apt install clang cmake libomp-dev ninja-build
+  sudo apt install autoconf clang cmake curl git libomp-dev libtool ninja-build unzip zip
+  ```
+
+  To build the benchmarks, you also need `xorg-dev`, which is required by geogram:
+
+  ```bash
+  sudo apt install xorg-dev
   ```
 
 ## Clone
@@ -24,8 +30,6 @@ git pull --recurse-submodules
 ## Build
 
 ```bash
-export CC=clang
-export CXX=clang++
 ./run configure  # or ./run c
 ./run build      # or ./run b
 ```

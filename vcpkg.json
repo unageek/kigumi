@@ -14,10 +14,22 @@
     "gtest"
   ],
   "features": {
-    "benches": {
-      "description": "Build benchmark programs",
+    "bench-geogram": {
+      "description": "Build the benchmark for geogram",
       "dependencies": [
+        "tbb"
+      ]
+    },
+    "bench-manifold": {
+      "description": "Build the benchmark for manifold",
+      "dependencies": [
+        "assimp",
+        "clipper2",
         "glm",
+        {
+          "name": "pkgconf",
+          "host": true
+        },
         "tbb"
       ]
     }
