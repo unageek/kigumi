@@ -6,17 +6,9 @@ cd "$(dirname "$0")/.."
 
 set +e
 
-./build/benches/corefinement/corefinement
-./build/benches/corefinement/corefinement "$1" "$2" meshes/int_corefinement.obj
-
-./build/benches/geogram/geogram
-NUM_THREADS=1 ./build/benches/geogram/geogram "$1" "$2" meshes/int_geogram.obj
-./build/benches/geogram/geogram "$1" "$2" meshes/int_geogram.obj
-
-./build/benches/kigumi/kigumi
-NUM_THREADS=1 ./build/benches/kigumi/kigumi "$1" "$2" meshes/int_kigumi.obj
-./build/benches/kigumi/kigumi "$1" "$2" meshes/int_kigumi.obj
-
-./build/benches/manifold/manifold
-NUM_THREADS=1 ./build/benches/manifold/manifold "$1" "$2" meshes/int_manifold.obj
-./build/benches/manifold/manifold "$1" "$2" meshes/int_manifold.obj
+while read -r method
+do
+    "./build/benches/$method/$method" meshes/cos_sin.obj meshes/sin_cos.obj "meshes/oo_$method.obj"
+    "./build/benches/$method/$method" meshes/cos_sin.obj meshes/box.obj "meshes/oc_$method.obj"
+    "./build/benches/$method/$method" meshes/cos_sin_closed.obj meshes/sin_cos_closed.obj "meshes/cc_$method.obj"
+done < tools/bench_methods.txt

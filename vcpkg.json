@@ -15,15 +15,11 @@
   ],
   "features": {
     "bench-geogram": {
-      "description": "Build the benchmark for geogram",
-      "dependencies": [
-        "tbb"
-      ]
+      "description": "Build the benchmark for geogram"
     },
     "bench-manifold": {
       "description": "Build the benchmark for manifold",
       "dependencies": [
-        "assimp",
         "clipper2",
         "glm",
         {

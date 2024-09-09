@@ -15,7 +15,6 @@ elseif(MSVC)
 endif()
 
 target_link_libraries(${TARGET} PRIVATE
+    kigumi
     manifold
-    meshIO
-    TBB::tbb
 )

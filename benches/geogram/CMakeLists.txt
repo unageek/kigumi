@@ -16,5 +16,5 @@ endif()
 
 target_link_libraries(${TARGET} PRIVATE
     geogram
-    TBB::tbb
+    kigumi
 )

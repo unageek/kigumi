@@ -1,33 +1,71 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define TBB_PREVIEW_GLOBAL_CONTROL
-
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/number_utils.h>
 #include <geogram/basic/common.h>
 #include <geogram/mesh/mesh.h>
-#include <geogram/mesh/mesh_io.h>
 #include <geogram/mesh/mesh_surface_intersection.h>
-#include <tbb/global_control.h>
+#include <kigumi/Mesh_handles.h>
+#include <kigumi/Triangle_soup.h>
+#include <kigumi/Triangle_soup_io.h>
 
-#include <algorithm>
+#include <array>
 #include <chrono>
-#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
 
+using K = CGAL::Exact_predicates_exact_constructions_kernel;
+using Triangle_soup = kigumi::Triangle_soup<K>;
+using kigumi::read_triangle_soup;
+using kigumi::Vertex_handle;
+using kigumi::write_triangle_soup;
+
+namespace {
+
+bool read_mesh(const std::string& filename, GEO::Mesh& mesh) {
+  Triangle_soup soup;
+  if (!read_triangle_soup(filename, soup)) {
+    return false;
+  }
+
+  mesh.clear();
+  for (auto vh : soup.vertices()) {
+    const auto& p = soup.point(vh);
+    std::array<double, 3> point{CGAL::to_double(p.x()), CGAL::to_double(p.y()),
+                                CGAL::to_double(p.z())};
+    mesh.vertices.create_vertex(point.data());
+  }
+  for (auto fh : soup.faces()) {
+    const auto& f = soup.face(fh);
+    mesh.facets.create_triangle(f[0].i, f[1].i, f[2].i);
+  }
+
+  return true;
+}
+
+bool write_mesh(const std::string& filename, const GEO::Mesh& mesh) {
+  Triangle_soup soup;
+  for (GEO::index_t i = 0; i < mesh.vertices.nb(); ++i) {
+    const auto& p = mesh.vertices.point(i);
+    soup.add_vertex({p[0], p[1], p[2]});
+  }
+  for (GEO::index_t i = 0; i < mesh.facets.nb(); ++i) {
+    if (mesh.facets.nb_vertices(i) != 3) {
+      throw std::runtime_error("only triangle facets are supported");
+    }
+    auto v1 = mesh.facets.vertex(i, 0);
+    auto v2 = mesh.facets.vertex(i, 1);
+    auto v3 = mesh.facets.vertex(i, 2);
+    soup.add_face({Vertex_handle{v1}, Vertex_handle{v2}, Vertex_handle{v3}});
+  }
+
+  return write_triangle_soup(filename, soup);
+}
+
+}  // namespace
+
 int main(int argc, char* argv[]) {
   try {
-    auto num_threads =
-        tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism);
-    const auto* env_num_threads = std::getenv("NUM_THREADS");
-    if (env_num_threads != nullptr) {
-      num_threads = static_cast<std::size_t>(std::max(1, std::atoi(env_num_threads)));
-    }
-    tbb::global_control with_num_threads{tbb::global_control::max_allowed_parallelism, num_threads};
-    std::cout << "num_threads: "
-              << tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism)
-              << " (can be set with the environment variable NUM_THREADS)" << std::endl;
-
     GEO::initialize(GEO::GEOGRAM_INSTALL_ALL);
 
     std::vector<std::string> args(argv + 1, argv + argc);
@@ -36,15 +74,15 @@ int main(int argc, char* argv[]) {
     GEO::Mesh second;
     GEO::Mesh result;
 
-    GEO::mesh_load(args.at(0), first);
-    GEO::mesh_load(args.at(1), second);
+    read_mesh(args.at(0), first);
+    read_mesh(args.at(1), second);
 
     auto start = std::chrono::high_resolution_clock::now();
     GEO::mesh_intersection(result, first, second);
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start) << std::endl;
 
-    GEO::mesh_save(result, args.at(2));
+    write_mesh(args.at(2), result);
 
     return 0;
   } catch (const std::exception& e) {

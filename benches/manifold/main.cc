@@ -1,39 +1,70 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define TBB_PREVIEW_GLOBAL_CONTROL
-
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/number_utils.h>
+#include <kigumi/Mesh_handles.h>
+#include <kigumi/Triangle_soup.h>
+#include <kigumi/Triangle_soup_io.h>
 #include <manifold.h>
-#include <meshIO.h>
-#include <tbb/global_control.h>
 
-#include <algorithm>
 #include <chrono>
-#include <cstdlib>
 #include <exception>
 #include <iostream>
 #include <string>
 #include <vector>
 
-using manifold::ExportMesh;
-using manifold::ImportMesh;
-using manifold::Manifold;
+using K = CGAL::Exact_predicates_exact_constructions_kernel;
+using Triangle_soup = kigumi::Triangle_soup<K>;
+using kigumi::read_triangle_soup;
+using kigumi::Vertex_handle;
+using kigumi::write_triangle_soup;
+
+namespace {
+
+bool read_manifold(const std::string& filename, manifold::Manifold& manifold) {
+  Triangle_soup soup;
+  if (!read_triangle_soup(filename, soup)) {
+    return false;
+  }
+
+  manifold::Mesh mesh;
+  for (auto vh : soup.vertices()) {
+    const auto& p = soup.point(vh);
+    mesh.vertPos.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()),
+                              CGAL::to_double(p.z()));
+  }
+  for (auto fh : soup.faces()) {
+    const auto& f = soup.face(fh);
+    mesh.triVerts.emplace_back(f[0].i, f[1].i, f[2].i);
+  }
+
+  manifold = manifold::Manifold{mesh};
+  return true;
+}
+
+bool write_manifold(const std::string& filename, const manifold::Manifold& manifold) {
+  auto mesh = manifold.GetMesh();
+
+  Triangle_soup soup;
+  for (const auto& p : mesh.vertPos) {
+    soup.add_vertex({p.x, p.y, p.z});
+  }
+  for (const auto& tri : mesh.triVerts) {
+    soup.add_face({Vertex_handle(tri.x), Vertex_handle(tri.y), Vertex_handle(tri.z)});
+  }
+
+  return write_triangle_soup(filename, soup);
+}
+
+}  // namespace
 
 int main(int argc, char* argv[]) {
   try {
-    auto num_threads =
-        tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism);
-    const auto* env_num_threads = std::getenv("NUM_THREADS");
-    if (env_num_threads != nullptr) {
-      num_threads = static_cast<std::size_t>(std::max(1, std::atoi(env_num_threads)));
-    }
-    tbb::global_control with_num_threads{tbb::global_control::max_allowed_parallelism, num_threads};
-    std::cout << "num_threads: "
-              << tbb::global_control::active_value(tbb::global_control::max_allowed_parallelism)
-              << " (can be set with the environment variable NUM_THREADS)" << std::endl;
-
     std::vector<std::string> args(argv + 1, argv + argc);
 
-    Manifold first{ImportMesh(args.at(0))};
-    Manifold second{ImportMesh(args.at(1))};
+    manifold::Manifold first;
+    manifold::Manifold second;
+
+    read_manifold(args.at(0), first);
+    read_manifold(args.at(1), second);
 
     auto start = std::chrono::high_resolution_clock::now();
     auto result = first.Boolean(second, manifold::OpType::Intersect);
@@ -41,7 +72,7 @@ int main(int argc, char* argv[]) {
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start) << std::endl;
 
-    ExportMesh(args.at(2), result.GetMesh(), {});
+    write_manifold(args.at(2), result);
 
     return 0;
   } catch (const std::exception& e) {

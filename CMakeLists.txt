@@ -48,7 +48,6 @@ target_link_libraries(${TARGET} INTERFACE
 if(KIGUMI_BUILD_BENCHES)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(Clipper2 REQUIRED IMPORTED_TARGET Clipper2)
-    find_package(TBB CONFIG REQUIRED)
 
     include(FetchContent)
 
@@ -63,7 +62,6 @@ if(KIGUMI_BUILD_BENCHES)
     set(GEOGRAM_WITH_HLBFGS OFF)
     set(GEOGRAM_WITH_LEGACY_NUMERICS OFF)
     set(GEOGRAM_WITH_LUA OFF)
-    set(GEOGRAM_WITH_TBB ON)
     set(GEOGRAM_WITH_TETGEN OFF)
     set(GEOGRAM_WITH_TRIANGLE OFF)
     FetchContent_MakeAvailable(geogram)
@@ -75,8 +73,6 @@ if(KIGUMI_BUILD_BENCHES)
         GIT_SHALLOW ON
     )
     set(MANIFOLD_CROSS_SECTION OFF)
-    set(MANIFOLD_EXPORT ON)
-    set(MANIFOLD_PAR "TBB" CACHE STRING "")
     set(MANIFOLD_TEST OFF)
     FetchContent_MakeAvailable(manifold)
 

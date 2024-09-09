@@ -16,4 +16,5 @@ endif()
 
 target_link_libraries(${TARGET} PRIVATE
     CGAL::CGAL
+    kigumi
 )
