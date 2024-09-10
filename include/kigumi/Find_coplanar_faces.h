@@ -3,6 +3,7 @@
 #include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
+#include <kigumi/parallel_do.h>
 
 #include <algorithm>
 #include <array>
@@ -43,14 +44,14 @@ class Find_coplanar_faces {
       triangle_to_fi.emplace(tri, fi);
     }
 
-    for (auto fi : b.faces()) {
+    parallel_do(b.faces().begin(), b.faces().end(), [&](Face_index fi) {
       auto tri = triangle(b, fi, b_points);
 
       auto it = triangle_to_fi.find(tri);
       if (it != triangle_to_fi.end()) {
         a_face_tags.at(it->second.idx()) = Face_tag::COPLANAR;
         b_face_tags.at(fi.idx()) = Face_tag::COPLANAR;
-        continue;
+        return;
       }
 
       it = triangle_to_fi.find(opposite(tri));
@@ -58,7 +59,7 @@ class Find_coplanar_faces {
         a_face_tags.at(it->second.idx()) = Face_tag::OPPOSITE;
         b_face_tags.at(fi.idx()) = Face_tag::OPPOSITE;
       }
-    }
+    });
 
     return {std::move(left_face_tags), std::move(right_face_tags)};
   }
