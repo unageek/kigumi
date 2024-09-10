@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kigumi/contexts.h>
+#include <kigumi/threading.h>
 
 #include <algorithm>
 #include <atomic>
@@ -20,7 +20,7 @@ void parallel_do(RandomAccessIterator first, RandomAccessIterator last, State st
     return;
   }
 
-  auto num_threads = std::min(Num_threads::current(), size);
+  auto num_threads = std::min(Threading_context::current().num_threads(), size);
   if (num_threads == 1) {
     for (auto it = first; it != last; ++it) {
       body(*it, state);

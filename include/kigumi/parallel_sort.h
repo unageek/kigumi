@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kigumi/contexts.h>
+#include <kigumi/threading.h>
 
 #include <algorithm>
 #include <barrier>
@@ -18,7 +18,7 @@ void parallel_sort(RandomAccessIterator first, RandomAccessIterator last, Compar
     return;
   }
 
-  auto num_threads = std::min(Num_threads::current(), (size + 1023) / 1024);
+  auto num_threads = std::min(Threading_context::current().num_threads(), (size + 1023) / 1024);
   if (num_threads == 1) {
     std::sort(first, last, comp);
     return;

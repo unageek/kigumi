@@ -5,7 +5,7 @@
 #include <kigumi/Boolean_region_builder.h>
 #include <kigumi/Region.h>
 #include <kigumi/Triangle_soup_io.h>
-#include <kigumi/contexts.h>
+#include <kigumi/threading.h>
 
 #include <chrono>
 #include <cstdlib>
@@ -20,20 +20,20 @@ using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Region = kigumi::Region<K>;
 using kigumi::Boolean_operator;
 using kigumi::Boolean_region_builder;
-using kigumi::Num_threads;
 using kigumi::read_triangle_soup;
+using kigumi::Threading_context;
 using kigumi::write_triangle_soup;
 
 int main(int argc, char* argv[]) {
   try {
-    const auto* env_num_threads = std::getenv("NUM_THREADS");
-    std::size_t num_threads = Num_threads::current();
+    const auto* env_num_threads = std::getenv("KIGUMI_NUM_THREADS");
+    auto threading_opts = Threading_context::current();
     if (env_num_threads != nullptr) {
-      num_threads = static_cast<std::size_t>(std::atoi(env_num_threads));
+      threading_opts.set_num_threads(static_cast<std::size_t>(std::atoi(env_num_threads)));
     }
-    Num_threads with_num_threads{num_threads};
-    std::cout << "num_threads: " << Num_threads::current()
-              << " (can be set with the environment variable NUM_THREADS)" << std::endl;
+    Threading_context threading_ctx{threading_opts};
+    std::cout << "num_threads: " << Threading_context::current().num_threads()
+              << " (can be set with the environment variable KIGUMI_NUM_THREADS)" << std::endl;
 
     std::vector<std::string> args(argv + 1, argv + argc);
 

@@ -28,7 +28,7 @@ Here are the timings (in seconds) for computing the Boolean intersection between
 | **Closed**        |                   57.4 |                    FAILED |            6.4 |           3.5 |                    8.9 |            1.7 |
 | **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                 FAILED |         FAILED |
 
-¹ Ran with `NUM_THREADS=1`. ² Configured with `-DMANIFOLD_PAR=TBB`.
+¹ Ran with `KIGUMI_NUM_THREADS=1`. ² Configured with `-DMANIFOLD_PAR=TBB`.
 
 Benchmarks were performed on a MacBook Pro 13" (M1, 2020). Programs were built with Homebrew Clang 18.1.8. The following
 commands were used:
