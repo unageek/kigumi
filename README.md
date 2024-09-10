@@ -23,9 +23,9 @@ Here are the timings (in seconds) for computing the Boolean intersection between
 
 | Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [manif.][manif] (seq.) | manif. (par.)² |
 |-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-----------------------:|---------------:|
-| **Open**          |                    4.6 |                    FAILED |            2.5 |           1.4 |                 FAILED |         FAILED |
-| **Open & closed** |                 FAILED |                      70.5 |            1.7 |           1.0 |                 FAILED |         FAILED |
-| **Closed**        |                   57.4 |                    FAILED |            5.5 |           2.8 |                    8.9 |            1.7 |
+| **Open**          |                    4.6 |                    FAILED |            2.4 |           1.3 |                 FAILED |         FAILED |
+| **Open & closed** |                 FAILED |                      70.5 |            1.6 |           0.9 |                 FAILED |         FAILED |
+| **Closed**        |                   57.4 |                    FAILED |            5.4 |           2.7 |                    8.9 |            1.7 |
 | **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                 FAILED |         FAILED |
 
 ¹ Ran with `KIGUMI_NUM_THREADS=1`. ² Configured with `-DMANIFOLD_PAR=TBB`.

@@ -19,8 +19,10 @@ namespace internal {
 
 template <class K, class FaceData>
 CGAL::Bbox_3 face_bbox(const Triangle_soup<K, FaceData>& m, Face_index fi) {
+  auto bbox_fast = [](const typename K::Point_3& p) -> CGAL::Bbox_3 { return p.approx().bbox(); };
+
   const auto& f = m.face(fi);
-  return m.point(f[0]).bbox() + m.point(f[1]).bbox() + m.point(f[2]).bbox();
+  return bbox_fast(m.point(f[0])) + bbox_fast(m.point(f[1])) + bbox_fast(m.point(f[2]));
 }
 
 template <class K, class FaceData>

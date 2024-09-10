@@ -184,7 +184,15 @@ class Triangle_mesh {
     return {point(f[0]), point(f[1]), point(f[2])};
   }
 
-  Bbox bbox() const { return CGAL::bbox_3(points_.begin(), points_.end()); }
+  Bbox bbox() const {
+    auto bbox_fast = [](const Point& p) -> Bbox { return p.approx().bbox(); };
+
+    Bbox bbox;
+    for (const auto& p : points_) {
+      bbox += bbox_fast(p);
+    }
+    return bbox;
+  }
 
   Triangle_soup<K, FaceData> take_triangle_soup() {
     return {std::move(points_), std::move(faces_), std::move(face_data_)};

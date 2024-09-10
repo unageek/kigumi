@@ -3,7 +3,7 @@
 #include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangle_soup_io.h>
-#include <manifold.h>
+#include <manifold/manifold.h>
 
 #include <chrono>
 #include <exception>

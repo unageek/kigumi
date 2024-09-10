@@ -116,13 +116,22 @@ class Triangle_soup {
     return {point(f[0]), point(f[1]), point(f[2])};
   }
 
-  Bbox bbox() const { return CGAL::bbox_3(points_.begin(), points_.end()); }
+  Bbox bbox() const {
+    auto bbox_fast = [](const Point& p) -> Bbox { return p.approx().bbox(); };
+
+    Bbox bbox;
+    for (const auto& p : points_) {
+      bbox += bbox_fast(p);
+    }
+    return bbox;
+  }
 
   const AABB_tree<Leaf>& aabb_tree() const {
     std::lock_guard lock{aabb_tree_mutex_};
 
     if (!aabb_tree_) {
       std::vector<Leaf> leaves;
+      leaves.reserve(num_faces());
       for (auto fi : faces()) {
         leaves.emplace_back(internal::face_bbox(*this, fi), fi);
       }
