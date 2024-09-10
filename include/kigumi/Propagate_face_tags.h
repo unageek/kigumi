@@ -2,7 +2,7 @@
 
 #include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_entities.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Warnings.h>
 
@@ -18,7 +18,7 @@ class Propagate_face_tags {
 
  public:
   Warnings operator()(Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges,
-                      Face_handle seed) const {
+                      Face_index seed) const {
     const auto& data = m.data(seed);
     auto from_left = data.from_left;
     auto tag = data.tag;
@@ -53,7 +53,7 @@ class Propagate_face_tags {
   }
 
  private:
-  mutable std::queue<Face_handle> queue_;
+  mutable std::queue<Face_index> queue_;
 };
 
 }  // namespace kigumi

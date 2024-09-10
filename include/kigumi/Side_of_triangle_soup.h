@@ -3,7 +3,7 @@
 #include <CGAL/Kernel/global_functions.h>
 #include <CGAL/enum.h>
 #include <CGAL/intersections.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/mesh_utility.h>
 
@@ -45,7 +45,7 @@ class Side_of_triangle_soup {
       tree.get_intersecting_leaves(std::back_inserter(leaves_), ray);
 
       for (const auto* leaf : leaves_) {
-        auto fh = leaf->face_handle();
+        auto fh = leaf->face_index();
         auto tri = soup.triangle(fh);
 
         auto result = CGAL::intersection(tri, ray);
@@ -92,7 +92,7 @@ class Side_of_triangle_soup {
  private:
   struct Intersection {
     FT distance;
-    Face_handle fh;
+    Face_index fh;
   };
 
   mutable std::vector<const Leaf*> leaves_;

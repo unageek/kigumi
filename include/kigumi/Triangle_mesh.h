@@ -2,7 +2,7 @@
 
 #include <CGAL/Bbox_3.h>
 #include <kigumi/Mesh_entities.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/Triangle_soup.h>
@@ -91,22 +91,22 @@ class Triangle_mesh {
 
   explicit Triangle_mesh(std::vector<Point> points) : points_{std::move(points)} {}
 
-  Vertex_handle add_vertex(const Point& p) {
+  Vertex_index add_vertex(const Point& p) {
     points_.push_back(p);
-    return {points_.size() - 1};
+    return Vertex_index{points_.size() - 1};
   }
 
-  Face_handle add_face(const Face& face) {
+  Face_index add_face(const Face& face) {
     faces_.push_back(face);
     face_data_.emplace_back();
-    return {faces_.size() - 1};
+    return Face_index{faces_.size() - 1};
   }
 
   void finalize() {
-    std::vector<std::pair<Vertex_handle, Face_handle>> map;
+    std::vector<std::pair<Vertex_index, Face_index>> map;
     std::size_t face_index{};
     for (const auto& face : faces_) {
-      Face_handle fh{face_index};
+      Face_index fh{face_index};
       map.emplace_back(face[0], fh);
       map.emplace_back(face[1], fh);
       map.emplace_back(face[2], fh);
@@ -120,7 +120,7 @@ class Triangle_mesh {
     for (const auto& [vh, fh] : map) {
       face_indices_.push_back(fh);
 
-      auto vi = static_cast<std::ptrdiff_t>(vh.i);
+      auto vi = static_cast<std::ptrdiff_t>(vh.idx());
       for (std::ptrdiff_t i = 0; i < vi - prev_vi; ++i) {
         indices_.push_back(index);
       }
@@ -134,28 +134,28 @@ class Triangle_mesh {
 
   std::size_t num_faces() const { return faces_.size(); }
 
-  Vertex_iterator vertices_begin() const { return Vertex_iterator({0}); }
+  Vertex_iterator vertices_begin() const { return Vertex_iterator(Vertex_index{0}); }
 
-  Vertex_iterator vertices_end() const { return Vertex_iterator({points_.size()}); }
+  Vertex_iterator vertices_end() const { return Vertex_iterator(Vertex_index{points_.size()}); }
 
   auto vertices() const { return boost::make_iterator_range(vertices_begin(), vertices_end()); }
 
-  Face_iterator faces_begin() const { return Face_iterator({0}); }
+  Face_iterator faces_begin() const { return Face_iterator(Face_index{0}); }
 
-  Face_iterator faces_end() const { return Face_iterator({faces_.size()}); }
+  Face_iterator faces_end() const { return Face_iterator(Face_index{faces_.size()}); }
 
   auto faces() const { return boost::make_iterator_range(faces_begin(), faces_end()); }
 
   auto faces_around_edge(const Edge& edge) const {
-    auto i_it = face_indices_.begin() + indices_.at(edge[0].i);
-    auto i_end = face_indices_.begin() + indices_.at(edge[0].i + 1);
-    auto j_it = face_indices_.begin() + indices_.at(edge[1].i);
-    auto j_end = face_indices_.begin() + indices_.at(edge[1].i + 1);
+    auto i_it = face_indices_.begin() + indices_.at(edge[0].idx());
+    auto i_end = face_indices_.begin() + indices_.at(edge[0].idx() + 1);
+    auto j_it = face_indices_.begin() + indices_.at(edge[1].idx());
+    auto j_end = face_indices_.begin() + indices_.at(edge[1].idx() + 1);
     return boost::make_iterator_range(Face_around_edge_iterator(i_it, i_end, j_it, j_end),
                                       Face_around_edge_iterator(i_end, i_end, j_end, j_end));
   }
 
-  auto faces_around_face(Face_handle fh, const std::unordered_set<Edge>& border_edges) const {
+  auto faces_around_face(Face_index fh, const std::unordered_set<Edge>& border_edges) const {
     const auto& f = face(fh);
     auto e1 = make_edge(f[0], f[1]);
     auto e2 = make_edge(f[1], f[2]);
@@ -171,15 +171,15 @@ class Triangle_mesh {
         Face_around_face_iterator(fh, end1, end1, end2, end2, end3, end3));
   }
 
-  Face_data& data(Face_handle handle) { return face_data_.at(handle.i); }
+  Face_data& data(Face_index handle) { return face_data_.at(handle.idx()); }
 
-  const Face_data& data(Face_handle handle) const { return face_data_.at(handle.i); }
+  const Face_data& data(Face_index handle) const { return face_data_.at(handle.idx()); }
 
-  const Face& face(Face_handle handle) const { return faces_.at(handle.i); }
+  const Face& face(Face_index handle) const { return faces_.at(handle.idx()); }
 
-  const Point& point(Vertex_handle handle) const { return points_.at(handle.i); }
+  const Point& point(Vertex_index handle) const { return points_.at(handle.idx()); }
 
-  Triangle triangle(Face_handle handle) const {
+  Triangle triangle(Face_index handle) const {
     const auto& f = face(handle);
     return {point(f[0]), point(f[1]), point(f[2])};
   }
@@ -195,7 +195,7 @@ class Triangle_mesh {
   std::vector<Face> faces_;
   std::vector<Face_data> face_data_;
   std::vector<std::size_t> indices_;
-  std::vector<Face_handle> face_indices_;
+  std::vector<Face_index> face_indices_;
 };
 
 }  // namespace kigumi

@@ -3,7 +3,7 @@
 #include <geogram/basic/common.h>
 #include <geogram/mesh/mesh.h>
 #include <geogram/mesh/mesh_surface_intersection.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangle_soup_io.h>
 
@@ -17,7 +17,7 @@
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Triangle_soup = kigumi::Triangle_soup<K>;
 using kigumi::read_triangle_soup;
-using kigumi::Vertex_handle;
+using kigumi::Vertex_index;
 using kigumi::write_triangle_soup;
 
 namespace {
@@ -37,7 +37,7 @@ bool read_mesh(const std::string& filename, GEO::Mesh& mesh) {
   }
   for (auto fh : soup.faces()) {
     const auto& f = soup.face(fh);
-    mesh.facets.create_triangle(f[0].i, f[1].i, f[2].i);
+    mesh.facets.create_triangle(f[0].idx(), f[1].idx(), f[2].idx());
   }
 
   return true;
@@ -56,7 +56,7 @@ bool write_mesh(const std::string& filename, const GEO::Mesh& mesh) {
     auto v1 = mesh.facets.vertex(i, 0);
     auto v2 = mesh.facets.vertex(i, 1);
     auto v3 = mesh.facets.vertex(i, 2);
-    soup.add_face({Vertex_handle{v1}, Vertex_handle{v2}, Vertex_handle{v3}});
+    soup.add_face({Vertex_index{v1}, Vertex_index{v2}, Vertex_index{v3}});
   }
 
   return write_triangle_soup(filename, soup);

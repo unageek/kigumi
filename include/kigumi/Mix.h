@@ -5,7 +5,7 @@
 #include <kigumi/Corefine.h>
 #include <kigumi/Find_border_edges.h>
 #include <kigumi/Mesh_entities.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Warnings.h>
@@ -41,7 +41,7 @@ class Mix {
       auto tag = corefine.get_left_triangles(fh, std::back_inserter(tris));
       for (const auto& tri : tris) {
         auto new_fh =
-            m.add_face({Vertex_handle{tri[0]}, Vertex_handle{tri[1]}, Vertex_handle{tri[2]}});
+            m.add_face({Vertex_index{tri[0]}, Vertex_index{tri[1]}, Vertex_index{tri[2]}});
         m.data(new_fh).from_left = true;
         m.data(new_fh).tag = tag;
         m.data(new_fh).data = left.data(fh);
@@ -53,7 +53,7 @@ class Mix {
       auto tag = corefine.get_right_triangles(fh, std::back_inserter(tris));
       for (const auto& tri : tris) {
         auto new_fh =
-            m.add_face({Vertex_handle{tri[0]}, Vertex_handle{tri[1]}, Vertex_handle{tri[2]}});
+            m.add_face({Vertex_index{tri[0]}, Vertex_index{tri[1]}, Vertex_index{tri[2]}});
         m.data(new_fh).from_left = false;
         m.data(new_fh).tag = tag;
         m.data(new_fh).data = right.data(fh);

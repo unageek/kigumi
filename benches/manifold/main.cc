@@ -1,6 +1,6 @@
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/number_utils.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangle_soup_io.h>
 #include <manifold.h>
@@ -14,7 +14,7 @@
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Triangle_soup = kigumi::Triangle_soup<K>;
 using kigumi::read_triangle_soup;
-using kigumi::Vertex_handle;
+using kigumi::Vertex_index;
 using kigumi::write_triangle_soup;
 
 namespace {
@@ -33,7 +33,7 @@ bool read_manifold(const std::string& filename, manifold::Manifold& manifold) {
   }
   for (auto fh : soup.faces()) {
     const auto& f = soup.face(fh);
-    mesh.triVerts.emplace_back(f[0].i, f[1].i, f[2].i);
+    mesh.triVerts.emplace_back(f[0].idx(), f[1].idx(), f[2].idx());
   }
 
   manifold = manifold::Manifold{mesh};
@@ -48,7 +48,7 @@ bool write_manifold(const std::string& filename, const manifold::Manifold& manif
     soup.add_vertex({p.x, p.y, p.z});
   }
   for (const auto& tri : mesh.triVerts) {
-    soup.add_face({Vertex_handle(tri.x), Vertex_handle(tri.y), Vertex_handle(tri.z)});
+    soup.add_face({Vertex_index(tri.x), Vertex_index(tri.y), Vertex_index(tri.z)});
   }
 
   return write_triangle_soup(filename, soup);

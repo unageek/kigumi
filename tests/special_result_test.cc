@@ -6,8 +6,8 @@
 #include "make_cube.h"
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
-using kigumi::Boolean_region_builder;
 using kigumi::Boolean_operator;
+using kigumi::Boolean_region_builder;
 
 auto mk_cube(double length, bool invert = false) {
   auto min = -length / 2.0;

@@ -6,7 +6,7 @@
 #include <kigumi/AABB_tree/AABB_leaf.h>
 #include <kigumi/AABB_tree/AABB_tree.h>
 #include <kigumi/Mesh_entities.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mesh_iterators.h>
 #include <kigumi/Null_data.h>
 #include <kigumi/io.h>
@@ -34,12 +34,12 @@ class Triangle_soup {
     using Bbox = CGAL::Bbox_3;
 
    public:
-    Leaf(const Bbox& bbox, Face_handle fh) : AABB_leaf{bbox}, fh_{fh} {}
+    Leaf(const Bbox& bbox, Face_index fh) : AABB_leaf{bbox}, fh_{fh} {}
 
-    Face_handle face_handle() const { return fh_; }
+    Face_index face_index() const { return fh_; }
 
    private:
-    Face_handle fh_;
+    Face_index fh_;
   };
 
   Triangle_soup() = default;
@@ -76,42 +76,42 @@ class Triangle_soup {
   Triangle_soup(std::vector<Point> points, std::vector<Face> faces, std::vector<FaceData> face_data)
       : points_{std::move(points)}, faces_{std::move(faces)}, face_data_{std::move(face_data)} {}
 
-  Vertex_handle add_vertex(const Point& p) {
+  Vertex_index add_vertex(const Point& p) {
     points_.push_back(p);
-    return {points_.size() - 1};
+    return Vertex_index{points_.size() - 1};
   }
 
-  Face_handle add_face(const Face& face) {
+  Face_index add_face(const Face& face) {
     faces_.push_back(face);
     face_data_.emplace_back();
-    return {faces_.size() - 1};
+    return Face_index{faces_.size() - 1};
   }
 
   std::size_t num_vertices() const { return points_.size(); }
 
   std::size_t num_faces() const { return faces_.size(); }
 
-  Vertex_iterator vertices_begin() const { return Vertex_iterator({0}); }
+  Vertex_iterator vertices_begin() const { return Vertex_iterator(Vertex_index{0}); }
 
-  Vertex_iterator vertices_end() const { return Vertex_iterator({points_.size()}); }
+  Vertex_iterator vertices_end() const { return Vertex_iterator(Vertex_index{points_.size()}); }
 
   auto vertices() const { return boost::make_iterator_range(vertices_begin(), vertices_end()); }
 
-  Face_iterator faces_begin() const { return Face_iterator({0}); }
+  Face_iterator faces_begin() const { return Face_iterator(Face_index{0}); }
 
-  Face_iterator faces_end() const { return Face_iterator({faces_.size()}); }
+  Face_iterator faces_end() const { return Face_iterator(Face_index{faces_.size()}); }
 
   auto faces() const { return boost::make_iterator_range(faces_begin(), faces_end()); }
 
-  Face_data& data(Face_handle handle) { return face_data_.at(handle.i); }
+  Face_data& data(Face_index handle) { return face_data_.at(handle.idx()); }
 
-  const Face_data& data(Face_handle handle) const { return face_data_.at(handle.i); }
+  const Face_data& data(Face_index handle) const { return face_data_.at(handle.idx()); }
 
-  const Face& face(Face_handle handle) const { return faces_.at(handle.i); }
+  const Face& face(Face_index handle) const { return faces_.at(handle.idx()); }
 
-  const Point& point(Vertex_handle handle) const { return points_.at(handle.i); }
+  const Point& point(Vertex_index handle) const { return points_.at(handle.idx()); }
 
-  Triangle triangle(Face_handle handle) const {
+  Triangle triangle(Face_index handle) const {
     const auto& f = face(handle);
     return {point(f[0]), point(f[1]), point(f[2])};
   }
@@ -146,8 +146,8 @@ struct Write<Triangle_soup<K, FaceData>> {
     kigumi_write<std::int32_t>(out, t.num_vertices());
     kigumi_write<std::int32_t>(out, t.num_faces());
 
-    for (std::size_t i = 0; i < t.num_vertices(); ++i) {
-      const auto& p = t.point({i});
+    for (auto vh : t.vertices()) {
+      const auto& p = t.point(vh);
 
       if (p.approx().x().is_point() && p.approx().y().is_point() && p.approx().z().is_point()) {
         kigumi_write<bool>(out, false);
@@ -165,9 +165,9 @@ struct Write<Triangle_soup<K, FaceData>> {
     for (const auto& fh : t.faces()) {
       const auto& f = t.face(fh);
       const auto& f_data = t.data(fh);
-      kigumi_write<Vertex_handle>(out, f[0]);
-      kigumi_write<Vertex_handle>(out, f[1]);
-      kigumi_write<Vertex_handle>(out, f[2]);
+      kigumi_write<Vertex_index>(out, f[0]);
+      kigumi_write<Vertex_index>(out, f[1]);
+      kigumi_write<Vertex_index>(out, f[2]);
       kigumi_write<FaceData>(out, f_data);
     }
   }
@@ -209,9 +209,9 @@ struct Read<Triangle_soup<K, FaceData>> {
     for (std::size_t i = 0; i < num_faces; ++i) {
       Face face{};
       FaceData f_data{};
-      kigumi_read<Vertex_handle>(in, face[0]);
-      kigumi_read<Vertex_handle>(in, face[1]);
-      kigumi_read<Vertex_handle>(in, face[2]);
+      kigumi_read<Vertex_index>(in, face[0]);
+      kigumi_read<Vertex_index>(in, face[1]);
+      kigumi_read<Vertex_index>(in, face[2]);
       kigumi_read<FaceData>(in, f_data);
       auto fh = t.add_face(face);
       t.data(fh) = f_data;

@@ -3,7 +3,7 @@
 #include <CGAL/enum.h>
 #include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_entities.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Propagate_face_tags.h>
 #include <kigumi/Side_of_triangle_soup.h>
@@ -55,11 +55,11 @@ class Classify_faces_globally {
   }
 
  private:
-  static std::vector<Face_handle> find_unclassified_connected_components(
+  static std::vector<Face_index> find_unclassified_connected_components(
       const Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges) {
-    std::vector<Face_handle> representative_faces;
+    std::vector<Face_index> representative_faces;
     std::vector<bool> visited(m.num_faces(), false);
-    std::queue<Face_handle> queue;
+    std::queue<Face_index> queue;
 
     auto begin = m.faces_begin();
     auto end = m.faces_end();
@@ -67,11 +67,11 @@ class Classify_faces_globally {
     while (true) {
       for (auto it = begin; it != end; ++it) {
         auto fh = *it;
-        if (visited.at(fh.i)) {
+        if (visited.at(fh.idx())) {
           continue;
         }
 
-        visited.at(fh.i) = true;
+        visited.at(fh.idx()) = true;
         if (m.data(fh).tag == Face_tag::UNKNOWN) {
           queue.push(fh);
           representative_faces.push_back(fh);
@@ -89,11 +89,11 @@ class Classify_faces_globally {
         queue.pop();
 
         for (auto adj_fh : m.faces_around_face(fh, border_edges)) {
-          if (visited.at(adj_fh.i)) {
+          if (visited.at(adj_fh.idx())) {
             continue;
           }
 
-          visited.at(adj_fh.i) = true;
+          visited.at(adj_fh.idx()) = true;
           queue.push(adj_fh);
         }
       }

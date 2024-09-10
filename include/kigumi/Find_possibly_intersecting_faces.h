@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kigumi/Face_tag.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/mesh_utility.h>
 #include <kigumi/parallel_do.h>
@@ -14,15 +14,15 @@ namespace kigumi {
 
 template <class K, class FaceData>
 class Find_possibly_intersecting_faces {
-  using Face_handle_pair = std::pair<Face_handle, Face_handle>;
+  using Face_index_pair = std::pair<Face_index, Face_index>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
   using Leaf = typename Triangle_soup::Leaf;
 
  public:
-  std::vector<Face_handle_pair> operator()(const Triangle_soup& left, const Triangle_soup& right,
-                                           const std::vector<Face_tag>& left_face_tags,
-                                           const std::vector<Face_tag>& right_face_tags) const {
-    std::vector<Face_handle_pair> pairs;
+  std::vector<Face_index_pair> operator()(const Triangle_soup& left, const Triangle_soup& right,
+                                          const std::vector<Face_tag>& left_face_tags,
+                                          const std::vector<Face_tag>& right_face_tags) const {
+    std::vector<Face_index_pair> pairs;
 
     auto left_is_a = left.num_faces() < right.num_faces();
     const auto& a = left_is_a ? left : right;
@@ -32,11 +32,11 @@ class Find_possibly_intersecting_faces {
     const auto& a_tree = a.aabb_tree();
 
     parallel_do(
-        b.faces_begin(), b.faces_end(), std::vector<Face_handle_pair>{},
+        b.faces_begin(), b.faces_end(), std::vector<Face_index_pair>{},
         [&](auto b_fh, auto& local_pairs) {
           thread_local std::vector<const Leaf*> leaves;
 
-          if (b_face_tags.at(b_fh.i) != Face_tag::UNKNOWN) {
+          if (b_face_tags.at(b_fh.idx()) != Face_tag::UNKNOWN) {
             return;
           }
 
@@ -44,8 +44,8 @@ class Find_possibly_intersecting_faces {
           a_tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(b, b_fh));
 
           for (const auto* leaf : leaves) {
-            auto a_fh = leaf->face_handle();
-            if (a_face_tags.at(a_fh.i) != Face_tag::UNKNOWN) {
+            auto a_fh = leaf->face_index();
+            if (a_face_tags.at(a_fh.idx()) != Face_tag::UNKNOWN) {
               continue;
             }
 

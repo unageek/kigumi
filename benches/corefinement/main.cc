@@ -3,7 +3,7 @@
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/boost/graph/graph_traits_Surface_mesh.h>
 #include <CGAL/boost/graph/iterator.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangle_soup_io.h>
 
@@ -20,7 +20,7 @@ using Surface_mesh = CGAL::Surface_mesh<K::Point_3>;
 using SM_Vertex_index = Surface_mesh::Vertex_index;
 using Triangle_soup = kigumi::Triangle_soup<K>;
 using kigumi::read_triangle_soup;
-using kigumi::Vertex_handle;
+using kigumi::Vertex_index;
 using kigumi::write_triangle_soup;
 
 namespace {
@@ -38,9 +38,9 @@ bool read_surface_mesh(const std::string& filename, Surface_mesh& mesh) {
   }
   for (auto fh : soup.faces()) {
     const auto& f = soup.face(fh);
-    auto v1 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[0].i)};
-    auto v2 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[1].i)};
-    auto v3 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[2].i)};
+    auto v1 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[0].idx())};
+    auto v2 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[1].idx())};
+    auto v3 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[2].idx())};
     mesh.add_face(v1, v2, v3);
   }
 
@@ -54,10 +54,10 @@ bool write_surface_mesh(const std::string& filename, const Surface_mesh& mesh) {
     soup.add_vertex(p);
   }
   for (auto f : mesh.faces()) {
-    std::array<Vertex_handle, 3> face;
+    std::array<Vertex_index, 3> face;
     auto* it = face.begin();
     for (auto v : CGAL::vertices_around_face(CGAL::halfedge(f, mesh), mesh)) {
-      *it++ = Vertex_handle{v};
+      *it++ = Vertex_index{v};
     }
     soup.add_face({face});
   }

@@ -5,7 +5,7 @@
 #include <CGAL/number_utils.h>
 #include <kigumi/Face_tag.h>
 #include <kigumi/Mesh_entities.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Propagate_face_tags.h>
 #include <kigumi/Warnings.h>
@@ -184,13 +184,13 @@ class Classify_faces_locally {
 
  private:
   struct Face_around_edge {
-    Face_handle fh;
-    Vertex_handle vh_r;
+    Face_index fh;
+    Vertex_index vh_r;
     Vector_2 r;
     int radial_bin;
     CGAL::Orientation orientation;
 
-    Face_around_edge(Face_handle fh, Vertex_handle vh_r, Vector_2 r, CGAL::Orientation orientation)
+    Face_around_edge(Face_index fh, Vertex_index vh_r, Vector_2 r, CGAL::Orientation orientation)
         : fh{fh},
           vh_r{vh_r},
           r{std::move(r)},

@@ -2,7 +2,7 @@
 
 #include <CGAL/number_utils.h>
 #include <kigumi/Context.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/io/ascii.h>
 
@@ -40,7 +40,7 @@ bool read_obj(std::istream& is, Triangle_soup<K, FaceData>& soup) {
 
   std::string line;
   std::string s;
-  std::vector<Vertex_handle> face;
+  std::vector<Vertex_index> face;
 
   while (std::getline(is, line)) {
     std::istringstream iss{line};
@@ -65,9 +65,9 @@ bool read_obj(std::istream& is, Triangle_soup<K, FaceData>& soup) {
       std::ptrdiff_t v{};
       while (iss >> v) {
         if (v > 0) {
-          face.push_back(Vertex_handle{static_cast<std::size_t>(v) - 1});
+          face.push_back(Vertex_index{static_cast<std::size_t>(v) - 1});
         } else if (v < 0) {
-          face.push_back(Vertex_handle{new_soup.num_vertices() + v});
+          face.push_back(Vertex_index{new_soup.num_vertices() + v});
         } else {
           std::cerr << "invalid face line: " << line << std::endl;
           return false;
@@ -122,11 +122,11 @@ bool write_obj(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
     const auto& f = soup.face(fh);
     if (Write_obj_context::current().negative_indices()) {
       auto nv = soup.num_vertices();
-      os << "f " << -static_cast<std::ptrdiff_t>(nv - f[0].i) << ' '
-         << -static_cast<std::ptrdiff_t>(nv - f[1].i) << ' '
-         << -static_cast<std::ptrdiff_t>(nv - f[2].i) << '\n';
+      os << "f " << -static_cast<std::ptrdiff_t>(nv - f[0].idx()) << ' '
+         << -static_cast<std::ptrdiff_t>(nv - f[1].idx()) << ' '
+         << -static_cast<std::ptrdiff_t>(nv - f[2].idx()) << '\n';
     } else {
-      os << "f " << f[0].i + 1 << ' ' << f[1].i + 1 << ' ' << f[2].i + 1 << '\n';
+      os << "f " << f[0].idx() + 1 << ' ' << f[1].idx() + 1 << ' ' << f[2].idx() + 1 << '\n';
     }
   }
 

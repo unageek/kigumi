@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CGAL/number_utils.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/io/ascii.h>
 
@@ -189,7 +189,7 @@ bool read_ply(std::istream& is, Triangle_soup<K, FaceData>& soup) {
   }
 
   Triangle_soup new_soup;
-  std::vector<Vertex_handle> face;
+  std::vector<Vertex_index> face;
 
   // Read body.
   auto element_it = elements.begin();
@@ -240,7 +240,7 @@ bool read_ply(std::istream& is, Triangle_soup<K, FaceData>& soup) {
           for (std::size_t i = 0; i < count; ++i) {
             std::size_t v{};
             iss >> v;
-            face.push_back(Vertex_handle{v});
+            face.push_back(Vertex_index{v});
           }
         } else if (it->type == "list") {
           std::size_t count{};
@@ -318,7 +318,7 @@ bool write_ply(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
 
   for (auto fh : soup.faces()) {
     const auto& f = soup.face(fh);
-    os << "3 " << f[0].i << ' ' << f[1].i << ' ' << f[2].i << '\n';
+    os << "3 " << f[0].idx() << ' ' << f[1].idx() << ' ' << f[2].idx() << '\n';
   }
 
   return os.good();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kigumi/Face_tag.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_soup.h>
 
 #include <algorithm>
@@ -35,7 +35,7 @@ class Find_coplanar_faces {
     auto& a_face_tags = left_is_a ? left_face_tags : right_face_tags;
     auto& b_face_tags = left_is_a ? right_face_tags : left_face_tags;
 
-    std::unordered_map<Triangle, Face_handle, Triangle_hash> triangle_to_fh;
+    std::unordered_map<Triangle, Face_index, Triangle_hash> triangle_to_fh;
 
     triangle_to_fh.reserve(a.num_faces());
     for (auto fh : a.faces()) {
@@ -48,15 +48,15 @@ class Find_coplanar_faces {
 
       auto it = triangle_to_fh.find(tri);
       if (it != triangle_to_fh.end()) {
-        a_face_tags.at(it->second.i) = Face_tag::COPLANAR;
-        b_face_tags.at(fh.i) = Face_tag::COPLANAR;
+        a_face_tags.at(it->second.idx()) = Face_tag::COPLANAR;
+        b_face_tags.at(fh.idx()) = Face_tag::COPLANAR;
         continue;
       }
 
       it = triangle_to_fh.find(opposite(tri));
       if (it != triangle_to_fh.end()) {
-        a_face_tags.at(it->second.i) = Face_tag::OPPOSITE;
-        b_face_tags.at(fh.i) = Face_tag::OPPOSITE;
+        a_face_tags.at(it->second.idx()) = Face_tag::OPPOSITE;
+        b_face_tags.at(fh.idx()) = Face_tag::OPPOSITE;
       }
     }
 
@@ -64,13 +64,13 @@ class Find_coplanar_faces {
   }
 
  private:
-  static Triangle triangle(const Triangle_soup& m, Face_handle fh,
+  static Triangle triangle(const Triangle_soup& m, Face_index fh,
                            const std::vector<std::size_t>& points) {
     auto face = m.face(fh);
     Triangle triangle{
-        points.at(face[0].i),
-        points.at(face[1].i),
-        points.at(face[2].i),
+        points.at(face[0].idx()),
+        points.at(face[1].idx()),
+        points.at(face[2].idx()),
     };
     std::rotate(triangle.begin(), std::min_element(triangle.begin(), triangle.end()),
                 triangle.end());

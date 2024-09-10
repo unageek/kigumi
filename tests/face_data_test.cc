@@ -16,8 +16,8 @@ struct Face_data {
   int i{};
 };
 using M = kigumi::Region<K, Face_data>;
-using kigumi::Boolean_region_builder;
 using kigumi::Boolean_operator;
+using kigumi::Boolean_region_builder;
 
 namespace {
 

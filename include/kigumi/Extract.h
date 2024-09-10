@@ -2,7 +2,7 @@
 
 #include <kigumi/Boolean_operator.h>
 #include <kigumi/Face_tag.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Mixed.h>
 #include <kigumi/Triangle_soup.h>
 
@@ -17,9 +17,10 @@ class Extract {
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
  public:
-  Triangle_soup operator()(const Mixed_triangle_soup& m, Boolean_operator op, bool prefer_first) const {
+  Triangle_soup operator()(const Mixed_triangle_soup& m, Boolean_operator op,
+                           bool prefer_first) const {
     Triangle_soup soup;
-    std::vector<Vertex_handle> map(m.num_vertices());
+    std::vector<Vertex_index> map(m.num_vertices());
 
     auto u_mask = union_mask(op);
     auto i_mask = intersection_mask(op);
@@ -58,8 +59,8 @@ class Extract {
       Face new_f;
       for (std::size_t i = 0; i < 3; ++i) {
         auto vh = f.at(i);
-        auto& new_vh = map.at(vh.i);
-        if (new_vh == Vertex_handle{}) {
+        auto& new_vh = map.at(vh.idx());
+        if (new_vh == Vertex_index{}) {
           const auto& p = m.point(vh);
           new_vh = soup.add_vertex(p);
         }

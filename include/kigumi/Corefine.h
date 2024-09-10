@@ -5,7 +5,7 @@
 #include <kigumi/Find_coplanar_faces.h>
 #include <kigumi/Find_possibly_intersecting_faces.h>
 #include <kigumi/Intersection_point_inserter.h>
-#include <kigumi/Mesh_handles.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Point_list.h>
 #include <kigumi/Triangle_region.h>
 #include <kigumi/Triangle_soup.h>
@@ -68,12 +68,12 @@ class Corefine {
           auto [left_fh, right_fh] = pair;
           const auto& left_face = left_.face(left_fh);
           const auto& right_face = right_.face(right_fh);
-          auto a = left_point_ids_.at(left_face[0].i);
-          auto b = left_point_ids_.at(left_face[1].i);
-          auto c = left_point_ids_.at(left_face[2].i);
-          auto p = right_point_ids_.at(right_face[0].i);
-          auto q = right_point_ids_.at(right_face[1].i);
-          auto r = right_point_ids_.at(right_face[2].i);
+          auto a = left_point_ids_.at(left_face[0].idx());
+          auto b = left_point_ids_.at(left_face[1].idx());
+          auto c = left_point_ids_.at(left_face[2].idx());
+          auto p = right_point_ids_.at(right_face[0].idx());
+          auto q = right_point_ids_.at(right_face[1].idx());
+          auto r = right_point_ids_.at(right_face[2].idx());
           auto sym_inters = face_face_intersection(a, b, c, p, q, r);
           if (sym_inters.empty()) {
             return;
@@ -101,12 +101,12 @@ class Corefine {
     for (auto& info : infos) {
       const auto& left_face = left_.face(info.left_fh);
       const auto& right_face = right_.face(info.right_fh);
-      auto a = left_point_ids_.at(left_face[0].i);
-      auto b = left_point_ids_.at(left_face[1].i);
-      auto c = left_point_ids_.at(left_face[2].i);
-      auto p = right_point_ids_.at(right_face[0].i);
-      auto q = right_point_ids_.at(right_face[1].i);
-      auto r = right_point_ids_.at(right_face[2].i);
+      auto a = left_point_ids_.at(left_face[0].idx());
+      auto b = left_point_ids_.at(left_face[1].idx());
+      auto c = left_point_ids_.at(left_face[2].idx());
+      auto p = right_point_ids_.at(right_face[0].idx());
+      auto q = right_point_ids_.at(right_face[1].idx());
+      auto r = right_point_ids_.at(right_face[2].idx());
       for (auto sym_inter : info.symbolic_intersections) {
         auto left_region = intersection(sym_inter, Triangle_region::LEFT_FACE);
         auto right_region = intersection(sym_inter, Triangle_region::RIGHT_FACE);
@@ -131,9 +131,9 @@ class Corefine {
       while (first != infos.end()) {
         auto fh = first->left_fh;
         const auto& f = left_.face(fh);
-        auto a = left_point_ids_.at(f[0].i);
-        auto b = left_point_ids_.at(f[1].i);
-        auto c = left_point_ids_.at(f[2].i);
+        auto a = left_point_ids_.at(f[0].idx());
+        auto b = left_point_ids_.at(f[1].idx());
+        auto c = left_point_ids_.at(f[2].idx());
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
@@ -169,9 +169,9 @@ class Corefine {
       while (first != infos.end()) {
         auto fh = first->right_fh;
         const auto& f = right_.face(fh);
-        auto a = right_point_ids_.at(f[0].i);
-        auto b = right_point_ids_.at(f[1].i);
-        auto c = right_point_ids_.at(f[2].i);
+        auto a = right_point_ids_.at(f[0].idx());
+        auto b = right_point_ids_.at(f[1].idx());
+        auto c = right_point_ids_.at(f[2].idx());
         const auto& pa = points_.at(a);
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
@@ -198,37 +198,37 @@ class Corefine {
   }
 
   template <class OutputIterator>
-  Face_tag get_left_triangles(Face_handle fh, OutputIterator tris) const {
+  Face_tag get_left_triangles(Face_index fh, OutputIterator tris) const {
     get_triangles(left_, fh, left_triangulations_, left_point_ids_, tris);
-    return left_face_tags_.at(fh.i);
+    return left_face_tags_.at(fh.idx());
   }
 
   template <class OutputIterator>
-  Face_tag get_right_triangles(Face_handle fh, OutputIterator tris) const {
+  Face_tag get_right_triangles(Face_index fh, OutputIterator tris) const {
     get_triangles(right_, fh, right_triangulations_, right_point_ids_, tris);
-    return right_face_tags_.at(fh.i);
+    return right_face_tags_.at(fh.idx());
   }
 
   std::vector<Point> take_points() { return points_.take_points(); }
 
  private:
   struct Intersection_info {
-    Face_handle left_fh;
-    Face_handle right_fh;
+    Face_index left_fh;
+    Face_index right_fh;
     boost::container::static_vector<Triangle_region, 6> symbolic_intersections;
     boost::container::static_vector<std::size_t, 6> intersections;
   };
 
   template <class OutputIterator>
-  void get_triangles(const Triangle_soup& soup, Face_handle fh,
-                     const std::unordered_map<Face_handle, Triangulation>& triangulations,
+  void get_triangles(const Triangle_soup& soup, Face_index fh,
+                     const std::unordered_map<Face_index, Triangulation>& triangulations,
                      const std::vector<std::size_t>& point_ids, OutputIterator tris) const {
     auto it = triangulations.find(fh);
     if (it == triangulations.end()) {
       const auto& f = soup.face(fh);
-      auto a = point_ids.at(f[0].i);
-      auto b = point_ids.at(f[1].i);
-      auto c = point_ids.at(f[2].i);
+      auto a = point_ids.at(f[0].idx());
+      auto b = point_ids.at(f[1].idx());
+      auto c = point_ids.at(f[2].idx());
       *tris++ = {a, b, c};
     } else {
       it->second.get_triangles(tris);
@@ -257,9 +257,9 @@ class Corefine {
   }
 
   const Triangle_soup& left_;
-  std::unordered_map<Face_handle, Triangulation> left_triangulations_;
+  std::unordered_map<Face_index, Triangulation> left_triangulations_;
   const Triangle_soup& right_;
-  std::unordered_map<Face_handle, Triangulation> right_triangulations_;
+  std::unordered_map<Face_index, Triangulation> right_triangulations_;
   Point_list points_;
   std::vector<std::size_t> left_point_ids_;
   std::vector<std::size_t> right_point_ids_;
