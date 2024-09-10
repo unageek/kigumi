@@ -32,12 +32,12 @@ bool read_surface_mesh(const std::string& filename, Surface_mesh& mesh) {
   }
 
   mesh.clear();
-  for (auto vh : soup.vertices()) {
-    const auto& p = soup.point(vh);
+  for (auto vi : soup.vertices()) {
+    const auto& p = soup.point(vi);
     mesh.add_vertex(p);
   }
-  for (auto fh : soup.faces()) {
-    const auto& f = soup.face(fh);
+  for (auto fi : soup.faces()) {
+    const auto& f = soup.face(fi);
     auto v1 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[0].idx())};
     auto v2 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[1].idx())};
     auto v3 = SM_Vertex_index{static_cast<Surface_mesh::size_type>(f[2].idx())};

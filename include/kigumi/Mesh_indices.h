@@ -82,10 +82,10 @@ struct Read<Vertex_index> {
 
 template <>
 struct std::hash<kigumi::Face_index> {
-  std::size_t operator()(kigumi::Face_index fh) const noexcept { return fh.idx(); }
+  std::size_t operator()(kigumi::Face_index fi) const noexcept { return fi.idx(); }
 };
 
 template <>
 struct std::hash<kigumi::Vertex_index> {
-  std::size_t operator()(kigumi::Vertex_index vh) const noexcept { return vh.idx(); }
+  std::size_t operator()(kigumi::Vertex_index vi) const noexcept { return vi.idx(); }
 };

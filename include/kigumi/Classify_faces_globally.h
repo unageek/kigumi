@@ -34,20 +34,20 @@ class Classify_faces_globally {
 
     parallel_do(
         representative_faces.begin(), representative_faces.end(), Warnings{},
-        [&](auto fh_src, auto& local_warnings) {
+        [&](auto fi_src, auto& local_warnings) {
           thread_local Propagate_face_tags propagate_face_tags;
           thread_local Side_of_triangle_soup side_of_triangle_soup;
 
-          auto& f_src = m.data(fh_src);
+          auto& f_src = m.data(fi_src);
           const auto& soup_trg = f_src.from_left ? right : left;
-          auto p_src = internal::face_centroid(m, fh_src);
+          auto p_src = internal::face_centroid(m, fi_src);
           auto side = side_of_triangle_soup(soup_trg, p_src);
           if (side == CGAL::ON_ORIENTED_BOUNDARY) {
             throw std::runtime_error(
                 "local classification must be performed before global classification");
           }
           f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::EXTERIOR : Face_tag::INTERIOR;
-          local_warnings |= propagate_face_tags(m, border_edges, fh_src);
+          local_warnings |= propagate_face_tags(m, border_edges, fi_src);
         },
         [&](const auto& local_warnings) { warnings |= local_warnings; });
 
@@ -66,15 +66,15 @@ class Classify_faces_globally {
 
     while (true) {
       for (auto it = begin; it != end; ++it) {
-        auto fh = *it;
-        if (visited.at(fh.idx())) {
+        auto fi = *it;
+        if (visited.at(fi.idx())) {
           continue;
         }
 
-        visited.at(fh.idx()) = true;
-        if (m.data(fh).tag == Face_tag::UNKNOWN) {
-          queue.push(fh);
-          representative_faces.push_back(fh);
+        visited.at(fi.idx()) = true;
+        if (m.data(fi).tag == Face_tag::UNKNOWN) {
+          queue.push(fi);
+          representative_faces.push_back(fi);
           begin = ++it;
           break;
         }
@@ -85,16 +85,16 @@ class Classify_faces_globally {
       }
 
       while (!queue.empty()) {
-        auto fh = queue.front();
+        auto fi = queue.front();
         queue.pop();
 
-        for (auto adj_fh : m.faces_around_face(fh, border_edges)) {
-          if (visited.at(adj_fh.idx())) {
+        for (auto adj_fi : m.faces_around_face(fi, border_edges)) {
+          if (visited.at(adj_fi.idx())) {
             continue;
           }
 
-          visited.at(adj_fh.idx()) = true;
-          queue.push(adj_fh);
+          visited.at(adj_fi.idx()) = true;
+          queue.push(adj_fi);
         }
       }
     }

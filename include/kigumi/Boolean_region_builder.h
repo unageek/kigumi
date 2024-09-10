@@ -39,16 +39,16 @@ class Boolean_region_builder {
       std::vector<Point> points;
       points.reserve(a.boundary_.num_vertices() + b.boundary_.num_vertices());
       std::transform(a.boundary_.vertices_begin(), a.boundary_.vertices_end(),
-                     std::back_inserter(points), [&](auto vh) { return a.boundary_.point(vh); });
+                     std::back_inserter(points), [&](auto vi) { return a.boundary_.point(vi); });
       std::transform(b.boundary_.vertices_begin(), b.boundary_.vertices_end(),
-                     std::back_inserter(points), [&](auto vh) { return b.boundary_.point(vh); });
+                     std::back_inserter(points), [&](auto vi) { return b.boundary_.point(vi); });
 
       std::vector<Face> faces;
       faces.reserve(a.boundary_.num_faces() + b.boundary_.num_faces());
       std::transform(a.boundary_.faces_begin(), a.boundary_.faces_end(), std::back_inserter(faces),
-                     [&](auto fh) { return a.boundary_.face(fh); });
+                     [&](auto fi) { return a.boundary_.face(fi); });
       std::transform(b.boundary_.faces_begin(), b.boundary_.faces_end(), std::back_inserter(faces),
-                     [&](auto fh) { return b.boundary_.face(fh); });
+                     [&](auto fi) { return b.boundary_.face(fi); });
 
       // std::tie is used since structured bindings cannot be captured by lambda expressions.
       Face_tag first_tag{};
@@ -60,12 +60,12 @@ class Boolean_region_builder {
       std::vector<Mixed_face_data> face_data;
       face_data.reserve(faces.size());
       std::transform(a.boundary_.faces_begin(), a.boundary_.faces_end(),
-                     std::back_inserter(face_data), [&, first_tag](auto fh) -> Mixed_face_data {
-                       return {.from_left = true, .tag = first_tag, .data = a.boundary_.data(fh)};
+                     std::back_inserter(face_data), [&, first_tag](auto fi) -> Mixed_face_data {
+                       return {.from_left = true, .tag = first_tag, .data = a.boundary_.data(fi)};
                      });
       std::transform(b.boundary_.faces_begin(), b.boundary_.faces_end(),
-                     std::back_inserter(face_data), [&, second_tag](auto fh) -> Mixed_face_data {
-                       return {.from_left = false, .tag = second_tag, .data = b.boundary_.data(fh)};
+                     std::back_inserter(face_data), [&, second_tag](auto fi) -> Mixed_face_data {
+                       return {.from_left = false, .tag = second_tag, .data = b.boundary_.data(fi)};
                      });
 
       m_ = {std::move(points), std::move(faces), std::move(face_data)};
@@ -114,12 +114,12 @@ class Boolean_region_builder {
 
     if (op == Boolean_operator::E || op == Boolean_operator::J) {
       if (std::all_of(m_.faces_begin(), m_.faces_end(),
-                      [&](auto fh) { return m_.data(fh).tag == Face_tag::COPLANAR; })) {
+                      [&](auto fi) { return m_.data(fi).tag == Face_tag::COPLANAR; })) {
         return apply(op, false, false) ? Region::full() : Region::empty();
       }
 
       if (std::all_of(m_.faces_begin(), m_.faces_end(),
-                      [&](auto fh) { return m_.data(fh).tag == Face_tag::OPPOSITE; })) {
+                      [&](auto fi) { return m_.data(fi).tag == Face_tag::OPPOSITE; })) {
         return apply(op, false, true) ? Region::full() : Region::empty();
       }
     }

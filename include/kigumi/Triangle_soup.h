@@ -34,12 +34,12 @@ class Triangle_soup {
     using Bbox = CGAL::Bbox_3;
 
    public:
-    Leaf(const Bbox& bbox, Face_index fh) : AABB_leaf{bbox}, fh_{fh} {}
+    Leaf(const Bbox& bbox, Face_index fi) : AABB_leaf{bbox}, fi_{fi} {}
 
-    Face_index face_index() const { return fh_; }
+    Face_index face_index() const { return fi_; }
 
    private:
-    Face_index fh_;
+    Face_index fi_;
   };
 
   Triangle_soup() = default;
@@ -103,16 +103,16 @@ class Triangle_soup {
 
   auto faces() const { return boost::make_iterator_range(faces_begin(), faces_end()); }
 
-  Face_data& data(Face_index handle) { return face_data_.at(handle.idx()); }
+  Face_data& data(Face_index fi) { return face_data_.at(fi.idx()); }
 
-  const Face_data& data(Face_index handle) const { return face_data_.at(handle.idx()); }
+  const Face_data& data(Face_index fi) const { return face_data_.at(fi.idx()); }
 
-  const Face& face(Face_index handle) const { return faces_.at(handle.idx()); }
+  const Face& face(Face_index fi) const { return faces_.at(fi.idx()); }
 
-  const Point& point(Vertex_index handle) const { return points_.at(handle.idx()); }
+  const Point& point(Vertex_index vi) const { return points_.at(vi.idx()); }
 
-  Triangle triangle(Face_index handle) const {
-    const auto& f = face(handle);
+  Triangle triangle(Face_index fi) const {
+    const auto& f = face(fi);
     return {point(f[0]), point(f[1]), point(f[2])};
   }
 
@@ -123,8 +123,8 @@ class Triangle_soup {
 
     if (!aabb_tree_) {
       std::vector<Leaf> leaves;
-      for (auto fh : faces()) {
-        leaves.emplace_back(internal::face_bbox(*this, fh), fh);
+      for (auto fi : faces()) {
+        leaves.emplace_back(internal::face_bbox(*this, fi), fi);
       }
       aabb_tree_ = std::make_unique<AABB_tree<Leaf>>(std::move(leaves));
     }
@@ -146,8 +146,8 @@ struct Write<Triangle_soup<K, FaceData>> {
     kigumi_write<std::int32_t>(out, t.num_vertices());
     kigumi_write<std::int32_t>(out, t.num_faces());
 
-    for (auto vh : t.vertices()) {
-      const auto& p = t.point(vh);
+    for (auto vi : t.vertices()) {
+      const auto& p = t.point(vi);
 
       if (p.approx().x().is_point() && p.approx().y().is_point() && p.approx().z().is_point()) {
         kigumi_write<bool>(out, false);
@@ -162,9 +162,9 @@ struct Write<Triangle_soup<K, FaceData>> {
       }
     }
 
-    for (const auto& fh : t.faces()) {
-      const auto& f = t.face(fh);
-      const auto& f_data = t.data(fh);
+    for (const auto& fi : t.faces()) {
+      const auto& f = t.face(fi);
+      const auto& f_data = t.data(fi);
       kigumi_write<Vertex_index>(out, f[0]);
       kigumi_write<Vertex_index>(out, f[1]);
       kigumi_write<Vertex_index>(out, f[2]);
@@ -213,8 +213,8 @@ struct Read<Triangle_soup<K, FaceData>> {
       kigumi_read<Vertex_index>(in, face[1]);
       kigumi_read<Vertex_index>(in, face[2]);
       kigumi_read<FaceData>(in, f_data);
-      auto fh = t.add_face(face);
-      t.data(fh) = f_data;
+      auto fi = t.add_face(face);
+      t.data(fi) = f_data;
     }
   }
 };

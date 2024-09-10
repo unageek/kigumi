@@ -117,8 +117,8 @@ bool is_normal(const M& m) {
   }
 
   Triangle t{Point{0, 0, 0}, Point{1, 0, 0}, Point{0, 1, 0}};
-  for (auto fh : soup.faces()) {
-    return soup.triangle(fh) == t;
+  for (auto fi : soup.faces()) {
+    return soup.triangle(fi) == t;
   }
 
   return false;
@@ -131,8 +131,8 @@ bool is_inverse(const M& m) {
   }
 
   Triangle t{Point{0, 0, 0}, Point{0, 1, 0}, Point{1, 0, 0}};
-  for (auto fh : soup.faces()) {
-    return soup.triangle(fh) == t;
+  for (auto fi : soup.faces()) {
+    return soup.triangle(fi) == t;
   }
 
   return false;
@@ -143,10 +143,10 @@ bool is_inverse(const M& m) {
 
 TEST(SpecialMeshTest, EmptyNormal) {
   Triangle_soup<K> soup;
-  auto vh1 = soup.add_vertex({0, 0, 0});
-  auto vh2 = soup.add_vertex({1, 0, 0});
-  auto vh3 = soup.add_vertex({0, 1, 0});
-  soup.add_face({vh1, vh2, vh3});
+  auto vi1 = soup.add_vertex({0, 0, 0});
+  auto vi2 = soup.add_vertex({1, 0, 0});
+  auto vi3 = soup.add_vertex({0, 1, 0});
+  soup.add_face({vi1, vi2, vi3});
 
   auto m1 = M::empty();
   M m2{std::move(soup)};
@@ -172,10 +172,10 @@ TEST(SpecialMeshTest, EmptyNormal) {
 
 TEST(SpecialMeshTest, NormalEmpty) {
   Triangle_soup<K> soup;
-  auto vh1 = soup.add_vertex({0, 0, 0});
-  auto vh2 = soup.add_vertex({1, 0, 0});
-  auto vh3 = soup.add_vertex({0, 1, 0});
-  soup.add_face({vh1, vh2, vh3});
+  auto vi1 = soup.add_vertex({0, 0, 0});
+  auto vi2 = soup.add_vertex({1, 0, 0});
+  auto vi3 = soup.add_vertex({0, 1, 0});
+  soup.add_face({vi1, vi2, vi3});
 
   M m1{std::move(soup)};
   auto m2 = M::empty();
@@ -201,10 +201,10 @@ TEST(SpecialMeshTest, NormalEmpty) {
 
 TEST(SpecialMeshTest, FullNormal) {
   Triangle_soup<K> soup;
-  auto vh1 = soup.add_vertex({0, 0, 0});
-  auto vh2 = soup.add_vertex({1, 0, 0});
-  auto vh3 = soup.add_vertex({0, 1, 0});
-  soup.add_face({vh1, vh2, vh3});
+  auto vi1 = soup.add_vertex({0, 0, 0});
+  auto vi2 = soup.add_vertex({1, 0, 0});
+  auto vi3 = soup.add_vertex({0, 1, 0});
+  soup.add_face({vi1, vi2, vi3});
 
   auto m1 = M::full();
   M m2{std::move(soup)};
@@ -230,10 +230,10 @@ TEST(SpecialMeshTest, FullNormal) {
 
 TEST(SpecialMeshTest, NormalFull) {
   Triangle_soup<K> soup;
-  auto vh1 = soup.add_vertex({0, 0, 0});
-  auto vh2 = soup.add_vertex({1, 0, 0});
-  auto vh3 = soup.add_vertex({0, 1, 0});
-  soup.add_face({vh1, vh2, vh3});
+  auto vi1 = soup.add_vertex({0, 0, 0});
+  auto vi2 = soup.add_vertex({1, 0, 0});
+  auto vi3 = soup.add_vertex({0, 1, 0});
+  soup.add_face({vi1, vi2, vi3});
 
   M m1{std::move(soup)};
   auto m2 = M::full();
@@ -259,10 +259,10 @@ TEST(SpecialMeshTest, NormalFull) {
 
 TEST(SpecialMeshTest, Equivalent) {
   Triangle_soup<K> soup;
-  auto vh1 = soup.add_vertex({0, 0, 0});
-  auto vh2 = soup.add_vertex({1, 0, 0});
-  auto vh3 = soup.add_vertex({0, 1, 0});
-  soup.add_face({vh1, vh2, vh3});
+  auto vi1 = soup.add_vertex({0, 0, 0});
+  auto vi2 = soup.add_vertex({1, 0, 0});
+  auto vi3 = soup.add_vertex({0, 1, 0});
+  soup.add_face({vi1, vi2, vi3});
 
   Triangle_soup<K> soup2{soup};
 
@@ -291,18 +291,18 @@ TEST(SpecialMeshTest, Equivalent) {
 TEST(SpecialMeshTest, Complementary) {
   Triangle_soup<K> soup;
   {
-    auto vh1 = soup.add_vertex({0, 0, 0});
-    auto vh2 = soup.add_vertex({1, 0, 0});
-    auto vh3 = soup.add_vertex({0, 1, 0});
-    soup.add_face({vh1, vh2, vh3});
+    auto vi1 = soup.add_vertex({0, 0, 0});
+    auto vi2 = soup.add_vertex({1, 0, 0});
+    auto vi3 = soup.add_vertex({0, 1, 0});
+    soup.add_face({vi1, vi2, vi3});
   }
 
   Triangle_soup<K> soup2;
   {
-    auto vh1 = soup2.add_vertex({0, 0, 0});
-    auto vh2 = soup2.add_vertex({1, 0, 0});
-    auto vh3 = soup2.add_vertex({0, 1, 0});
-    soup2.add_face({vh1, vh3, vh2});
+    auto vi1 = soup2.add_vertex({0, 0, 0});
+    auto vi2 = soup2.add_vertex({1, 0, 0});
+    auto vi3 = soup2.add_vertex({0, 1, 0});
+    soup2.add_face({vi1, vi3, vi2});
   }
 
   M m1{std::move(soup)};

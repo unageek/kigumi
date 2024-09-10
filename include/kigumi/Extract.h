@@ -27,9 +27,9 @@ class Extract {
     auto c_mask = coplanar_mask(op, prefer_first);
     auto o_mask = opposite_mask(op, prefer_first);
 
-    for (auto fh : m.faces()) {
+    for (auto fi : m.faces()) {
       auto mask = Mask::NONE;
-      switch (m.data(fh).tag) {
+      switch (m.data(fi).tag) {
         case Face_tag::EXTERIOR:
           mask = u_mask;
           break;
@@ -46,7 +46,7 @@ class Extract {
           break;
       }
 
-      auto from_left = m.data(fh).from_left;
+      auto from_left = m.data(fi).from_left;
       auto output_id = from_left ? (mask & Mask::A) != Mask::NONE  //
                                  : (mask & Mask::B) != Mask::NONE;
       auto output_inv = from_left ? (mask & Mask::A_INV) != Mask::NONE  //
@@ -55,24 +55,24 @@ class Extract {
         continue;
       }
 
-      const auto& f = m.face(fh);
+      const auto& f = m.face(fi);
       Face new_f;
       for (std::size_t i = 0; i < 3; ++i) {
-        auto vh = f.at(i);
-        auto& new_vh = map.at(vh.idx());
-        if (new_vh == Vertex_index{}) {
-          const auto& p = m.point(vh);
-          new_vh = soup.add_vertex(p);
+        auto vi = f.at(i);
+        auto& new_vi = map.at(vi.idx());
+        if (new_vi == Vertex_index{}) {
+          const auto& p = m.point(vi);
+          new_vi = soup.add_vertex(p);
         }
-        new_f.at(i) = new_vh;
+        new_f.at(i) = new_vi;
       }
 
       if (output_inv) {
         std::swap(new_f[1], new_f[2]);
       }
 
-      auto new_fh = soup.add_face(new_f);
-      soup.data(new_fh) = m.data(fh).data;
+      auto new_fi = soup.add_face(new_f);
+      soup.data(new_fi) = m.data(fi).data;
     }
 
     return soup;

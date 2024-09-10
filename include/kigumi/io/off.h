@@ -196,8 +196,8 @@ bool write_off(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
   os << "OFF\n"  //
      << soup.num_vertices() << ' ' << soup.num_faces() << " 0\n";
 
-  for (auto vh : soup.vertices()) {
-    const auto& p = soup.point(vh);
+  for (auto vi : soup.vertices()) {
+    const auto& p = soup.point(vi);
     p.exact();
     Double x{CGAL::to_double(p.x())};
     Double y{CGAL::to_double(p.y())};
@@ -205,8 +205,8 @@ bool write_off(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
     os << x << ' ' << y << ' ' << z << '\n';
   }
 
-  for (auto fh : soup.faces()) {
-    const auto& f = soup.face(fh);
+  for (auto fi : soup.faces()) {
+    const auto& f = soup.face(fi);
     os << "3 " << f[0].idx() << ' ' << f[1].idx() << ' ' << f[2].idx() << '\n';
   }
 

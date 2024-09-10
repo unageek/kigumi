@@ -35,28 +35,28 @@ class Find_coplanar_faces {
     auto& a_face_tags = left_is_a ? left_face_tags : right_face_tags;
     auto& b_face_tags = left_is_a ? right_face_tags : left_face_tags;
 
-    std::unordered_map<Triangle, Face_index, Triangle_hash> triangle_to_fh;
+    std::unordered_map<Triangle, Face_index, Triangle_hash> triangle_to_fi;
 
-    triangle_to_fh.reserve(a.num_faces());
-    for (auto fh : a.faces()) {
-      auto tri = triangle(a, fh, a_points);
-      triangle_to_fh.emplace(tri, fh);
+    triangle_to_fi.reserve(a.num_faces());
+    for (auto fi : a.faces()) {
+      auto tri = triangle(a, fi, a_points);
+      triangle_to_fi.emplace(tri, fi);
     }
 
-    for (auto fh : b.faces()) {
-      auto tri = triangle(b, fh, b_points);
+    for (auto fi : b.faces()) {
+      auto tri = triangle(b, fi, b_points);
 
-      auto it = triangle_to_fh.find(tri);
-      if (it != triangle_to_fh.end()) {
+      auto it = triangle_to_fi.find(tri);
+      if (it != triangle_to_fi.end()) {
         a_face_tags.at(it->second.idx()) = Face_tag::COPLANAR;
-        b_face_tags.at(fh.idx()) = Face_tag::COPLANAR;
+        b_face_tags.at(fi.idx()) = Face_tag::COPLANAR;
         continue;
       }
 
-      it = triangle_to_fh.find(opposite(tri));
-      if (it != triangle_to_fh.end()) {
+      it = triangle_to_fi.find(opposite(tri));
+      if (it != triangle_to_fi.end()) {
         a_face_tags.at(it->second.idx()) = Face_tag::OPPOSITE;
-        b_face_tags.at(fh.idx()) = Face_tag::OPPOSITE;
+        b_face_tags.at(fi.idx()) = Face_tag::OPPOSITE;
       }
     }
 
@@ -64,9 +64,9 @@ class Find_coplanar_faces {
   }
 
  private:
-  static Triangle triangle(const Triangle_soup& m, Face_index fh,
+  static Triangle triangle(const Triangle_soup& m, Face_index fi,
                            const std::vector<std::size_t>& points) {
-    auto face = m.face(fh);
+    auto face = m.face(fi);
     Triangle triangle{
         points.at(face[0].idx()),
         points.at(face[1].idx()),

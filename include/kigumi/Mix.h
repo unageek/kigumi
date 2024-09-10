@@ -36,27 +36,27 @@ class Mix {
     Mixed_triangle_mesh<K, FaceData> m(corefine.take_points());
 
     std::vector<std::array<std::size_t, 3>> tris;
-    for (auto fh : left.faces()) {
+    for (auto fi : left.faces()) {
       tris.clear();
-      auto tag = corefine.get_left_triangles(fh, std::back_inserter(tris));
+      auto tag = corefine.get_left_triangles(fi, std::back_inserter(tris));
       for (const auto& tri : tris) {
-        auto new_fh =
+        auto new_fi =
             m.add_face({Vertex_index{tri[0]}, Vertex_index{tri[1]}, Vertex_index{tri[2]}});
-        m.data(new_fh).from_left = true;
-        m.data(new_fh).tag = tag;
-        m.data(new_fh).data = left.data(fh);
+        m.data(new_fi).from_left = true;
+        m.data(new_fi).tag = tag;
+        m.data(new_fi).data = left.data(fi);
       }
     }
 
-    for (auto fh : right.faces()) {
+    for (auto fi : right.faces()) {
       tris.clear();
-      auto tag = corefine.get_right_triangles(fh, std::back_inserter(tris));
+      auto tag = corefine.get_right_triangles(fi, std::back_inserter(tris));
       for (const auto& tri : tris) {
-        auto new_fh =
+        auto new_fi =
             m.add_face({Vertex_index{tri[0]}, Vertex_index{tri[1]}, Vertex_index{tri[2]}});
-        m.data(new_fh).from_left = false;
-        m.data(new_fh).tag = tag;
-        m.data(new_fh).data = right.data(fh);
+        m.data(new_fi).from_left = false;
+        m.data(new_fi).tag = tag;
+        m.data(new_fi).data = right.data(fi);
       }
     }
 

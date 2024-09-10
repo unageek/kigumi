@@ -31,14 +31,14 @@ class Propagate_face_tags {
 
     queue_.push(seed);
     while (!queue_.empty()) {
-      auto fh = queue_.front();
+      auto fi = queue_.front();
       queue_.pop();
 
-      for (auto fh2 : m.faces_around_face(fh, border_edges)) {
-        auto& tag2 = m.data(fh2).tag;
+      for (auto fi2 : m.faces_around_face(fi, border_edges)) {
+        auto& tag2 = m.data(fi2).tag;
         if (tag2 == Face_tag::UNKNOWN) {
           tag2 = tag;
-          queue_.push(fh2);
+          queue_.push(fi2);
         } else if (tag2 != tag) {
           if (from_left) {
             warnings |= Warnings::FIRST_MESH_PARTIALLY_INTERSECTS_WITH_SECOND_MESH;

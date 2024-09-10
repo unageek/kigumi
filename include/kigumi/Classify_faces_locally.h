@@ -27,8 +27,8 @@ class Classify_faces_locally {
   Warnings operator()(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge,
                       const std::unordered_set<Edge>& border_edges) const {
     bool found_untagged_face{};
-    for (auto fh : m.faces_around_edge(edge)) {
-      if (m.data(fh).tag == Face_tag::UNKNOWN) {
+    for (auto fi : m.faces_around_edge(edge)) {
+      if (m.data(fi).tag == Face_tag::UNKNOWN) {
         found_untagged_face = true;
         break;
       }
@@ -44,9 +44,9 @@ class Classify_faces_locally {
     auto v = plane.base2();
 
     faces_.clear();
-    for (auto fh : m.faces_around_edge(edge)) {
+    for (auto fi : m.faces_around_edge(edge)) {
       // The face is either pqr or qpr.
-      const auto& f = m.face(fh);
+      const auto& f = m.face(fi);
 
       std::size_t i{};  // The index of the vertex p.
       std::size_t j{};  // The index of the vertex q.
@@ -64,7 +64,7 @@ class Classify_faces_locally {
       auto orientation = j == (i + 1) % 3 ? CGAL::COUNTERCLOCKWISE  // The face is pqr.
                                           : CGAL::CLOCKWISE;        // The face is qpr.
 
-      faces_.emplace_back(fh, f.at(k), std::move(r_uv), orientation);
+      faces_.emplace_back(fi, f.at(k), std::move(r_uv), orientation);
     }
 
     // Sort the faces radially around the edge.
@@ -75,15 +75,15 @@ class Classify_faces_locally {
 
     for (std::size_t i = 0; i < faces_.size(); ++i) {
       auto j = (i + 1) % faces_.size();
-      const auto& fi = faces_.at(i);
-      auto& fi_data = m.data(fi.fh);
-      const auto& fj = faces_.at(j);
-      auto& fj_data = m.data(fj.fh);
+      const auto& f = faces_.at(i);
+      auto& f_data = m.data(f.fi);
+      const auto& g = faces_.at(j);
+      auto& g_data = m.data(g.fi);
 
-      if (fi.vh_r == fj.vh_r) {
-        auto tag = fi.orientation == fj.orientation ? Face_tag::COPLANAR : Face_tag::OPPOSITE;
-        fi_data.tag = tag;
-        fj_data.tag = tag;
+      if (f.vi_r == g.vi_r) {
+        auto tag = f.orientation == g.orientation ? Face_tag::COPLANAR : Face_tag::OPPOSITE;
+        f_data.tag = tag;
+        g_data.tag = tag;
       }
     }
 
@@ -94,25 +94,25 @@ class Classify_faces_locally {
     std::size_t k{};
     for (std::size_t i = 0; i < faces_.size(); ++i) {
       auto j = (i + 1) % faces_.size();
-      const auto& fi = faces_.at(i);
-      auto& fi_data = m.data(fi.fh);
-      const auto& fj = faces_.at(j);
-      auto& fj_data = m.data(fj.fh);
+      const auto& f = faces_.at(i);
+      auto& f_data = m.data(f.fi);
+      const auto& g = faces_.at(j);
+      auto& g_data = m.data(g.fi);
 
-      if (fi_data.tag == Face_tag::COPLANAR || fi_data.tag == Face_tag::OPPOSITE ||
-          fj_data.tag == Face_tag::COPLANAR || fj_data.tag == Face_tag::OPPOSITE) {
+      if (f_data.tag == Face_tag::COPLANAR || f_data.tag == Face_tag::OPPOSITE ||
+          g_data.tag == Face_tag::COPLANAR || g_data.tag == Face_tag::OPPOSITE) {
         continue;
       }
 
-      // Neither fi nor fj is overlapping with adjacent faces.
+      // Neither f nor g is overlapping with adjacent faces.
 
-      if (fi.orientation == fj.orientation) {
-        if (fi.orientation == CGAL::COUNTERCLOCKWISE) {
-          fi_data.tag = Face_tag::INTERIOR;
-          fj_data.tag = Face_tag::EXTERIOR;
+      if (f.orientation == g.orientation) {
+        if (f.orientation == CGAL::COUNTERCLOCKWISE) {
+          f_data.tag = Face_tag::INTERIOR;
+          g_data.tag = Face_tag::EXTERIOR;
         } else {
-          fi_data.tag = Face_tag::EXTERIOR;
-          fj_data.tag = Face_tag::INTERIOR;
+          f_data.tag = Face_tag::EXTERIOR;
+          g_data.tag = Face_tag::INTERIOR;
         }
         is_undefined_configuration = false;
         k = j;
@@ -138,12 +138,12 @@ class Classify_faces_locally {
 
     auto consistent = true;
     for (auto dry_run : {true, false}) {
-      auto tag = m.data(faces_.at(k).fh).tag;
+      auto tag = m.data(faces_.at(k).fi).tag;
       auto orientation = faces_.at(k).orientation;
       // Go around and return to the starting point to check consistency.
       for (std::size_t i = k + 1; i <= k + faces_.size(); ++i) {
         const auto& f = faces_.at(i % faces_.size());
-        auto& f_data = m.data(f.fh);
+        auto& f_data = m.data(f.fi);
 
         if (f.orientation == orientation) {
           tag = tag == Face_tag::EXTERIOR ? Face_tag::INTERIOR : Face_tag::EXTERIOR;
@@ -172,10 +172,10 @@ class Classify_faces_locally {
     Warnings warnings{};
 
     for (const auto& f : faces_) {
-      auto fh = f.fh;
-      auto f_tag = m.data(fh).tag;
+      auto fi = f.fi;
+      auto f_tag = m.data(fi).tag;
       if (f_tag == Face_tag::EXTERIOR || f_tag == Face_tag::INTERIOR) {
-        warnings |= propagate_face_tags_(m, border_edges, fh);
+        warnings |= propagate_face_tags_(m, border_edges, fi);
       }
     }
 
@@ -184,15 +184,15 @@ class Classify_faces_locally {
 
  private:
   struct Face_around_edge {
-    Face_index fh;
-    Vertex_index vh_r;
+    Face_index fi;
+    Vertex_index vi_r;
     Vector_2 r;
     int radial_bin;
     CGAL::Orientation orientation;
 
-    Face_around_edge(Face_index fh, Vertex_index vh_r, Vector_2 r, CGAL::Orientation orientation)
-        : fh{fh},
-          vh_r{vh_r},
+    Face_around_edge(Face_index fi, Vertex_index vi_r, Vector_2 r, CGAL::Orientation orientation)
+        : fi{fi},
+          vi_r{vi_r},
           r{std::move(r)},
           radial_bin{classify_radial_bin()},
           orientation{orientation} {}
@@ -234,14 +234,14 @@ class Classify_faces_locally {
   };
 
   struct Radial_ordering {
-    bool operator()(const Face_around_edge& f1, const Face_around_edge& f2) const {
-      if (f1.vh_r == f2.vh_r) {
+    bool operator()(const Face_around_edge& f, const Face_around_edge& g) const {
+      if (f.vi_r == g.vi_r) {
         return false;
       }
-      if (f1.radial_bin != f2.radial_bin) {
-        return f1.radial_bin < f2.radial_bin;
+      if (f.radial_bin != g.radial_bin) {
+        return f.radial_bin < g.radial_bin;
       }
-      return CGAL::orientation(f1.r, f2.r) > 0;
+      return CGAL::orientation(f.r, g.r) > 0;
     }
   };
 

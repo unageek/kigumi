@@ -31,11 +31,11 @@ class Side_of_triangle_soup {
 
     const auto& tree = soup.aabb_tree();
 
-    for (auto fh_trg : soup.faces()) {
+    for (auto fi_trg : soup.faces()) {
       leaves_.clear();
       intersections_.clear();
 
-      auto p_trg = internal::face_centroid(soup, fh_trg);
+      auto p_trg = internal::face_centroid(soup, fi_trg);
 
       if (p == p_trg) {
         return CGAL::ON_ORIENTED_BOUNDARY;
@@ -45,8 +45,8 @@ class Side_of_triangle_soup {
       tree.get_intersecting_leaves(std::back_inserter(leaves_), ray);
 
       for (const auto* leaf : leaves_) {
-        auto fh = leaf->face_index();
-        auto tri = soup.triangle(fh);
+        auto fi = leaf->face_index();
+        auto tri = soup.triangle(fi);
 
         auto result = CGAL::intersection(tri, ray);
         if (!result) {
@@ -58,7 +58,7 @@ class Side_of_triangle_soup {
             return CGAL::ON_ORIENTED_BOUNDARY;
           }
           auto d = CGAL::squared_distance(p, *point);
-          intersections_.emplace_back(std::move(d), fh);
+          intersections_.emplace_back(std::move(d), fi);
         } else if (const auto* segment = boost::get<Segment>(&*result)) {
           if (segment->source() == p || segment->target() == p) {
             return CGAL::ON_ORIENTED_BOUNDARY;
@@ -82,7 +82,7 @@ class Side_of_triangle_soup {
         }
       }
 
-      return internal::oriented_side_of_face_supporting_plane(soup, intersections_.at(0).fh, p);
+      return internal::oriented_side_of_face_supporting_plane(soup, intersections_.at(0).fi, p);
     }
 
     // Should not happen.
@@ -92,7 +92,7 @@ class Side_of_triangle_soup {
  private:
   struct Intersection {
     FT distance;
-    Face_index fh;
+    Face_index fi;
   };
 
   mutable std::vector<const Leaf*> leaves_;

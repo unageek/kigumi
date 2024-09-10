@@ -33,26 +33,26 @@ class Find_possibly_intersecting_faces {
 
     parallel_do(
         b.faces_begin(), b.faces_end(), std::vector<Face_index_pair>{},
-        [&](auto b_fh, auto& local_pairs) {
+        [&](auto b_fi, auto& local_pairs) {
           thread_local std::vector<const Leaf*> leaves;
 
-          if (b_face_tags.at(b_fh.idx()) != Face_tag::UNKNOWN) {
+          if (b_face_tags.at(b_fi.idx()) != Face_tag::UNKNOWN) {
             return;
           }
 
           leaves.clear();
-          a_tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(b, b_fh));
+          a_tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(b, b_fi));
 
           for (const auto* leaf : leaves) {
-            auto a_fh = leaf->face_index();
-            if (a_face_tags.at(a_fh.idx()) != Face_tag::UNKNOWN) {
+            auto a_fi = leaf->face_index();
+            if (a_face_tags.at(a_fi.idx()) != Face_tag::UNKNOWN) {
               continue;
             }
 
             if (left_is_a) {
-              local_pairs.emplace_back(a_fh, b_fh);
+              local_pairs.emplace_back(a_fi, b_fi);
             } else {
-              local_pairs.emplace_back(b_fh, a_fh);
+              local_pairs.emplace_back(b_fi, a_fi);
             }
           }
         },

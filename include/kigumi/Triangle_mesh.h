@@ -106,25 +106,25 @@ class Triangle_mesh {
     std::vector<std::pair<Vertex_index, Face_index>> map;
     std::size_t face_index{};
     for (const auto& face : faces_) {
-      Face_index fh{face_index};
-      map.emplace_back(face[0], fh);
-      map.emplace_back(face[1], fh);
-      map.emplace_back(face[2], fh);
+      Face_index fi{face_index};
+      map.emplace_back(face[0], fi);
+      map.emplace_back(face[1], fi);
+      map.emplace_back(face[2], fi);
       ++face_index;
     }
 
     parallel_sort(map.begin(), map.end());
 
     std::size_t index{};
-    std::ptrdiff_t prev_vi{-1};
-    for (const auto& [vh, fh] : map) {
-      face_indices_.push_back(fh);
+    std::ptrdiff_t prev_v{-1};
+    for (const auto& [vi, fi] : map) {
+      face_indices_.push_back(fi);
 
-      auto vi = static_cast<std::ptrdiff_t>(vh.idx());
-      for (std::ptrdiff_t i = 0; i < vi - prev_vi; ++i) {
+      auto v = static_cast<std::ptrdiff_t>(vi.idx());
+      for (std::ptrdiff_t i = 0; i < v - prev_v; ++i) {
         indices_.push_back(index);
       }
-      prev_vi = vi;
+      prev_v = v;
       ++index;
     }
     indices_.push_back(index);
@@ -155,8 +155,8 @@ class Triangle_mesh {
                                       Face_around_edge_iterator(i_end, i_end, j_end, j_end));
   }
 
-  auto faces_around_face(Face_index fh, const std::unordered_set<Edge>& border_edges) const {
-    const auto& f = face(fh);
+  auto faces_around_face(Face_index fi, const std::unordered_set<Edge>& border_edges) const {
+    const auto& f = face(fi);
     auto e1 = make_edge(f[0], f[1]);
     auto e2 = make_edge(f[1], f[2]);
     auto e3 = make_edge(f[2], f[0]);
@@ -167,20 +167,20 @@ class Triangle_mesh {
     auto end3 = faces_around_edge(e3).end();
     auto it3 = border_edges.contains(e3) ? end3 : faces_around_edge(e3).begin();
     return boost::make_iterator_range(
-        Face_around_face_iterator(fh, it1, end1, it2, end2, it3, end3),
-        Face_around_face_iterator(fh, end1, end1, end2, end2, end3, end3));
+        Face_around_face_iterator(fi, it1, end1, it2, end2, it3, end3),
+        Face_around_face_iterator(fi, end1, end1, end2, end2, end3, end3));
   }
 
-  Face_data& data(Face_index handle) { return face_data_.at(handle.idx()); }
+  Face_data& data(Face_index fi) { return face_data_.at(fi.idx()); }
 
-  const Face_data& data(Face_index handle) const { return face_data_.at(handle.idx()); }
+  const Face_data& data(Face_index fi) const { return face_data_.at(fi.idx()); }
 
-  const Face& face(Face_index handle) const { return faces_.at(handle.idx()); }
+  const Face& face(Face_index fi) const { return faces_.at(fi.idx()); }
 
-  const Point& point(Vertex_index handle) const { return points_.at(handle.idx()); }
+  const Point& point(Vertex_index vi) const { return points_.at(vi.idx()); }
 
-  Triangle triangle(Face_index handle) const {
-    const auto& f = face(handle);
+  Triangle triangle(Face_index fi) const {
+    const auto& f = face(fi);
     return {point(f[0]), point(f[1]), point(f[2])};
   }
 

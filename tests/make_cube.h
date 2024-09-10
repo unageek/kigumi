@@ -18,30 +18,30 @@ kigumi::Region<K, FaceData> make_cube(const typename K::Point_3& min,
 
   kigumi::Triangle_soup<K, FaceData> soup;
 
-  auto vh1 = soup.add_vertex({min.x(), min.y(), min.z()});
-  auto vh2 = soup.add_vertex({max.x(), min.y(), min.z()});
-  auto vh3 = soup.add_vertex({min.x(), max.y(), min.z()});
-  auto vh4 = soup.add_vertex({max.x(), max.y(), min.z()});
-  auto vh5 = soup.add_vertex({min.x(), min.y(), max.z()});
-  auto vh6 = soup.add_vertex({max.x(), min.y(), max.z()});
-  auto vh7 = soup.add_vertex({min.x(), max.y(), max.z()});
-  auto vh8 = soup.add_vertex({max.x(), max.y(), max.z()});
+  auto vi1 = soup.add_vertex({min.x(), min.y(), min.z()});
+  auto vi2 = soup.add_vertex({max.x(), min.y(), min.z()});
+  auto vi3 = soup.add_vertex({min.x(), max.y(), min.z()});
+  auto vi4 = soup.add_vertex({max.x(), max.y(), min.z()});
+  auto vi5 = soup.add_vertex({min.x(), min.y(), max.z()});
+  auto vi6 = soup.add_vertex({max.x(), min.y(), max.z()});
+  auto vi7 = soup.add_vertex({min.x(), max.y(), max.z()});
+  auto vi8 = soup.add_vertex({max.x(), max.y(), max.z()});
 
-  soup.add_face(make_face({vh1, vh2, vh6}));
-  soup.add_face(make_face({vh1, vh3, vh4}));
-  soup.add_face(make_face({vh1, vh4, vh2}));
-  soup.add_face(make_face({vh1, vh5, vh7}));
-  soup.add_face(make_face({vh1, vh6, vh5}));
-  soup.add_face(make_face({vh1, vh7, vh3}));
-  soup.add_face(make_face({vh8, vh2, vh4}));
-  soup.add_face(make_face({vh8, vh3, vh7}));
-  soup.add_face(make_face({vh8, vh4, vh3}));
-  soup.add_face(make_face({vh8, vh5, vh6}));
-  soup.add_face(make_face({vh8, vh6, vh2}));
-  soup.add_face(make_face({vh8, vh7, vh5}));
+  soup.add_face(make_face({vi1, vi2, vi6}));
+  soup.add_face(make_face({vi1, vi3, vi4}));
+  soup.add_face(make_face({vi1, vi4, vi2}));
+  soup.add_face(make_face({vi1, vi5, vi7}));
+  soup.add_face(make_face({vi1, vi6, vi5}));
+  soup.add_face(make_face({vi1, vi7, vi3}));
+  soup.add_face(make_face({vi8, vi2, vi4}));
+  soup.add_face(make_face({vi8, vi3, vi7}));
+  soup.add_face(make_face({vi8, vi4, vi3}));
+  soup.add_face(make_face({vi8, vi5, vi6}));
+  soup.add_face(make_face({vi8, vi6, vi2}));
+  soup.add_face(make_face({vi8, vi7, vi5}));
 
-  for (auto fh : soup.faces()) {
-    soup.data(fh) = data;
+  for (auto fi : soup.faces()) {
+    soup.data(fi) = data;
   }
 
   return kigumi::Region<K, FaceData>{std::move(soup)};

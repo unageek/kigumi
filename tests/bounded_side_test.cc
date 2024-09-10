@@ -67,12 +67,12 @@ TEST(BoundedSideTest, Full) {
 
 TEST(BoundedSideTest, Plane) {
   Triangle_soup<K> soup;
-  auto vh1 = soup.add_vertex({0, 0, 0.5});
-  auto vh2 = soup.add_vertex({1, 0, 0.5});
-  auto vh3 = soup.add_vertex({0, 1, 0.5});
-  auto vh4 = soup.add_vertex({1, 1, 0.5});
-  soup.add_face({vh1, vh2, vh3});
-  soup.add_face({vh2, vh4, vh3});
+  auto vi1 = soup.add_vertex({0, 0, 0.5});
+  auto vi2 = soup.add_vertex({1, 0, 0.5});
+  auto vi3 = soup.add_vertex({0, 1, 0.5});
+  auto vi4 = soup.add_vertex({1, 1, 0.5});
+  soup.add_face({vi1, vi2, vi3});
+  soup.add_face({vi2, vi4, vi3});
 
   M m{std::move(soup)};
 

@@ -67,24 +67,24 @@ class Find_defects {
   static Triangle_soup merge_duplicate_vertices(const Triangle_soup& m) {
     Triangle_soup new_m;
 
-    std::vector<Vertex_index> vh_map;
-    vh_map.reserve(m.num_vertices());
+    std::vector<Vertex_index> vi_map;
+    vi_map.reserve(m.num_vertices());
 
     Point_list points;
     points.start_uniqueness_check();
-    for (auto vh : m.vertices()) {
-      const auto& p = m.point(vh);
+    for (auto vi : m.vertices()) {
+      const auto& p = m.point(vi);
       auto next_idx = points.size();
       auto idx = points.insert(p);
-      vh_map.push_back(Vertex_index{idx});
+      vi_map.push_back(Vertex_index{idx});
       if (idx == next_idx) {
         new_m.add_vertex(p);
       }
     }
 
-    for (auto fh : m.faces()) {
-      const auto& f = m.face(fh);
-      Face new_f{vh_map.at(f[0].idx()), vh_map.at(f[1].idx()), vh_map.at(f[2].idx())};
+    for (auto fi : m.faces()) {
+      const auto& f = m.face(fi);
+      Face new_f{vi_map.at(f[0].idx()), vi_map.at(f[1].idx()), vi_map.at(f[2].idx())};
       new_m.add_face(new_f);
     }
 
@@ -92,88 +92,88 @@ class Find_defects {
   }
 
   static std::vector<Vertex_index> isolated_vertices(const Triangle_soup& m) {
-    std::vector<Vertex_index> vhs;
+    std::vector<Vertex_index> vis;
 
     std::vector<bool> used(m.num_vertices(), false);
-    for (auto fh : m.faces()) {
-      for (auto vh : m.face(fh)) {
-        used.at(vh.idx()) = true;
+    for (auto fi : m.faces()) {
+      for (auto vi : m.face(fi)) {
+        used.at(vi.idx()) = true;
       }
     }
 
-    for (auto vh : m.vertices()) {
-      if (!used.at(vh.idx())) {
-        vhs.emplace_back(vh);
+    for (auto vi : m.vertices()) {
+      if (!used.at(vi.idx())) {
+        vis.emplace_back(vi);
       }
     }
 
-    return vhs;
+    return vis;
   }
 
   static std::vector<Vertex_index> non_manifold_vertices(const Triangle_soup& m) {
-    std::vector<Vertex_index> vhs;
+    std::vector<Vertex_index> vis;
 
     std::vector<std::vector<Face_index>> vf_map(m.num_vertices());
-    for (auto fh : m.faces()) {
-      const auto& f = m.face(fh);
+    for (auto fi : m.faces()) {
+      const auto& f = m.face(fi);
       if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
         continue;
       }
-      vf_map.at(f[0].idx()).push_back(fh);
-      vf_map.at(f[1].idx()).push_back(fh);
-      vf_map.at(f[2].idx()).push_back(fh);
+      vf_map.at(f[0].idx()).push_back(fi);
+      vf_map.at(f[1].idx()).push_back(fi);
+      vf_map.at(f[2].idx()).push_back(fi);
     }
 
-    auto next_vertex = [&](Face_index fh, Vertex_index vh) -> Vertex_index {
-      const auto& f = m.face(fh);
-      if (f[0] == vh) {
+    auto next_vertex = [&](Face_index fi, Vertex_index vi) -> Vertex_index {
+      const auto& f = m.face(fi);
+      if (f[0] == vi) {
         return f[1];
       }
-      if (f[1] == vh) {
+      if (f[1] == vi) {
         return f[2];
       }
       return f[0];
     };
 
-    auto prev_vertex = [&](Face_index fh, Vertex_index vh) -> Vertex_index {
-      const auto& f = m.face(fh);
-      if (f[0] == vh) {
+    auto prev_vertex = [&](Face_index fi, Vertex_index vi) -> Vertex_index {
+      const auto& f = m.face(fi);
+      if (f[0] == vi) {
         return f[2];
       }
-      if (f[1] == vh) {
+      if (f[1] == vi) {
         return f[0];
       }
       return f[1];
     };
 
-    for (auto vh : m.vertices()) {
-      const auto& v_fhs = vf_map.at(vh.idx());
-      if (v_fhs.empty()) {
+    for (auto vi : m.vertices()) {
+      const auto& v_fis = vf_map.at(vi.idx());
+      if (v_fis.empty()) {
         // An isolated vertex.
         continue;
       }
 
       std::unordered_map<Vertex_index, std::size_t> local_vis;
-      for (auto v_fh : v_fhs) {
-        local_vis.emplace(next_vertex(v_fh, vh), local_vis.size());
-        local_vis.emplace(prev_vertex(v_fh, vh), local_vis.size());
+      for (auto v_fi : v_fis) {
+        local_vis.emplace(next_vertex(v_fi, vi), local_vis.size());
+        local_vis.emplace(prev_vertex(v_fi, vi), local_vis.size());
       }
 
       auto order = local_vis.size();
       dense_undirected_graph g{order};
 
-      for (auto v_fh : v_fhs) {
-        auto i = local_vis.at(next_vertex(v_fh, vh));
-        auto j = local_vis.at(prev_vertex(v_fh, vh));
+      for (auto v_fi : v_fis) {
+        auto i = local_vis.at(next_vertex(v_fi, vi));
+        auto j = local_vis.at(prev_vertex(v_fi, vi));
         g.add_edge(i, j);
       }
 
       if (!g.is_simple() || !g.is_connected() || g.max_degree() > 2) {
-        vhs.push_back(vh);
+        vis.push_back(vi);
       }
     }
 
-    return vhs;
+    return vis;
   }
 
   static Edge to_edge(const Halfedge& he) { return make_edge(he[0], he[1]); }
@@ -182,8 +182,8 @@ class Find_defects {
 
   static std::unordered_multiset<Halfedge> collect_halfedges(const Triangle_soup& m) {
     std::unordered_multiset<Halfedge> hes;
-    for (auto fh : m.faces()) {
-      const auto& f = m.face(fh);
+    for (auto fi : m.faces()) {
+      const auto& f = m.face(fi);
       if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
         continue;
       }
@@ -255,48 +255,48 @@ class Find_defects {
   }
 
   static std::vector<Face_index> trivial_degenerate_faces(const Triangle_soup& m) {
-    std::vector<Face_index> fhs;
+    std::vector<Face_index> fis;
 
-    for (auto fh : m.faces()) {
-      const auto& f = m.face(fh);
+    for (auto fi : m.faces()) {
+      const auto& f = m.face(fi);
       if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
-        fhs.push_back(fh);
+        fis.push_back(fi);
       }
     }
 
-    return fhs;
+    return fis;
   }
 
   static std::vector<Face_index> non_trivial_degenerate_faces(const Triangle_soup& m) {
-    std::vector<Face_index> fhs;
+    std::vector<Face_index> fis;
 
     parallel_do(
         m.faces_begin(), m.faces_end(), std::vector<Face_index>{},
-        [&](auto fh, auto& local_fhs) {
-          const auto& f = m.face(fh);
+        [&](auto fi, auto& local_fis) {
+          const auto& f = m.face(fi);
           if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
             return;
           }
-          auto tri = m.triangle(fh);
+          auto tri = m.triangle(fi);
           if (tri.is_degenerate()) {
-            local_fhs.push_back(fh);
+            local_fis.push_back(fi);
           }
         },
-        [&](auto& local_fhs) {
-          if (fhs.empty()) {
-            fhs = std::move(local_fhs);
+        [&](auto& local_fis) {
+          if (fis.empty()) {
+            fis = std::move(local_fis);
           } else {
-            fhs.insert(fhs.end(), local_fhs.begin(), local_fhs.end());
+            fis.insert(fis.end(), local_fis.begin(), local_fis.end());
           }
         });
 
-    return fhs;
+    return fis;
   }
 
   static std::vector<Face_index> overlapping_faces(
       const Triangle_soup& m, const std::vector<Face_index>& trivial_degenerate_faces,
       const std::vector<Face_index>& non_trivial_degenerate_faces) {
-    std::vector<Face_index> fhs;
+    std::vector<Face_index> fis;
 
     std::unordered_set<Face_index> degenerate_faces;
     degenerate_faces.reserve(trivial_degenerate_faces.size() + non_trivial_degenerate_faces.size());
@@ -305,36 +305,36 @@ class Find_defects {
                             non_trivial_degenerate_faces.end());
 
     Point_list points;
-    for (auto vh : m.vertices()) {
-      points.insert(m.point(vh));
+    for (auto vi : m.vertices()) {
+      points.insert(m.point(vi));
     }
 
     const auto& tree = m.aabb_tree();
 
     parallel_do(
         m.faces_begin(), m.faces_end(), std::vector<Face_index>{},
-        [&](auto fh, auto& local_fhs) {
+        [&](auto fi, auto& local_fis) {
           thread_local Face_face_intersection face_face_intersection{points};
           thread_local std::vector<const Leaf*> leaves;
           thread_local std::vector<Vertex_index> shared_vertices;
 
-          if (degenerate_faces.contains(fh)) {
+          if (degenerate_faces.contains(fi)) {
             return;
           }
 
           leaves.clear();
-          tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(m, fh));
+          tree.get_intersecting_leaves(std::back_inserter(leaves), internal::face_bbox(m, fi));
 
-          auto f = m.face(fh);
+          auto f = m.face(fi);
           std::sort(f.begin(), f.end());
 
           for (const auto* leaf : leaves) {
-            auto fh2 = leaf->face_index();
-            if (fh2 <= fh || degenerate_faces.contains(fh2)) {
+            auto fi2 = leaf->face_index();
+            if (fi2 <= fi || degenerate_faces.contains(fi2)) {
               continue;
             }
 
-            auto f2 = m.face(fh2);
+            auto f2 = m.face(fi2);
             std::sort(f2.begin(), f2.end());
 
             auto inter = face_face_intersection(f[0].idx(), f[1].idx(), f[2].idx(), f2[0].idx(),
@@ -350,29 +350,29 @@ class Find_defects {
 
             if (inter.size() == 1) {
               if (num_shared_vertices < 1) {
-                local_fhs.push_back(fh);
+                local_fis.push_back(fi);
                 return;
               }
             } else if (inter.size() == 2) {
               if (num_shared_vertices < 2) {
-                local_fhs.push_back(fh);
+                local_fis.push_back(fi);
                 return;
               }
             } else {
-              local_fhs.push_back(fh);
+              local_fis.push_back(fi);
               return;
             }
           }
         },
-        [&](auto& local_fhs) {
-          if (fhs.empty()) {
-            fhs = std::move(local_fhs);
+        [&](auto& local_fis) {
+          if (fis.empty()) {
+            fis = std::move(local_fis);
           } else {
-            fhs.insert(fhs.end(), local_fhs.begin(), local_fhs.end());
+            fis.insert(fis.end(), local_fis.begin(), local_fis.end());
           }
         });
 
-    return fhs;
+    return fis;
   }
 
   Triangle_soup m_;

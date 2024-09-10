@@ -109,8 +109,8 @@ bool write_obj(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
     return false;
   }
 
-  for (auto vh : soup.vertices()) {
-    const auto& p = soup.point(vh);
+  for (auto vi : soup.vertices()) {
+    const auto& p = soup.point(vi);
     p.exact();
     Double x{CGAL::to_double(p.x())};
     Double y{CGAL::to_double(p.y())};
@@ -118,8 +118,8 @@ bool write_obj(std::ostream& os, const Triangle_soup<K, FaceData>& soup) {
     os << "v " << x << ' ' << y << ' ' << z << '\n';
   }
 
-  for (auto fh : soup.faces()) {
-    const auto& f = soup.face(fh);
+  for (auto fi : soup.faces()) {
+    const auto& f = soup.face(fi);
     if (Write_obj_context::current().negative_indices()) {
       auto nv = soup.num_vertices();
       os << "f " << -static_cast<std::ptrdiff_t>(nv - f[0].idx()) << ' '

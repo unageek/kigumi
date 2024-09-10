@@ -41,11 +41,11 @@ class Corefine {
 
     points_.start_uniqueness_check();
     points_.reserve(left_.num_vertices() + right_.num_vertices());
-    for (auto vh : left_.vertices()) {
-      left_point_ids_.push_back(points_.insert(left_.point(vh)));
+    for (auto vi : left_.vertices()) {
+      left_point_ids_.push_back(points_.insert(left_.point(vi)));
     }
-    for (auto vh : right_.vertices()) {
-      right_point_ids_.push_back(points_.insert(right_.point(vh)));
+    for (auto vi : right_.vertices()) {
+      right_point_ids_.push_back(points_.insert(right_.point(vi)));
     }
     points_.stop_uniqueness_check();
 
@@ -65,9 +65,9 @@ class Corefine {
         [&](const auto& pair, auto& local_state) {
           thread_local Face_face_intersection face_face_intersection{points_};
 
-          auto [left_fh, right_fh] = pair;
-          const auto& left_face = left_.face(left_fh);
-          const auto& right_face = right_.face(right_fh);
+          auto [left_fi, right_fi] = pair;
+          const auto& left_face = left_.face(left_fi);
+          const auto& right_face = right_.face(right_fi);
           auto a = left_point_ids_.at(left_face[0].idx());
           auto b = left_point_ids_.at(left_face[1].idx());
           auto c = left_point_ids_.at(left_face[2].idx());
@@ -79,7 +79,7 @@ class Corefine {
             return;
           }
           auto& [local_infos, local_num_intersections] = local_state;
-          local_infos.emplace_back(left_fh, right_fh, sym_inters);
+          local_infos.emplace_back(left_fi, right_fi, sym_inters);
           local_num_intersections += sym_inters.size();
         },
         [&](auto& local_state) {
@@ -99,8 +99,8 @@ class Corefine {
     points_.reserve(num_points_before_insertion + num_intersections / 2);
     Intersection_point_inserter inserter(points_);
     for (auto& info : infos) {
-      const auto& left_face = left_.face(info.left_fh);
-      const auto& right_face = right_.face(info.right_fh);
+      const auto& left_face = left_.face(info.left_fi);
+      const auto& right_face = right_.face(info.right_fi);
       auto a = left_point_ids_.at(left_face[0].idx());
       auto b = left_point_ids_.at(left_face[1].idx());
       auto c = left_point_ids_.at(left_face[2].idx());
@@ -120,17 +120,17 @@ class Corefine {
 
     std::cout << "Triangulating..." << std::endl;
 
-    auto left_fh_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
-      return a.left_fh < b.left_fh;
+    auto left_fi_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
+      return a.left_fi < b.left_fi;
     };
-    std::sort(infos.begin(), infos.end(), left_fh_less);
+    std::sort(infos.begin(), infos.end(), left_fi_less);
 
     std::vector<boost::iterator_range<typename decltype(infos)::const_iterator>> ranges;
     {
       auto first = infos.begin();
       while (first != infos.end()) {
-        auto fh = first->left_fh;
-        const auto& f = left_.face(fh);
+        auto fi = first->left_fi;
+        const auto& f = left_.face(fi);
         auto a = left_point_ids_.at(f[0].idx());
         auto b = left_point_ids_.at(f[1].idx());
         auto c = left_point_ids_.at(f[2].idx());
@@ -138,9 +138,9 @@ class Corefine {
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
         left_triangulations_.emplace(
-            fh, Triangulation{Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c});
+            fi, Triangulation{Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c});
 
-        auto last = std::upper_bound(first, infos.end(), *first, left_fh_less);
+        auto last = std::upper_bound(first, infos.end(), *first, left_fi_less);
         ranges.emplace_back(first, last);
         first = last;
       }
@@ -149,7 +149,7 @@ class Corefine {
     try {
       parallel_do(ranges.begin(), ranges.end(), [&](const auto& range) {
         const auto& any_info = range.front();
-        auto& triangulation = left_triangulations_.at(any_info.left_fh);
+        auto& triangulation = left_triangulations_.at(any_info.left_fi);
         for (const auto& info : range) {
           insert_intersection(triangulation, info);
         }
@@ -158,17 +158,17 @@ class Corefine {
       throw std::runtime_error("the second mesh has self-intersections");
     }
 
-    auto right_fh_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
-      return a.right_fh < b.right_fh;
+    auto right_fi_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
+      return a.right_fi < b.right_fi;
     };
-    std::sort(infos.begin(), infos.end(), right_fh_less);
+    std::sort(infos.begin(), infos.end(), right_fi_less);
 
     ranges.clear();
     {
       auto first = infos.begin();
       while (first != infos.end()) {
-        auto fh = first->right_fh;
-        const auto& f = right_.face(fh);
+        auto fi = first->right_fi;
+        const auto& f = right_.face(fi);
         auto a = right_point_ids_.at(f[0].idx());
         auto b = right_point_ids_.at(f[1].idx());
         auto c = right_point_ids_.at(f[2].idx());
@@ -176,9 +176,9 @@ class Corefine {
         const auto& pb = points_.at(b);
         const auto& pc = points_.at(c);
         right_triangulations_.emplace(
-            fh, Triangulation{Triangle_region::RIGHT_FACE, pa, pb, pc, a, b, c});
+            fi, Triangulation{Triangle_region::RIGHT_FACE, pa, pb, pc, a, b, c});
 
-        auto last = std::upper_bound(first, infos.end(), *first, right_fh_less);
+        auto last = std::upper_bound(first, infos.end(), *first, right_fi_less);
         ranges.emplace_back(first, last);
         first = last;
       }
@@ -187,7 +187,7 @@ class Corefine {
     try {
       parallel_do(ranges.begin(), ranges.end(), [&](const auto& range) {
         const auto& any_info = range.front();
-        auto& triangulation = right_triangulations_.at(any_info.right_fh);
+        auto& triangulation = right_triangulations_.at(any_info.right_fi);
         for (const auto& info : range) {
           insert_intersection(triangulation, info);
         }
@@ -198,34 +198,34 @@ class Corefine {
   }
 
   template <class OutputIterator>
-  Face_tag get_left_triangles(Face_index fh, OutputIterator tris) const {
-    get_triangles(left_, fh, left_triangulations_, left_point_ids_, tris);
-    return left_face_tags_.at(fh.idx());
+  Face_tag get_left_triangles(Face_index fi, OutputIterator tris) const {
+    get_triangles(left_, fi, left_triangulations_, left_point_ids_, tris);
+    return left_face_tags_.at(fi.idx());
   }
 
   template <class OutputIterator>
-  Face_tag get_right_triangles(Face_index fh, OutputIterator tris) const {
-    get_triangles(right_, fh, right_triangulations_, right_point_ids_, tris);
-    return right_face_tags_.at(fh.idx());
+  Face_tag get_right_triangles(Face_index fi, OutputIterator tris) const {
+    get_triangles(right_, fi, right_triangulations_, right_point_ids_, tris);
+    return right_face_tags_.at(fi.idx());
   }
 
   std::vector<Point> take_points() { return points_.take_points(); }
 
  private:
   struct Intersection_info {
-    Face_index left_fh;
-    Face_index right_fh;
+    Face_index left_fi;
+    Face_index right_fi;
     boost::container::static_vector<Triangle_region, 6> symbolic_intersections;
     boost::container::static_vector<std::size_t, 6> intersections;
   };
 
   template <class OutputIterator>
-  void get_triangles(const Triangle_soup& soup, Face_index fh,
+  void get_triangles(const Triangle_soup& soup, Face_index fi,
                      const std::unordered_map<Face_index, Triangulation>& triangulations,
                      const std::vector<std::size_t>& point_ids, OutputIterator tris) const {
-    auto it = triangulations.find(fh);
+    auto it = triangulations.find(fi);
     if (it == triangulations.end()) {
-      const auto& f = soup.face(fh);
+      const auto& f = soup.face(fi);
       auto a = point_ids.at(f[0].idx());
       auto b = point_ids.at(f[1].idx());
       auto c = point_ids.at(f[2].idx());

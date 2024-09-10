@@ -26,13 +26,13 @@ bool read_manifold(const std::string& filename, manifold::Manifold& manifold) {
   }
 
   manifold::Mesh mesh;
-  for (auto vh : soup.vertices()) {
-    const auto& p = soup.point(vh);
+  for (auto vi : soup.vertices()) {
+    const auto& p = soup.point(vi);
     mesh.vertPos.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()),
                               CGAL::to_double(p.z()));
   }
-  for (auto fh : soup.faces()) {
-    const auto& f = soup.face(fh);
+  for (auto fi : soup.faces()) {
+    const auto& f = soup.face(fi);
     mesh.triVerts.emplace_back(f[0].idx(), f[1].idx(), f[2].idx());
   }
 

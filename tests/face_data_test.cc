@@ -25,9 +25,9 @@ std::pair<double, double> get_areas(const M& m) {
   const auto& soup = m.boundary();
   auto area1 = 0.0;
   auto area2 = 0.0;
-  for (auto fh : soup.faces()) {
-    auto area = std::sqrt(CGAL::to_double(soup.triangle(fh).squared_area()));
-    if (soup.data(fh).i == 1) {
+  for (auto fi : soup.faces()) {
+    auto area = std::sqrt(CGAL::to_double(soup.triangle(fi).squared_area()));
+    if (soup.data(fi).i == 1) {
       area1 += area;
     } else {
       area2 += area;

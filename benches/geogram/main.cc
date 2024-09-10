@@ -29,14 +29,14 @@ bool read_mesh(const std::string& filename, GEO::Mesh& mesh) {
   }
 
   mesh.clear();
-  for (auto vh : soup.vertices()) {
-    const auto& p = soup.point(vh);
+  for (auto vi : soup.vertices()) {
+    const auto& p = soup.point(vi);
     std::array<double, 3> point{CGAL::to_double(p.x()), CGAL::to_double(p.y()),
                                 CGAL::to_double(p.z())};
     mesh.vertices.create_vertex(point.data());
   }
-  for (auto fh : soup.faces()) {
-    const auto& f = soup.face(fh);
+  for (auto fi : soup.faces()) {
+    const auto& f = soup.face(fi);
     mesh.facets.create_triangle(f[0].idx(), f[1].idx(), f[2].idx());
   }
 

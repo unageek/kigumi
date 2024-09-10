@@ -19,12 +19,12 @@ class Find_border_edges {
     auto left_is_a = left.num_faces() < right.num_faces();
     std::unordered_set<Edge> a_edges;
 
-    for (auto fh : m.faces()) {
-      if (m.data(fh).from_left != left_is_a) {
+    for (auto fi : m.faces()) {
+      if (m.data(fi).from_left != left_is_a) {
         continue;
       }
 
-      const auto& f = m.face(fh);
+      const auto& f = m.face(fi);
       auto e1 = make_edge(f[0], f[1]);
       auto e2 = make_edge(f[1], f[2]);
       auto e3 = make_edge(f[2], f[0]);
@@ -35,12 +35,12 @@ class Find_border_edges {
 
     std::unordered_set<Edge> border_edges;
 
-    for (auto fh : m.faces()) {
-      if (m.data(fh).from_left == left_is_a) {
+    for (auto fi : m.faces()) {
+      if (m.data(fi).from_left == left_is_a) {
         continue;
       }
 
-      const auto& f = m.face(fh);
+      const auto& f = m.face(fi);
       auto e1 = make_edge(f[0], f[1]);
       auto e2 = make_edge(f[1], f[2]);
       auto e3 = make_edge(f[2], f[0]);

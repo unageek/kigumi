@@ -11,26 +11,26 @@ class Vertex_iterator
     : public boost::iterator_facade<Vertex_iterator, Vertex_index,
                                     boost::random_access_traversal_tag, Vertex_index> {
  public:
-  explicit Vertex_iterator(Vertex_index vh) : vh_{vh} {}
+  explicit Vertex_iterator(Vertex_index vi) : vi_{vi} {}
 
  private:
   friend boost::iterator_core_access;
 
-  void advance(std::ptrdiff_t n) { vh_ += n; }
+  void advance(std::ptrdiff_t n) { vi_ += n; }
 
-  void decrement() { --vh_; }
+  void decrement() { --vi_; }
 
-  Vertex_index dereference() const { return vh_; }
+  Vertex_index dereference() const { return vi_; }
 
   std::ptrdiff_t distance_to(const Vertex_iterator& other) const {
-    return static_cast<std::ptrdiff_t>(other.vh_.idx()) - static_cast<std::ptrdiff_t>(vh_.idx());
+    return static_cast<std::ptrdiff_t>(other.vi_.idx()) - static_cast<std::ptrdiff_t>(vi_.idx());
   }
 
-  bool equal(const Vertex_iterator& other) const { return vh_ == other.vh_; }
+  bool equal(const Vertex_iterator& other) const { return vi_ == other.vi_; }
 
-  void increment() { ++vh_; }
+  void increment() { ++vi_; }
 
-  Vertex_index vh_;
+  Vertex_index vi_;
 };
 
 class Face_around_edge_iterator
@@ -97,26 +97,26 @@ class Face_iterator
     : public boost::iterator_facade<Face_iterator, Face_index, boost::random_access_traversal_tag,
                                     Face_index> {
  public:
-  explicit Face_iterator(Face_index fh) : fh_{fh} {}
+  explicit Face_iterator(Face_index fi) : fi_{fi} {}
 
  private:
   friend boost::iterator_core_access;
 
-  void advance(std::ptrdiff_t n) { fh_ += n; }
+  void advance(std::ptrdiff_t n) { fi_ += n; }
 
-  void decrement() { --fh_; }
+  void decrement() { --fi_; }
 
-  Face_index dereference() const { return fh_; }
+  Face_index dereference() const { return fi_; }
 
   std::ptrdiff_t distance_to(const Face_iterator& other) const {
-    return static_cast<std::ptrdiff_t>(other.fh_.idx()) - static_cast<std::ptrdiff_t>(fh_.idx());
+    return static_cast<std::ptrdiff_t>(other.fi_.idx()) - static_cast<std::ptrdiff_t>(fi_.idx());
   }
 
-  bool equal(const Face_iterator& other) const { return fh_ == other.fh_; }
+  bool equal(const Face_iterator& other) const { return fi_ == other.fi_; }
 
-  void increment() { ++fh_; }
+  void increment() { ++fi_; }
 
-  Face_index fh_;
+  Face_index fi_;
 };
 
 class Face_around_face_iterator
@@ -125,11 +125,11 @@ class Face_around_face_iterator
  public:
   Face_around_face_iterator() = default;
 
-  Face_around_face_iterator(Face_index fh, Face_around_edge_iterator it1,
+  Face_around_face_iterator(Face_index fi, Face_around_edge_iterator it1,
                             Face_around_edge_iterator end1, Face_around_edge_iterator it2,
                             Face_around_edge_iterator end2, Face_around_edge_iterator it3,
                             Face_around_edge_iterator end3)
-      : fh_{fh}, it1_{it1}, end1_{end1}, it2_{it2}, end2_{end2}, it3_{it3}, end3_{end3} {}
+      : fi_{fi}, it1_{it1}, end1_{end1}, it2_{it2}, end2_{end2}, it3_{it3}, end3_{end3} {}
 
  private:
   friend boost::iterator_core_access;
@@ -146,7 +146,7 @@ class Face_around_face_iterator
         break;
       }
 
-      if (dereference() != fh_) {
+      if (dereference() != fi_) {
         break;
       }
     }
@@ -169,7 +169,7 @@ class Face_around_face_iterator
     return {};
   }
 
-  Face_index fh_;
+  Face_index fi_;
   Face_around_edge_iterator it1_;
   Face_around_edge_iterator end1_;
   Face_around_edge_iterator it2_;
