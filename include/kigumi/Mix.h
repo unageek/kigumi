@@ -3,7 +3,6 @@
 #include <kigumi/Classify_faces_globally.h>
 #include <kigumi/Classify_faces_locally.h>
 #include <kigumi/Corefine.h>
-#include <kigumi/Find_border_edges.h>
 #include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_indices.h>
 #include <kigumi/Mixed.h>
@@ -22,7 +21,6 @@ template <class K, class FaceData>
 class Mix {
   using Classify_faces_globally = Classify_faces_globally<K, FaceData>;
   using Classify_faces_locally = Classify_faces_locally<K, FaceData>;
-  using Find_border_edges = Find_border_edges<K, FaceData>;
   using Mixed_triangle_soup = Mixed_triangle_soup<K, FaceData>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
@@ -64,12 +62,12 @@ class Mix {
 
     std::cout << "Local classification..." << std::endl;
 
-    auto border_edges = Find_border_edges{}(m, left, right);
+    auto intersecting_edges = corefine.get_intersecting_edges();
+    std::unordered_set<Edge> border_edges(intersecting_edges.begin(), intersecting_edges.end());
     Warnings warnings{};
 
-    std::vector<Edge> edges(border_edges.begin(), border_edges.end());
     parallel_do(
-        edges.begin(), edges.end(), Warnings{},
+        intersecting_edges.begin(), intersecting_edges.end(), Warnings{},
         [&](const auto& edge, auto& local_warnings) {
           thread_local Classify_faces_locally classify_faces_locally;
 

@@ -5,6 +5,7 @@
 #include <kigumi/Find_coplanar_faces.h>
 #include <kigumi/Find_possibly_intersecting_faces.h>
 #include <kigumi/Intersection_point_inserter.h>
+#include <kigumi/Mesh_entities.h>
 #include <kigumi/Mesh_indices.h>
 #include <kigumi/Point_list.h>
 #include <kigumi/Triangle_region.h>
@@ -57,8 +58,6 @@ class Corefine {
 
     std::cout << "Finding symbolic intersections..." << std::endl;
 
-    std::vector<Intersection_info> infos;
-
     std::size_t num_intersections{};
     parallel_do(
         pairs.begin(), pairs.end(), std::pair<std::vector<Intersection_info>, std::size_t>{},
@@ -84,10 +83,10 @@ class Corefine {
         },
         [&](auto& local_state) {
           auto& [local_infos, local_num_intersections] = local_state;
-          if (infos.empty()) {
-            infos = std::move(local_infos);
+          if (infos_.empty()) {
+            infos_ = std::move(local_infos);
           } else {
-            infos.insert(infos.end(), local_infos.begin(), local_infos.end());
+            infos_.insert(infos_.end(), local_infos.begin(), local_infos.end());
           }
           num_intersections += local_num_intersections;
         });
@@ -98,7 +97,7 @@ class Corefine {
 
     points_.reserve(num_points_before_insertion + num_intersections / 2);
     Intersection_point_inserter inserter(points_);
-    for (auto& info : infos) {
+    for (auto& info : infos_) {
       const auto& left_face = left_.face(info.left_fi);
       const auto& right_face = right_.face(info.right_fi);
       auto a = left_point_ids_.at(left_face[0].idx());
@@ -123,12 +122,12 @@ class Corefine {
     auto left_fi_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
       return a.left_fi < b.left_fi;
     };
-    std::sort(infos.begin(), infos.end(), left_fi_less);
+    std::sort(infos_.begin(), infos_.end(), left_fi_less);
 
-    std::vector<boost::iterator_range<typename decltype(infos)::const_iterator>> ranges;
+    std::vector<boost::iterator_range<typename decltype(infos_)::const_iterator>> ranges;
     {
-      auto first = infos.begin();
-      while (first != infos.end()) {
+      auto first = infos_.begin();
+      while (first != infos_.end()) {
         auto fi = first->left_fi;
         const auto& f = left_.face(fi);
         auto a = left_point_ids_.at(f[0].idx());
@@ -140,7 +139,7 @@ class Corefine {
         left_triangulations_.emplace(
             fi, Triangulation{Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c});
 
-        auto last = std::upper_bound(first, infos.end(), *first, left_fi_less);
+        auto last = std::upper_bound(first, infos_.end(), *first, left_fi_less);
         ranges.emplace_back(first, last);
         first = last;
       }
@@ -161,12 +160,12 @@ class Corefine {
     auto right_fi_less = [](const Intersection_info& a, const Intersection_info& b) -> bool {
       return a.right_fi < b.right_fi;
     };
-    std::sort(infos.begin(), infos.end(), right_fi_less);
+    std::sort(infos_.begin(), infos_.end(), right_fi_less);
 
     ranges.clear();
     {
-      auto first = infos.begin();
-      while (first != infos.end()) {
+      auto first = infos_.begin();
+      while (first != infos_.end()) {
         auto fi = first->right_fi;
         const auto& f = right_.face(fi);
         auto a = right_point_ids_.at(f[0].idx());
@@ -178,7 +177,7 @@ class Corefine {
         right_triangulations_.emplace(
             fi, Triangulation{Triangle_region::RIGHT_FACE, pa, pb, pc, a, b, c});
 
-        auto last = std::upper_bound(first, infos.end(), *first, right_fi_less);
+        auto last = std::upper_bound(first, infos_.end(), *first, right_fi_less);
         ranges.emplace_back(first, last);
         first = last;
       }
@@ -195,6 +194,26 @@ class Corefine {
     } catch (const typename Triangulation::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the first mesh has self-intersections");
     }
+  }
+
+  std::vector<Edge> get_intersecting_edges() const {
+    std::vector<Edge> edges;
+
+    for (const auto& info : infos_) {
+      auto n = info.intersections.size();
+      if (n < 2) {
+        continue;
+      }
+
+      for (std::size_t i = 0; i < n; ++i) {
+        auto j = i < n - 1 ? i + 1 : 0;
+        auto a = info.intersections.at(i);
+        auto b = info.intersections.at(j);
+        edges.push_back(make_edge(Vertex_index{a}, Vertex_index{b}));
+      }
+    }
+
+    return edges;
   }
 
   template <class OutputIterator>
@@ -265,6 +284,7 @@ class Corefine {
   std::vector<std::size_t> right_point_ids_;
   std::vector<Face_tag> left_face_tags_;
   std::vector<Face_tag> right_face_tags_;
+  std::vector<Intersection_info> infos_;
 };
 
 }  // namespace kigumi
