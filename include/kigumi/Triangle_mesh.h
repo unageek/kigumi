@@ -104,20 +104,22 @@ class Triangle_mesh {
 
   void finalize() {
     std::vector<std::pair<Vertex_index, Face_index>> map;
-    std::size_t face_index{};
+    map.reserve(3 * faces_.size());
+    Face_index fi{0};
     for (const auto& face : faces_) {
-      Face_index fi{face_index};
       map.emplace_back(face[0], fi);
       map.emplace_back(face[1], fi);
       map.emplace_back(face[2], fi);
-      ++face_index;
+      ++fi;
     }
 
     parallel_sort(map.begin(), map.end());
 
+    face_indices_.reserve(3 * faces_.size());
+    indices_.reserve(points_.size() + 1);
     std::size_t index{};
     std::ptrdiff_t prev_v{-1};
-    for (const auto& [vi, fi] : map) {
+    for (auto [vi, fi] : map) {
       face_indices_.push_back(fi);
 
       auto v = static_cast<std::ptrdiff_t>(vi.idx());

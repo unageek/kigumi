@@ -25,7 +25,7 @@ Here are the timings (in seconds) for computing the Boolean intersection between
 |-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-----------------------:|---------------:|
 | **Open**          |                    4.6 |                    FAILED |            2.4 |           1.3 |                 FAILED |         FAILED |
 | **Open & closed** |                 FAILED |                      70.5 |            1.6 |           0.9 |                 FAILED |         FAILED |
-| **Closed**        |                   57.4 |                    FAILED |            5.4 |           2.7 |                    8.9 |            1.7 |
+| **Closed**        |                   57.4 |                    FAILED |            5.3 |           2.7 |                    8.9 |            1.7 |
 | **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                 FAILED |         FAILED |
 
 ¹ Ran with `KIGUMI_NUM_THREADS=1`. ² Configured with `-DMANIFOLD_PAR=TBB`.
