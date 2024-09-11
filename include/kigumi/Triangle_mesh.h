@@ -105,12 +105,14 @@ class Triangle_mesh {
   void finalize() {
     std::vector<std::pair<Vertex_index, Face_index>> map;
     map.reserve(3 * faces_.size());
-    Face_index fi{0};
-    for (const auto& face : faces_) {
-      map.emplace_back(face[0], fi);
-      map.emplace_back(face[1], fi);
-      map.emplace_back(face[2], fi);
-      ++fi;
+    {
+      Face_index fi{0};
+      for (const auto& face : faces_) {
+        map.emplace_back(face[0], fi);
+        map.emplace_back(face[1], fi);
+        map.emplace_back(face[2], fi);
+        ++fi;
+      }
     }
 
     parallel_sort(map.begin(), map.end());
