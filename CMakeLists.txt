@@ -5,7 +5,7 @@ option(KIGUMI_BUILD_CLI "Build the command-line interface" ON)
 option(KIGUMI_BUILD_TESTS "Build the unit tests" ON)
 
 if(KIGUMI_BUILD_BENCHES)
-    list(APPEND VCPKG_MANIFEST_FEATURES "bench-geogram" "bench-manifold")
+    list(APPEND VCPKG_MANIFEST_FEATURES "bench-geogram" "bench-manifold" "bench-mcut")
 endif()
 
 project(kigumi CXX)
@@ -75,6 +75,14 @@ if(KIGUMI_BUILD_BENCHES)
     set(MANIFOLD_CROSS_SECTION OFF CACHE BOOL "")
     set(MANIFOLD_TEST OFF CACHE BOOL "")
     FetchContent_MakeAvailable(manifold)
+
+    FetchContent_Declare(
+        mcut
+        GIT_REPOSITORY https://github.com/cutdigital/mcut.git
+        GIT_TAG master
+        GIT_SHALLOW ON
+    )
+    FetchContent_MakeAvailable(mcut)
 
     add_subdirectory(benches)
 endif()

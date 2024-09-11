@@ -21,12 +21,12 @@ and [Boolean_region_builder.h](include/kigumi/Boolean_region_builder.h).
 
 Here are the timings (in seconds) for computing the Boolean intersection between meshes, excluding I/O time:
 
-| Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [manif.][manif] (seq.) | manif. (par.)² |
-|-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-----------------------:|---------------:|
-| **Open**          |                    4.6 |                    FAILED |            2.4 |           1.3 |                 FAILED |         FAILED |
-| **Open & closed** |                 FAILED |                      70.5 |            1.6 |           0.9 |                 FAILED |         FAILED |
-| **Closed**        |                   57.4 |                    FAILED |            5.3 |           2.7 |                    8.9 |            1.7 |
-| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                 FAILED |         FAILED |
+| Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [manif.][manif] (seq.) | manif. (par.)² | [MCUT][mcut] (par.) |
+|-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-----------------------:|---------------:|--------------------:|
+| **Open**          |                    4.6 |                    FAILED |            2.4 |           1.3 |                 FAILED |         FAILED |              FAILED |
+| **Open & closed** |                 FAILED |                      70.5 |            1.6 |           0.9 |                 FAILED |         FAILED |              FAILED |
+| **Closed**        |                   57.4 |                    FAILED |            5.3 |           2.7 |                    8.9 |            1.7 |                24.5 |
+| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                 FAILED |         FAILED |              FAILED |
 
 ¹ Ran with `KIGUMI_NUM_THREADS=1`. ² Configured with `-DMANIFOLD_PAR=TBB`.
 
@@ -101,3 +101,5 @@ An enhanced version of the algorithm described in [[1]](#1) is used.
 [geogram]: https://github.com/BrunoLevy/geogram
 
 [manif]: https://github.com/elalish/manifold
+
+[mcut]: https://github.com/cutdigital/mcut

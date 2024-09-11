@@ -28,6 +28,9 @@
         },
         "tbb"
       ]
+    },
+    "bench-mcut": {
+      "description": "Build the benchmark for MCUT"
     }
   }
 }
