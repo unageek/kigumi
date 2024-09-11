@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 build/
+install/
 .DS_Store
 meshes/*
 !meshes/box.obj

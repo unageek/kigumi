@@ -16,13 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(boost_container CONFIG REQUIRED)
-find_package(boost_container_hash CONFIG REQUIRED)
-find_package(boost_endian CONFIG REQUIRED)
-find_package(boost_iterator CONFIG REQUIRED)
-find_package(boost_program_options CONFIG REQUIRED)
-find_package(boost_program_options CONFIG REQUIRED)
-find_package(boost_range CONFIG REQUIRED)
+find_package(Boost CONFIG REQUIRED COMPONENTS container container_hash endian iterator program_options range)
 find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
@@ -32,7 +26,8 @@ set(TARGET kigumi)
 add_library(${TARGET} INTERFACE)
 
 target_include_directories(${TARGET} INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>"
 )
 
 target_link_libraries(${TARGET} INTERFACE
@@ -46,54 +41,27 @@ target_link_libraries(${TARGET} INTERFACE
 )
 
 if(KIGUMI_BUILD_BENCHES)
-    find_package(Eigen3 CONFIG REQUIRED)
-    find_package(libigl CONFIG REQUIRED)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(Clipper2 REQUIRED IMPORTED_TARGET Clipper2)
-
-    include(FetchContent)
-
-    FetchContent_Declare(
-        geogram
-        GIT_REPOSITORY https://github.com/BrunoLevy/geogram.git
-        GIT_TAG main
-        GIT_SHALLOW ON
-    )
-    set(GEOGRAM_LIB_ONLY ON CACHE BOOL "")
-    set(GEOGRAM_WITH_GRAPHICS OFF CACHE BOOL "")
-    set(GEOGRAM_WITH_HLBFGS OFF CACHE BOOL "")
-    set(GEOGRAM_WITH_LEGACY_NUMERICS OFF CACHE BOOL "")
-    set(GEOGRAM_WITH_LUA OFF CACHE BOOL "")
-    set(GEOGRAM_WITH_TETGEN OFF CACHE BOOL "")
-    set(GEOGRAM_WITH_TRIANGLE OFF CACHE BOOL "")
-    FetchContent_MakeAvailable(geogram)
-
-    FetchContent_Declare(
-        manifold
-        GIT_REPOSITORY https://github.com/elalish/manifold.git
-        GIT_TAG master
-        GIT_SHALLOW ON
-    )
-    set(MANIFOLD_CROSS_SECTION OFF CACHE BOOL "")
-    set(MANIFOLD_TEST OFF CACHE BOOL "")
-    FetchContent_MakeAvailable(manifold)
-
-    FetchContent_Declare(
-        mcut
-        GIT_REPOSITORY https://github.com/cutdigital/mcut.git
-        GIT_TAG master
-        GIT_SHALLOW ON
-    )
-    FetchContent_MakeAvailable(mcut)
-
     add_subdirectory(benches)
 endif()
 
 if(KIGUMI_BUILD_CLI)
     add_subdirectory(cli)
+    install(TARGETS kigumi_cli)
 endif()
 
 if(KIGUMI_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+install(TARGETS ${TARGET} EXPORT ${TARGET}Config)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    DESTINATION include)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/kigumiConfig.cmake
+    DESTINATION lib/cmake/kigumi
+)
+install(EXPORT ${TARGET}Config
+    FILE ${PROJECT_NAME}Targets.cmake
+    DESTINATION lib/cmake/${PROJECT_NAME}
+    NAMESPACE ${PROJECT_NAME}::
+)

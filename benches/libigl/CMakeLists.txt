@@ -1,3 +1,6 @@
+find_package(Eigen3 CONFIG REQUIRED)
+find_package(libigl CONFIG REQUIRED)
+
 set(TARGET kigumi_bench_libigl)
 
 add_executable(${TARGET}

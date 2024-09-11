@@ -1,3 +1,16 @@
+include(FetchContent)
+FetchContent_Declare(
+    mcut
+    GIT_REPOSITORY https://github.com/cutdigital/mcut.git
+    GIT_TAG master
+    GIT_SHALLOW ON
+)
+FetchContent_GetProperties(mcut)
+if(NOT mcut_POPULATED)
+    FetchContent_Populate(mcut)
+    add_subdirectory(${mcut_SOURCE_DIR} ${mcut_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
 set(TARGET kigumi_bench_mcut)
 
 add_executable(${TARGET}
