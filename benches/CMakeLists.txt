@@ -1,5 +1,6 @@
 add_subdirectory(corefinement)
 add_subdirectory(geogram)
 add_subdirectory(kigumi)
+add_subdirectory(libigl)
 add_subdirectory(manifold)
 add_subdirectory(mcut)

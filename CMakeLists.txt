@@ -5,7 +5,7 @@ option(KIGUMI_BUILD_CLI "Build the command-line interface" ON)
 option(KIGUMI_BUILD_TESTS "Build the unit tests" ON)
 
 if(KIGUMI_BUILD_BENCHES)
-    list(APPEND VCPKG_MANIFEST_FEATURES "bench-geogram" "bench-manifold" "bench-mcut")
+    list(APPEND VCPKG_MANIFEST_FEATURES "bench-geogram" "bench-libigl" "bench-manifold" "bench-mcut")
 endif()
 
 project(kigumi CXX)
@@ -46,6 +46,8 @@ target_link_libraries(${TARGET} INTERFACE
 )
 
 if(KIGUMI_BUILD_BENCHES)
+    find_package(Eigen3 CONFIG REQUIRED)
+    find_package(libigl CONFIG REQUIRED)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(Clipper2 REQUIRED IMPORTED_TARGET Clipper2)
 

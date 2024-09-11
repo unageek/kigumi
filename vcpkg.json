@@ -17,6 +17,18 @@
     "bench-geogram": {
       "description": "Build the benchmark for geogram"
     },
+    "bench-libigl": {
+      "description": "Build the benchmark for libigl",
+      "dependencies": [
+        "eigen3",
+        {
+          "name": "libigl",
+          "features": [
+            "cgal"
+          ]
+        }
+      ]
+    },
     "bench-manifold": {
       "description": "Build the benchmark for manifold",
       "dependencies": [

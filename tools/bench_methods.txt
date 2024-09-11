@@ -1,5 +1,6 @@
 corefinement
 geogram
 kigumi
+libigl
 manifold
 mcut
