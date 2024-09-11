@@ -21,7 +21,7 @@ and [Boolean_region_builder.h](include/kigumi/Boolean_region_builder.h).
 
 Here are the timings (in seconds) for computing the Boolean intersection between meshes, excluding I/O time:
 
-| Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [libigl][libigl] (seq.)² | [manif.][manif] (seq.) | manif. (par.)³ | [MCUT][mcut] (par.) |
+| Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [libigl][libigl] (par.)² | [manif.][manif] (seq.) | manif. (par.)³ | [MCUT][mcut] (par.) |
 |-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-------------------------:|-----------------------:|---------------:|--------------------:|
 | **Open**          |                    4.6 |                    FAILED |            2.4 |           1.3 |                   FAILED |                 FAILED |         FAILED |              FAILED |
 | **Open & closed** |                 FAILED |                      70.5 |            1.6 |           0.9 |                   FAILED |                 FAILED |         FAILED |              FAILED |
