@@ -23,10 +23,10 @@ Here are the timings (in seconds) for computing the Boolean intersection between
 
 | Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [libigl][libigl] (par.)² | [manif.][manif] (seq.)³ | manif. (par.) | [MCUT][mcut] (par.) |
 |-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-------------------------:|------------------------:|--------------:|--------------------:|
-| **Open**          |                    4.6 |                    FAILED |            2.4 |           1.3 |                   FAILED |                  FAILED |        FAILED |              FAILED |
+| **Open**          |                    4.6 |                    FAILED |            2.3 |           1.2 |                   FAILED |                  FAILED |        FAILED |              FAILED |
 | **Open & closed** |                 FAILED |                      70.5 |            1.6 |           0.9 |                   FAILED |                  FAILED |        FAILED |              FAILED |
-| **Closed**        |                   57.4 |                    FAILED |            5.3 |           2.7 |                     61.0 |                     8.9 |           1.7 |                24.5 |
-| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.3 |                   FAILED |                  FAILED |        FAILED |              FAILED |
+| **Closed**        |                   57.4 |                    FAILED |            5.1 |           2.5 |                     61.0 |                     8.9 |           1.7 |                24.5 |
+| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.2 |                   FAILED |                  FAILED |        FAILED |              FAILED |
 
 ¹ Ran with `KIGUMI_NUM_THREADS=1`. ² `igl::copyleft::cgal::mesh_boolean` with `CGAL::Lazy_exact_nt<mpq_class>` as the
 number type was used. ³ Configured with `-DMANIFOLD_PAR=NONE`.
