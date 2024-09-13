@@ -8,7 +8,6 @@
 
 #include <queue>
 #include <stdexcept>
-#include <unordered_set>
 
 namespace kigumi {
 
@@ -17,8 +16,7 @@ class Propagate_face_tags {
   using Mixed_triangle_mesh = Mixed_triangle_mesh<K, FaceData>;
 
  public:
-  Warnings operator()(Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges,
-                      Face_index seed) const {
+  Warnings operator()(Mixed_triangle_mesh& m, const Edge_set& border_edges, Face_index seed) const {
     const auto& data = m.data(seed);
     auto from_left = data.from_left;
     auto tag = data.tag;

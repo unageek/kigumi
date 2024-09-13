@@ -4,6 +4,7 @@
 
 #include <array>
 #include <boost/container_hash/hash.hpp>
+#include <boost/unordered/unordered_flat_set.hpp>
 #include <functional>
 #include <utility>
 
@@ -20,10 +21,7 @@ inline Edge make_edge(Vertex_index first, Vertex_index second) {
   return {first, second};
 }
 
-}  // namespace kigumi
-
-template <>
-struct std::hash<kigumi::Edge> {
+struct Edge_hash {
   std::size_t operator()(const kigumi::Edge& edge) const noexcept {
     std::size_t seed{};
     boost::hash_combine(seed, edge[0].idx());
@@ -31,3 +29,7 @@ struct std::hash<kigumi::Edge> {
     return seed;
   }
 };
+
+using Edge_set = boost::unordered_flat_set<Edge, Edge_hash>;
+
+}  // namespace kigumi

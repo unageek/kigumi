@@ -6,13 +6,12 @@
 #include <kigumi/Mixed.h>
 #include <kigumi/Null_data.h>
 
-#include <unordered_set>
-
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
 using Classify_faces_locally = kigumi::Classify_faces_locally<K, kigumi::Null_data>;
 using Mixed_triangle_mesh = kigumi::Mixed_triangle_mesh<K, kigumi::Null_data>;
 using Point = K::Point_3;
 using kigumi::Edge;
+using kigumi::Edge_set;
 using kigumi::Face_tag;
 using kigumi::make_edge;
 
@@ -42,7 +41,7 @@ TEST(ClassifyFacesLocallyTest, NonOverlapping) {
   m.finalize();
 
   auto pq = make_edge(p, q);
-  std::unordered_set<Edge> border{pq};
+  Edge_set border{pq};
 
   Classify_faces_locally{}(m, pq, border);
   ASSERT_EQ(m.data(f0).tag, Face_tag::EXTERIOR);
@@ -69,7 +68,7 @@ TEST(ClassifyFacesLocallyTest, NonOverlappingUnknown) {
   m.finalize();
 
   auto pq = make_edge(p, q);
-  std::unordered_set<Edge> border{pq};
+  Edge_set border{pq};
 
   Classify_faces_locally{}(m, pq, border);
   ASSERT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
@@ -86,7 +85,7 @@ TEST(ClassifyFacesLocallyTest, Coplanar) {
   m.finalize();
 
   auto pq = make_edge(p, q);
-  std::unordered_set<Edge> border;
+  Edge_set border;
 
   Classify_faces_locally{}(m, pq, border);
   ASSERT_EQ(m.data(f0).tag, Face_tag::COPLANAR);
@@ -103,7 +102,7 @@ TEST(ClassifyFacesLocallyTest, Opposite) {
   m.finalize();
 
   auto pq = make_edge(p, q);
-  std::unordered_set<Edge> border;
+  Edge_set border;
 
   Classify_faces_locally{}(m, pq, border);
   ASSERT_EQ(m.data(f0).tag, Face_tag::OPPOSITE);
@@ -130,7 +129,7 @@ TEST(ClassifyFacesLocallyTest, Inconsistent1) {
   m.finalize();
 
   auto pq = make_edge(p, q);
-  std::unordered_set<Edge> border{pq};
+  Edge_set border{pq};
 
   Classify_faces_locally{}(m, pq, border);
   EXPECT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);
@@ -157,7 +156,7 @@ TEST(ClassifyFacesLocallyTest, Inconsistent2) {
   m.finalize();
 
   auto pq = make_edge(p, q);
-  std::unordered_set<Edge> border{pq};
+  Edge_set border{pq};
 
   Classify_faces_locally{}(m, pq, border);
   EXPECT_EQ(m.data(f0).tag, Face_tag::UNKNOWN);

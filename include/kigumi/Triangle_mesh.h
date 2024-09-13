@@ -9,8 +9,6 @@
 #include <kigumi/parallel_sort.h>
 
 #include <boost/range/iterator_range.hpp>
-#include <memory>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -159,7 +157,7 @@ class Triangle_mesh {
                                       Face_around_edge_iterator(i_end, i_end, j_end, j_end));
   }
 
-  auto faces_around_face(Face_index fi, const std::unordered_set<Edge>& border_edges) const {
+  auto faces_around_face(Face_index fi, const Edge_set& border_edges) const {
     const auto& f = face(fi);
     auto e1 = make_edge(f[0], f[1]);
     auto e2 = make_edge(f[1], f[2]);

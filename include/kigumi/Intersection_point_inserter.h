@@ -6,9 +6,9 @@
 
 #include <array>
 #include <boost/container_hash/hash.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <limits>
 #include <tuple>
-#include <unordered_map>
 #include <utility>
 
 namespace kigumi {
@@ -131,11 +131,11 @@ class Intersection_point_inserter {
   }
 
   Point_list& points_;
-  std::unordered_map<Line_line_intersection_key, std::size_t,
-                     boost::hash<Line_line_intersection_key>>
+  boost::unordered_flat_map<Line_line_intersection_key, std::size_t,
+                            boost::hash<Line_line_intersection_key>>
       line_line_intersection_cache_;
-  std::unordered_map<Plane_line_intersection_key, std::size_t,
-                     boost::hash<Plane_line_intersection_key>>
+  boost::unordered_flat_map<Plane_line_intersection_key, std::size_t,
+                            boost::hash<Plane_line_intersection_key>>
       plane_line_intersection_cache_;
 };
 

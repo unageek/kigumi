@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/container_hash/hash.hpp>
-#include <unordered_map>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -70,7 +70,7 @@ class Point_list {
   };
 
   std::vector<Point> points_;
-  std::unordered_map<Point, std::size_t, Point_hash> point_to_index_;
+  boost::unordered_flat_map<Point, std::size_t, Point_hash> point_to_index_;
   bool check_uniqueness_{};
 };
 

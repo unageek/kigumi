@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <boost/container_hash/hash.hpp>
-#include <unordered_map>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -36,7 +36,7 @@ class Find_coplanar_faces {
     auto& a_face_tags = left_is_a ? left_face_tags : right_face_tags;
     auto& b_face_tags = left_is_a ? right_face_tags : left_face_tags;
 
-    std::unordered_map<Triangle, Face_index, Triangle_hash> triangle_to_fi;
+    boost::unordered_flat_map<Triangle, Face_index, Triangle_hash> triangle_to_fi;
 
     triangle_to_fi.reserve(a.num_faces());
     for (auto fi : a.faces()) {

@@ -63,7 +63,7 @@ class Mix {
     std::cout << "Local classification..." << std::endl;
 
     auto intersecting_edges = corefine.get_intersecting_edges();
-    std::unordered_set<Edge> border_edges(intersecting_edges.begin(), intersecting_edges.end());
+    Edge_set border_edges(intersecting_edges.begin(), intersecting_edges.end());
     Warnings warnings{};
 
     parallel_do(

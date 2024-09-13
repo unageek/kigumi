@@ -9,7 +9,7 @@
 #include <array>
 #include <boost/container/static_vector.hpp>
 #include <boost/container_hash/hash.hpp>
-#include <unordered_map>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -20,7 +20,7 @@ class Face_face_intersection {
   using Orientation_3_key = std::array<std::size_t, 4>;
   using Orientation_3_key_hash = boost::hash<Orientation_3_key>;
   using Orientation_3_map =
-      std::unordered_map<Orientation_3_key, CGAL::Orientation, Orientation_3_key_hash>;
+      boost::unordered_flat_map<Orientation_3_key, CGAL::Orientation, Orientation_3_key_hash>;
   using Point_list = Point_list<K>;
 
  public:

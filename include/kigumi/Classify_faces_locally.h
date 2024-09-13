@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <unordered_set>
 #include <vector>
 
 namespace kigumi {
@@ -25,7 +24,7 @@ class Classify_faces_locally {
 
  public:
   Warnings operator()(Mixed_triangle_mesh<K, FaceData>& m, const Edge& edge,
-                      const std::unordered_set<Edge>& border_edges) const {
+                      const Edge_set& border_edges) const {
     bool found_untagged_face{};
     for (auto fi : m.faces_around_edge(edge)) {
       if (m.data(fi).tag == Face_tag::UNKNOWN) {

@@ -14,7 +14,6 @@
 
 #include <queue>
 #include <stdexcept>
-#include <unordered_set>
 #include <vector>
 
 namespace kigumi {
@@ -27,7 +26,7 @@ class Classify_faces_globally {
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
  public:
-  Warnings operator()(Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges,
+  Warnings operator()(Mixed_triangle_mesh& m, const Edge_set& border_edges,
                       const Triangle_soup& left, const Triangle_soup& right) const {
     auto representative_faces = find_unclassified_connected_components(m, border_edges);
     Warnings warnings{};
@@ -56,7 +55,7 @@ class Classify_faces_globally {
 
  private:
   static std::vector<Face_index> find_unclassified_connected_components(
-      const Mixed_triangle_mesh& m, const std::unordered_set<Edge>& border_edges) {
+      const Mixed_triangle_mesh& m, const Edge_set& border_edges) {
     std::vector<Face_index> representative_faces;
     std::vector<bool> visited(m.num_faces(), false);
     std::queue<Face_index> queue;

@@ -9,6 +9,7 @@
     "boost-iterator",
     "boost-program-options",
     "boost-range",
+    "boost-unordered",
     "cgal",
     "fast-float",
     "gtest"

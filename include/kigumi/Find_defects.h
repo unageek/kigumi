@@ -11,10 +11,11 @@
 
 #include <algorithm>
 #include <array>
+#include <boost/unordered/concurrent_flat_map.hpp>
+#include <boost/unordered/concurrent_flat_set.hpp>
 #include <boost/variant/get.hpp>
+#include <functional>
 #include <iterator>
-#include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -26,6 +27,17 @@ class Find_defects {
   using Point_list = Point_list<K>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
   using Leaf = typename Triangle_soup::Leaf;
+
+  struct Halfedge_hash {
+    std::size_t operator()(const Halfedge& he) const noexcept {
+      std::size_t seed{};
+      boost::hash_combine(seed, he[0].idx());
+      boost::hash_combine(seed, he[1].idx());
+      return seed;
+    }
+  };
+
+  using Halfedge_count = boost::unordered_flat_map<Halfedge, std::size_t, Halfedge_hash>;
 
  public:
   explicit Find_defects(const Triangle_soup& m)
@@ -153,7 +165,8 @@ class Find_defects {
         continue;
       }
 
-      std::unordered_map<Vertex_index, std::size_t> local_vis;
+      boost::unordered_flat_map<Vertex_index, std::size_t, std::hash<kigumi::Vertex_index>>
+          local_vis;
       for (auto v_fi : v_fis) {
         local_vis.emplace(next_vertex(v_fi, vi), local_vis.size());
         local_vis.emplace(prev_vertex(v_fi, vi), local_vis.size());
@@ -180,8 +193,8 @@ class Find_defects {
 
   static Halfedge opposite(const Halfedge& he) { return {he[1], he[0]}; }
 
-  static std::unordered_multiset<Halfedge> collect_halfedges(const Triangle_soup& m) {
-    std::unordered_multiset<Halfedge> hes;
+  static Halfedge_count collect_halfedges(const Triangle_soup& m) {
+    Halfedge_count hes;
     for (auto fi : m.faces()) {
       const auto& f = m.face(fi);
       if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
@@ -189,23 +202,17 @@ class Find_defects {
       }
       for (std::size_t i = 0; i < 3; ++i) {
         auto he = Halfedge{f.at(i), f.at((i + 1) % 3)};
-        hes.insert(he);
+        ++hes[he];
       }
     }
     return hes;
   }
 
-  static std::vector<Edge> boundary_edges(const std::unordered_multiset<Halfedge>& hes) {
+  static std::vector<Edge> boundary_edges(const Halfedge_count& hes) {
     std::vector<Edge> edges;
 
-    Halfedge last_he;
-    for (const auto& he : hes) {
-      if (he == last_he) {
-        continue;
-      }
-      last_he = he;
-
-      if (hes.count(he) == 1 && !hes.contains(opposite(he))) {
+    for (const auto& [he, count] : hes) {
+      if (count == 1 && !hes.contains(opposite(he))) {
         edges.push_back(to_edge(he));
       }
     }
@@ -213,17 +220,11 @@ class Find_defects {
     return edges;
   }
 
-  static std::vector<Edge> inconsistent_edges(const std::unordered_multiset<Halfedge>& hes) {
+  static std::vector<Edge> inconsistent_edges(const Halfedge_count& hes) {
     std::vector<Edge> edges;
 
-    Halfedge last_he;
-    for (const auto& he : hes) {
-      if (he == last_he) {
-        continue;
-      }
-      last_he = he;
-
-      if (hes.count(he) == 2 && !hes.contains(opposite(he))) {
+    for (const auto& [he, count] : hes) {
+      if (count == 2 && !hes.contains(opposite(he))) {
         edges.push_back(to_edge(he));
       }
     }
@@ -231,22 +232,19 @@ class Find_defects {
     return edges;
   }
 
-  static std::vector<Edge> non_manifold_edges(const std::unordered_multiset<Halfedge>& hes) {
+  static std::vector<Edge> non_manifold_edges(const Halfedge_count& hes) {
     std::vector<Edge> edges;
 
-    Halfedge last_he;
-    for (const auto& he : hes) {
-      if (he == last_he) {
-        continue;
-      }
-      last_he = he;
+    for (const auto& [he, count] : hes) {
+      auto opp_it = hes.find(opposite(he));
+      auto opp_count = opp_it == hes.end() ? 0 : opp_it->second;
 
-      if (he[0] > he[1] && hes.contains(opposite(he))) {
+      if (he[0] > he[1] && opp_count > 0) {
         // Prevent double counting.
         continue;
       }
 
-      if (hes.count(he) + hes.count(opposite(he)) > 2) {
+      if (count + opp_count > 2) {
         edges.push_back(to_edge(he));
       }
     }
@@ -298,7 +296,7 @@ class Find_defects {
       const std::vector<Face_index>& non_trivial_degenerate_faces) {
     std::vector<Face_index> fis;
 
-    std::unordered_set<Face_index> degenerate_faces;
+    boost::unordered_flat_set<Face_index, std::hash<Face_index>> degenerate_faces;
     degenerate_faces.reserve(trivial_degenerate_faces.size() + non_trivial_degenerate_faces.size());
     degenerate_faces.insert(trivial_degenerate_faces.begin(), trivial_degenerate_faces.end());
     degenerate_faces.insert(non_trivial_degenerate_faces.begin(),
@@ -378,7 +376,7 @@ class Find_defects {
   Triangle_soup m_;
   std::vector<Vertex_index> isolated_vertices_;
   std::vector<Vertex_index> non_manifold_vertices_;
-  std::unordered_multiset<Halfedge> halfedges_;
+  Halfedge_count halfedges_;
   std::vector<Edge> boundary_edges_;
   std::vector<Edge> inconsistent_edges_;
   std::vector<Edge> non_manifold_edges_;

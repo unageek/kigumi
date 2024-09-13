@@ -7,8 +7,8 @@
 #include <kigumi/Triangle_region.h>
 
 #include <array>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <stdexcept>
-#include <unordered_map>
 
 namespace kigumi {
 
@@ -131,7 +131,7 @@ class Triangulation {
   Triangle_region f_{};
   CDT cdt_;
   std::array<Vertex_handle, 3> vhs_;
-  std::unordered_map<std::size_t, Vertex_handle> id_to_vh_;
+  boost::unordered_flat_map<std::size_t, Vertex_handle> id_to_vh_;
 };
 
 }  // namespace kigumi

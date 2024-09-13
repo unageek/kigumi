@@ -16,7 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Boost CONFIG REQUIRED COMPONENTS container container_hash endian iterator program_options range)
+find_package(Boost CONFIG REQUIRED COMPONENTS container container_hash endian iterator program_options range unordered)
 find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
@@ -36,6 +36,7 @@ target_link_libraries(${TARGET} INTERFACE
     Boost::endian
     Boost::iterator
     Boost::range
+    Boost::unordered
     CGAL::CGAL
     FastFloat::fast_float
 )
