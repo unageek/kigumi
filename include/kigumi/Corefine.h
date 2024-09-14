@@ -16,11 +16,12 @@
 #include <algorithm>
 #include <boost/container/static_vector.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
+#include <functional>
 #include <iostream>
 #include <optional>
 #include <stdexcept>
 #include <tuple>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -126,16 +127,17 @@ class Corefine {
     std::sort(infos_.begin(), infos_.end(), left_fi_less);
 
     std::vector<boost::iterator_range<typename decltype(infos_)::const_iterator>> ranges;
-    {
-      auto first = infos_.begin();
-      while (first != infos_.end()) {
-        auto fi = first->left_fi;
-        left_triangulations_.emplace(fi, std::nullopt);
+    for (auto first = infos_.begin(); first != infos_.end();) {
+      auto last = std::upper_bound(first, infos_.end(), *first, left_fi_less);
+      ranges.emplace_back(first, last);
+      first = last;
+    }
 
-        auto last = std::upper_bound(first, infos_.end(), *first, left_fi_less);
-        ranges.emplace_back(first, last);
-        first = last;
-      }
+    left_triangulations_.reserve(ranges.size());
+    for (const auto& range : ranges) {
+      const auto& any_info = range.front();
+      auto fi = any_info.left_fi;
+      left_triangulations_.emplace(fi, std::nullopt);
     }
 
     try {
@@ -166,16 +168,17 @@ class Corefine {
     std::sort(infos_.begin(), infos_.end(), right_fi_less);
 
     ranges.clear();
-    {
-      auto first = infos_.begin();
-      while (first != infos_.end()) {
-        auto fi = first->right_fi;
-        right_triangulations_.emplace(fi, std::nullopt);
+    for (auto first = infos_.begin(); first != infos_.end();) {
+      auto last = std::upper_bound(first, infos_.end(), *first, right_fi_less);
+      ranges.emplace_back(first, last);
+      first = last;
+    }
 
-        auto last = std::upper_bound(first, infos_.end(), *first, right_fi_less);
-        ranges.emplace_back(first, last);
-        first = last;
-      }
+    right_triangulations_.reserve(ranges.size());
+    for (const auto& range : ranges) {
+      const auto& any_info = range.front();
+      auto fi = any_info.right_fi;
+      right_triangulations_.emplace(fi, std::nullopt);
     }
 
     try {
@@ -244,10 +247,10 @@ class Corefine {
   };
 
   template <class OutputIterator>
-  void get_triangles(
-      const Triangle_soup& soup, Face_index fi,
-      const std::unordered_map<Face_index, std::optional<Triangulation>>& triangulations,
-      const std::vector<std::size_t>& point_ids, OutputIterator tris) const {
+  void get_triangles(const Triangle_soup& soup, Face_index fi,
+                     const boost::unordered_flat_map<Face_index, std::optional<Triangulation>,
+                                                     std::hash<Face_index>>& triangulations,
+                     const std::vector<std::size_t>& point_ids, OutputIterator tris) const {
     auto it = triangulations.find(fi);
     if (it == triangulations.end()) {
       const auto& f = soup.face(fi);
@@ -282,9 +285,11 @@ class Corefine {
   }
 
   const Triangle_soup& left_;
-  std::unordered_map<Face_index, std::optional<Triangulation>> left_triangulations_;
+  boost::unordered_flat_map<Face_index, std::optional<Triangulation>, std::hash<Face_index>>
+      left_triangulations_;
   const Triangle_soup& right_;
-  std::unordered_map<Face_index, std::optional<Triangulation>> right_triangulations_;
+  boost::unordered_flat_map<Face_index, std::optional<Triangulation>, std::hash<Face_index>>
+      right_triangulations_;
   Point_list points_;
   std::vector<std::size_t> left_point_ids_;
   std::vector<std::size_t> right_point_ids_;

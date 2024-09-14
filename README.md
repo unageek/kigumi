@@ -25,7 +25,7 @@ Here are the timings (in seconds) for computing the Boolean intersection between
 |-------------------|-----------------------:|--------------------------:|---------------:|--------------:|-------------------------:|------------------------:|--------------:|--------------------:|
 | **Open**          |                    4.6 |                    FAILED |            2.0 |           1.1 |                   FAILED |                  FAILED |        FAILED |              FAILED |
 | **Open & closed** |                 FAILED |                      70.5 |            1.3 |           0.7 |                   FAILED |                  FAILED |        FAILED |              FAILED |
-| **Closed**        |                   57.4 |                    FAILED |            4.7 |           2.2 |                     61.0 |                     8.9 |           1.7 |                24.5 |
+| **Closed**        |                   57.4 |                    FAILED |            4.6 |           2.2 |                     61.0 |                     8.9 |           1.7 |                24.5 |
 | **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.2 |                   FAILED |                  FAILED |        FAILED |              FAILED |
 
 ¹ Ran with `KIGUMI_NUM_THREADS=1`. ² `igl::copyleft::cgal::mesh_boolean` with `CGAL::Lazy_exact_nt<mpq_class>` as the
