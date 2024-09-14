@@ -21,13 +21,15 @@ find_package(CGAL CONFIG REQUIRED)
 find_package(FastFloat CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
+include(GNUInstallDirs)
+
 set(TARGET kigumi)
 
 add_library(${TARGET} INTERFACE)
 
 target_include_directories(${TARGET} INTERFACE
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>"
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(${TARGET} INTERFACE
@@ -55,14 +57,26 @@ if(KIGUMI_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
-install(TARGETS ${TARGET} EXPORT ${TARGET}Config)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    DESTINATION include)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/kigumiConfig.cmake
-    DESTINATION lib/cmake/kigumi
+install(
+    TARGETS ${TARGET}
+    EXPORT ${PROJECT_NAME}Targets
 )
-install(EXPORT ${TARGET}Config
-    FILE ${PROJECT_NAME}Targets.cmake
-    DESTINATION lib/cmake/${PROJECT_NAME}
+install(
+    FILES cmake/kigumiConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(
+    EXPORT ${PROJECT_NAME}Targets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    NAMESPACE ${PROJECT_NAME}::
+)
+
+export(
+    EXPORT ${PROJECT_NAME}Targets
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
     NAMESPACE ${PROJECT_NAME}::
 )
