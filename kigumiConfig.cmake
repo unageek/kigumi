@@ -1,4 +1,4 @@
-find_dependency(Boost REQUIRED COMPONENTS container container_hash endian iterator range)
+find_dependency(Boost REQUIRED COMPONENTS container container_hash endian iterator range unordered)
 find_dependency(CGAL REQUIRED)
 find_dependency(FastFloat REQUIRED)
 
