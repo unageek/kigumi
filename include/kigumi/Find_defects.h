@@ -23,19 +23,9 @@ namespace kigumi {
 
 template <class K, class FaceData>
 class Find_defects {
-  using Halfedge = std::array<Vertex_index, 2>;
   using Point_list = Point_list<K>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
   using Leaf = typename Triangle_soup::Leaf;
-
-  struct Halfedge_hash {
-    std::size_t operator()(const Halfedge& he) const noexcept {
-      std::size_t seed{};
-      boost::hash_combine(seed, he[0].idx());
-      boost::hash_combine(seed, he[1].idx());
-      return seed;
-    }
-  };
 
   using Halfedge_count = boost::unordered_flat_map<Halfedge, std::size_t, Halfedge_hash>;
 

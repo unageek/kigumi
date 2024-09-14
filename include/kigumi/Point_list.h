@@ -8,6 +8,20 @@
 namespace kigumi {
 
 template <class K>
+struct Point_3_hash {
+  std::size_t operator()(const typename K::Point_3& p) const noexcept {
+    if (!p.approx().x().is_point() || !p.approx().y().is_point() || !p.approx().z().is_point()) {
+      p.exact();
+    }
+    std::size_t seed{};
+    boost::hash_combine(seed, p.approx().x().inf());
+    boost::hash_combine(seed, p.approx().y().inf());
+    boost::hash_combine(seed, p.approx().z().inf());
+    return seed;
+  }
+};
+
+template <class K>
 class Point_list {
   using Point = typename K::Point_3;
 
@@ -56,21 +70,8 @@ class Point_list {
   }
 
  private:
-  struct Point_hash {
-    std::size_t operator()(const Point& p) const noexcept {
-      if (!p.approx().x().is_point() || !p.approx().y().is_point() || !p.approx().z().is_point()) {
-        p.exact();
-      }
-      std::size_t seed{};
-      boost::hash_combine(seed, p.approx().x().inf());
-      boost::hash_combine(seed, p.approx().y().inf());
-      boost::hash_combine(seed, p.approx().z().inf());
-      return seed;
-    }
-  };
-
   std::vector<Point> points_;
-  boost::unordered_flat_map<Point, std::size_t, Point_hash> point_to_index_;
+  boost::unordered_flat_map<Point, std::size_t, Point_3_hash<K>> point_to_index_;
   bool check_uniqueness_{};
 };
 
