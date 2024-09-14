@@ -128,7 +128,7 @@ class Corefine {
 
     std::vector<boost::iterator_range<typename decltype(infos_)::const_iterator>> ranges;
     for (auto first = infos_.begin(); first != infos_.end();) {
-      auto last = std::upper_bound(first, infos_.end(), *first, left_fi_less);
+      auto last = std::upper_bound(first + 1, infos_.end(), *first, left_fi_less);
       ranges.emplace_back(first, last);
       first = last;
     }
@@ -169,7 +169,7 @@ class Corefine {
 
     ranges.clear();
     for (auto first = infos_.begin(); first != infos_.end();) {
-      auto last = std::upper_bound(first, infos_.end(), *first, right_fi_less);
+      auto last = std::upper_bound(first + 1, infos_.end(), *first, right_fi_less);
       ranges.emplace_back(first, last);
       first = last;
     }
