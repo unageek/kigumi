@@ -1,4 +1,4 @@
-set(TARGET kigumi-test)
+set(TARGET kigumi_tests)
 
 add_executable(${TARGET}
     bounded_side_test.cc
@@ -10,25 +10,15 @@ add_executable(${TARGET}
 )
 
 if(UNIX)
-    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror -fsanitize=undefined)
+    target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror)
 elseif(MSVC)
     target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702)
 endif()
 
-target_include_directories(${TARGET} PRIVATE
-    ${PROJECT_SOURCE_DIR}/include
-)
-
 target_link_libraries(${TARGET} PRIVATE
-    Boost::container
-    Boost::container_hash
-    Boost::endian
-    Boost::iterator
-    Boost::range
-    CGAL::CGAL
     GTest::gtest
     GTest::gtest_main
-    -fsanitize=undefined
+    kigumi
 )
 
 add_test(NAME ${TARGET} COMMAND $<TARGET_FILE:${TARGET}>)
