@@ -225,15 +225,17 @@ class Corefine {
   }
 
   template <class OutputIterator>
-  Face_tag get_left_triangles(Face_index fi, OutputIterator tris) const {
-    get_triangles(left_, fi, left_triangulations_, left_point_ids_, tris);
-    return left_face_tags_.at(fi.idx());
+  std::pair<Face_tag, std::size_t> get_left_faces(Face_index fi, OutputIterator faces) const {
+    auto tag = left_face_tags_.at(fi.idx());
+    auto count = get_faces(left_, fi, left_triangulations_, left_point_ids_, faces);
+    return {tag, count};
   }
 
   template <class OutputIterator>
-  Face_tag get_right_triangles(Face_index fi, OutputIterator tris) const {
-    get_triangles(right_, fi, right_triangulations_, right_point_ids_, tris);
-    return right_face_tags_.at(fi.idx());
+  std::pair<Face_tag, std::size_t> get_right_faces(Face_index fi, OutputIterator faces) const {
+    auto tag = right_face_tags_.at(fi.idx());
+    auto count = get_faces(right_, fi, right_triangulations_, right_point_ids_, faces);
+    return {tag, count};
   }
 
   std::vector<Point> take_points() { return points_.take_points(); }
@@ -247,20 +249,21 @@ class Corefine {
   };
 
   template <class OutputIterator>
-  void get_triangles(const Triangle_soup& soup, Face_index fi,
-                     const boost::unordered_flat_map<Face_index, std::optional<Triangulation>,
-                                                     std::hash<Face_index>>& triangulations,
-                     const std::vector<std::size_t>& point_ids, OutputIterator tris) const {
+  std::size_t get_faces(const Triangle_soup& soup, Face_index fi,
+                        const boost::unordered_flat_map<Face_index, std::optional<Triangulation>,
+                                                        std::hash<Face_index>>& triangulations,
+                        const std::vector<std::size_t>& point_ids, OutputIterator faces) const {
     auto it = triangulations.find(fi);
-    if (it == triangulations.end()) {
-      const auto& f = soup.face(fi);
-      auto a = point_ids.at(f[0].idx());
-      auto b = point_ids.at(f[1].idx());
-      auto c = point_ids.at(f[2].idx());
-      *tris++ = {a, b, c};
-    } else {
-      it->second.value().get_triangles(tris);
+    if (it != triangulations.end()) {
+      return it->second.value().get_faces(faces);
     }
+
+    const auto& f = soup.face(fi);
+    auto a = Vertex_index{point_ids.at(f[0].idx())};
+    auto b = Vertex_index{point_ids.at(f[1].idx())};
+    auto c = Vertex_index{point_ids.at(f[2].idx())};
+    *faces++ = {a, b, c};
+    return 1;
   }
 
   void insert_intersection(Triangulation& triangulation, const Intersection_info& info) {

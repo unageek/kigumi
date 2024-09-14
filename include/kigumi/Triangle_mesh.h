@@ -87,7 +87,8 @@ class Triangle_mesh {
     return *this;
   }
 
-  explicit Triangle_mesh(std::vector<Point> points) : points_{std::move(points)} {}
+  Triangle_mesh(std::vector<Point> points, std::vector<Face> faces, std::vector<FaceData> face_data)
+      : points_{std::move(points)}, faces_{std::move(faces)}, face_data_{std::move(face_data)} {}
 
   Vertex_index add_vertex(const Point& p) {
     points_.push_back(p);

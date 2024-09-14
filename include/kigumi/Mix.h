@@ -21,6 +21,8 @@ template <class K, class FaceData>
 class Mix {
   using Classify_faces_globally = Classify_faces_globally<K, FaceData>;
   using Classify_faces_locally = Classify_faces_locally<K, FaceData>;
+  using Mixed_face_data = Mixed_face_data<FaceData>;
+  using Mixed_triangle_mesh = Mixed_triangle_mesh<K, FaceData>;
   using Mixed_triangle_soup = Mixed_triangle_soup<K, FaceData>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
 
@@ -31,33 +33,22 @@ class Mix {
 
     std::cout << "Constructing mixed mesh..." << std::endl;
 
-    Mixed_triangle_mesh<K, FaceData> m(corefine.take_points());
+    std::vector<Face> faces;
+    std::vector<Mixed_face_data> face_data;
 
-    std::vector<std::array<std::size_t, 3>> tris;
     for (auto fi : left.faces()) {
-      tris.clear();
-      auto tag = corefine.get_left_triangles(fi, std::back_inserter(tris));
-      for (const auto& tri : tris) {
-        auto new_fi =
-            m.add_face({Vertex_index{tri[0]}, Vertex_index{tri[1]}, Vertex_index{tri[2]}});
-        m.data(new_fi).from_left = true;
-        m.data(new_fi).tag = tag;
-        m.data(new_fi).data = left.data(fi);
-      }
+      auto [tag, count] = corefine.get_left_faces(fi, std::back_inserter(faces));
+      Mixed_face_data data{true, tag, left.data(fi)};
+      face_data.resize(face_data.size() + count, data);
     }
 
     for (auto fi : right.faces()) {
-      tris.clear();
-      auto tag = corefine.get_right_triangles(fi, std::back_inserter(tris));
-      for (const auto& tri : tris) {
-        auto new_fi =
-            m.add_face({Vertex_index{tri[0]}, Vertex_index{tri[1]}, Vertex_index{tri[2]}});
-        m.data(new_fi).from_left = false;
-        m.data(new_fi).tag = tag;
-        m.data(new_fi).data = right.data(fi);
-      }
+      auto [tag, count] = corefine.get_right_faces(fi, std::back_inserter(faces));
+      Mixed_face_data data{false, tag, right.data(fi)};
+      face_data.resize(face_data.size() + count, data);
     }
 
+    Mixed_triangle_mesh m(corefine.take_points(), std::move(faces), std::move(face_data));
     m.finalize();
 
     std::cout << "Local classification..." << std::endl;
@@ -77,8 +68,8 @@ class Mix {
 
     std::cout << "Global classification..." << std::endl;
 
-    Classify_faces_globally classify_globally;
-    warnings |= classify_globally(m, border_edges, left, right);
+    Classify_faces_globally classify_faces_globally;
+    warnings |= classify_faces_globally(m, border_edges, left, right);
 
     return {m.take_triangle_soup(), warnings};
   }

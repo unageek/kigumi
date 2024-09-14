@@ -4,6 +4,7 @@
 #include <CGAL/Kernel/global_functions.h>
 #include <CGAL/Projection_traits_3.h>
 #include <CGAL/Triangulation_vertex_base_with_info_2.h>
+#include <kigumi/Mesh_indices.h>
 #include <kigumi/Triangle_region.h>
 
 #include <array>
@@ -39,13 +40,16 @@ class Triangulation {
   }
 
   template <class OutputIterator>
-  void get_triangles(OutputIterator tris) const {
+  std::size_t get_faces(OutputIterator faces) const {
+    std::size_t count{};
     for (auto it = cdt_.finite_faces_begin(); it != cdt_.finite_faces_end(); ++it) {
-      auto a = it->vertex(0)->info();
-      auto b = it->vertex(1)->info();
-      auto c = it->vertex(2)->info();
-      *tris++ = {a, b, c};
+      auto a = Vertex_index{it->vertex(0)->info()};
+      auto b = Vertex_index{it->vertex(1)->info()};
+      auto c = Vertex_index{it->vertex(2)->info()};
+      *faces++ = {a, b, c};
+      ++count;
     }
+    return count;
   }
 
   Vertex_handle insert(const Point& p, std::size_t id, Triangle_region region) {
