@@ -7,7 +7,7 @@
 
 #include <algorithm>
 #include <array>
-#include <boost/variant/get.hpp>
+#include <variant>
 #include <vector>
 
 using K = CGAL::Exact_predicates_exact_constructions_kernel;
@@ -53,16 +53,16 @@ bool test(Point_list& points, std::array<std::size_t, 3> abc, std::array<std::si
 
   auto inter = CGAL::intersection(Triangle{pa, pb, pc}, Triangle{pp, pq, pr});
   if (inter) {
-    if (const auto* p = boost::get<Point>(&*inter)) {
+    if (const auto* p = std::get_if<Point>(&*inter)) {
       expected.push_back(*p);
-    } else if (const auto* s = boost::get<Segment>(&*inter)) {
+    } else if (const auto* s = std::get_if<Segment>(&*inter)) {
       expected.push_back(s->source());
       expected.push_back(s->target());
-    } else if (const auto* t = boost::get<Triangle>(&*inter)) {
+    } else if (const auto* t = std::get_if<Triangle>(&*inter)) {
       expected.push_back(t->vertex(0));
       expected.push_back(t->vertex(1));
       expected.push_back(t->vertex(2));
-    } else if (const auto* ps = boost::get<std::vector<Point>>(&*inter)) {
+    } else if (const auto* ps = std::get_if<std::vector<Point>>(&*inter)) {
       expected = *ps;
     }
   }

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
+#include <variant>
 #include <vector>
 
 namespace kigumi {
@@ -53,13 +54,13 @@ class Side_of_triangle_soup {
           continue;
         }
 
-        if (const auto* point = boost::get<Point>(&*result)) {
+        if (const auto* point = std::get_if<Point>(&*result)) {
           if (*point == p) {
             return CGAL::ON_ORIENTED_BOUNDARY;
           }
           auto d = CGAL::squared_distance(p, *point);
           intersections_.emplace_back(std::move(d), fi);
-        } else if (const auto* segment = boost::get<Segment>(&*result)) {
+        } else if (const auto* segment = std::get_if<Segment>(&*result)) {
           if (segment->source() == p || segment->target() == p) {
             return CGAL::ON_ORIENTED_BOUNDARY;
           }
