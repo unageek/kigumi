@@ -1,8 +1,8 @@
-# Building on macOS Sonoma
+# Building on macOS Sequoia
 
 ## Prerequisites
 
-- Xcode 15
+- Xcode 16
 
 - [Homebrew](https://brew.sh)
 
