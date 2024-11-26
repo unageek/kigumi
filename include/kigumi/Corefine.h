@@ -204,8 +204,8 @@ class Corefine {
     }
   }
 
-  std::vector<Edge> get_intersecting_edges() const {
-    std::vector<Edge> edges;
+  Edge_set get_intersecting_edges() const {
+    Edge_set edges;
 
     for (const auto& info : infos_) {
       auto n = info.intersections.size();
@@ -217,7 +217,7 @@ class Corefine {
         auto j = i < n - 1 ? i + 1 : 0;
         auto a = info.intersections.at(i);
         auto b = info.intersections.at(j);
-        edges.push_back(make_edge(Vertex_index{a}, Vertex_index{b}));
+        edges.insert(make_edge(Vertex_index{a}, Vertex_index{b}));
       }
     }
 

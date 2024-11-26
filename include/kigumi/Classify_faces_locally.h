@@ -118,63 +118,60 @@ class Classify_faces_locally {
       }
     }
 
-    if (is_undefined_configuration) {
-      return {};
-    }
+    if (!is_undefined_configuration) {
+      // Check consistency and tag rest of the faces.
 
-    // Check consistency and tag rest of the faces.
+      // An example case of an inconsistent configuration:
+      //
+      //                 Right, Int.
+      //                    //|
+      //                    //|
+      //                    //|
+      //             /////////|/////////
+      //   Left, ??? ---------+--------- Left, Ext.
+      //          :
+      //   Should be tagged as interior according to global classification.
 
-    // An example case of an inconsistent configuration:
-    //
-    //                 Right, Int.
-    //                    //|
-    //                    //|
-    //                    //|
-    //             /////////|/////////
-    //   Left, ??? ---------+--------- Left, Ext.
-    //          :
-    //   Should be tagged as interior according to global classification.
+      auto consistent = true;
+      for (auto dry_run : {true, false}) {
+        auto tag = m.data(faces_.at(k).fi).tag;
+        auto orientation = faces_.at(k).orientation;
+        // Go around and return to the starting point to check consistency.
+        for (std::size_t i = k + 1; i <= k + faces_.size(); ++i) {
+          const auto& f = faces_.at(i % faces_.size());
+          auto& f_data = m.data(f.fi);
 
-    auto consistent = true;
-    for (auto dry_run : {true, false}) {
-      auto tag = m.data(faces_.at(k).fi).tag;
-      auto orientation = faces_.at(k).orientation;
-      // Go around and return to the starting point to check consistency.
-      for (std::size_t i = k + 1; i <= k + faces_.size(); ++i) {
-        const auto& f = faces_.at(i % faces_.size());
-        auto& f_data = m.data(f.fi);
-
-        if (f.orientation == orientation) {
-          tag = tag == Face_tag::EXTERIOR ? Face_tag::INTERIOR : Face_tag::EXTERIOR;
-        }
-        orientation = f.orientation;
-
-        if (f_data.tag == Face_tag::UNKNOWN) {
-          if (!dry_run) {
-            f_data.tag = tag;
+          if (f.orientation == orientation) {
+            tag = tag == Face_tag::EXTERIOR ? Face_tag::INTERIOR : Face_tag::EXTERIOR;
           }
-        } else if ((f_data.tag == Face_tag::EXTERIOR || f_data.tag == Face_tag::INTERIOR) &&
-                   f_data.tag != tag) {
-          consistent = false;
+          orientation = f.orientation;
+
+          if (f_data.tag == Face_tag::UNKNOWN) {
+            if (!dry_run) {
+              f_data.tag = tag;
+            }
+          } else if ((f_data.tag == Face_tag::EXTERIOR || f_data.tag == Face_tag::INTERIOR) &&
+                     f_data.tag != tag) {
+            consistent = false;
+            break;
+          }
+        }
+
+        if (!consistent) {
+          // Leave unknown faces to the global classifier.
           break;
         }
       }
-
-      if (!consistent) {
-        // Leave unknown faces to the global classifier.
-        break;
-      }
     }
 
-    // Propagate face tags.
+    // Propagate the tags.
 
     Warnings warnings{};
 
     for (const auto& f : faces_) {
-      auto fi = f.fi;
-      auto f_tag = m.data(fi).tag;
-      if (f_tag == Face_tag::EXTERIOR || f_tag == Face_tag::INTERIOR) {
-        warnings |= propagate_face_tags_(m, border_edges, fi);
+      const auto& f_data = m.data(f.fi);
+      if (f_data.tag != Face_tag::UNKNOWN) {
+        warnings |= propagate_face_tags_(m, border_edges, f.fi);
       }
     }
 

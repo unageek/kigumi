@@ -53,8 +53,8 @@ class Mix {
 
     std::cout << "Local classification..." << std::endl;
 
-    auto intersecting_edges = corefine.get_intersecting_edges();
-    Edge_set border_edges(intersecting_edges.begin(), intersecting_edges.end());
+    auto border_edges = corefine.get_intersecting_edges();
+    std::vector<Edge> intersecting_edges(border_edges.begin(), border_edges.end());
     Warnings warnings{};
 
     parallel_do(

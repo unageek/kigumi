@@ -7,7 +7,6 @@
 #include <kigumi/Warnings.h>
 
 #include <queue>
-#include <stdexcept>
 
 namespace kigumi {
 
@@ -20,10 +19,6 @@ class Propagate_face_tags {
     const auto& data = m.data(seed);
     auto from_left = data.from_left;
     auto tag = data.tag;
-
-    if (tag != Face_tag::INTERIOR && tag != Face_tag::EXTERIOR) {
-      throw std::runtime_error("the seed face must be tagged as either interior or exterior");
-    }
 
     Warnings warnings{};
 
