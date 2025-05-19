@@ -22,8 +22,8 @@ class Extract {
     Triangle_soup soup;
     std::vector<Vertex_index> map(m.num_vertices());
 
-    auto u_mask = union_mask(op);
-    auto i_mask = intersection_mask(op);
+    auto e_mask = exterior_mask(op);
+    auto i_mask = interior_mask(op);
     auto c_mask = coplanar_mask(op, prefer_first);
     auto o_mask = opposite_mask(op, prefer_first);
 
@@ -31,7 +31,7 @@ class Extract {
       auto mask = Mask::NONE;
       switch (m.data(fi).tag) {
         case Face_tag::EXTERIOR:
-          mask = u_mask;
+          mask = e_mask;
           break;
         case Face_tag::INTERIOR:
           mask = i_mask;

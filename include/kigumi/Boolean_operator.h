@@ -72,7 +72,7 @@ inline Mask operator&(Mask a, Mask b) {
   return static_cast<Mask>(static_cast<std::uint8_t>(a) & static_cast<std::uint8_t>(b));
 }
 
-inline Mask union_mask(Boolean_operator op) {
+inline Mask exterior_mask(Boolean_operator op) {
   switch (op) {
     case Boolean_operator::I:
     case Boolean_operator::L:
@@ -97,7 +97,7 @@ inline Mask union_mask(Boolean_operator op) {
   }
 }
 
-inline Mask intersection_mask(Boolean_operator op) {
+inline Mask interior_mask(Boolean_operator op) {
   switch (op) {
     case Boolean_operator::B:
     case Boolean_operator::I:
