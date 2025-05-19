@@ -55,7 +55,7 @@ bool write_surface_mesh(const std::string& filename, const Surface_mesh& mesh) {
   }
   for (auto f : mesh.faces()) {
     std::array<Vertex_index, 3> face;
-    auto* it = face.begin();
+    auto it = face.begin();
     for (auto v : CGAL::vertices_around_face(CGAL::halfedge(f, mesh), mesh)) {
       *it++ = Vertex_index{v};
     }
