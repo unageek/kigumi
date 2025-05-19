@@ -12,6 +12,11 @@ if(UNIX)
     target_compile_options(${TARGET} PRIVATE -Wall -Wextra -Werror)
 elseif(MSVC)
     target_compile_options(${TARGET} PRIVATE /W4 /WX /wd4702)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(${TARGET} PRIVATE
+            -Wno-overriding-option -Wno-unused-command-line-argument
+        )
+    endif()
 endif()
 
 target_link_libraries(${TARGET} PRIVATE
