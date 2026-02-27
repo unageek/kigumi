@@ -14,6 +14,7 @@
 
 #include <queue>
 #include <stdexcept>
+#include <tuple>
 #include <vector>
 
 namespace kigumi {
@@ -32,11 +33,10 @@ class Classify_faces_globally {
     Warnings warnings{};
 
     parallel_do(
-        representative_faces.begin(), representative_faces.end(), Warnings{},
-        [&](auto fi_src, auto& local_warnings) {
-          thread_local Propagate_face_tags propagate_face_tags;
-          thread_local Side_of_triangle_soup side_of_triangle_soup;
-
+        representative_faces.begin(), representative_faces.end(),
+        [] { return std::make_tuple(Warnings{}, Propagate_face_tags{}, Side_of_triangle_soup{}); },
+        [&](auto fi_src, auto& local_state) {
+          auto& [local_warnings, propagate_face_tags, side_of_triangle_soup] = local_state;
           auto& f_src = m.data(fi_src);
           const auto& soup_trg = f_src.from_left ? right : left;
           auto p_src = internal::face_centroid(m, fi_src);
@@ -48,7 +48,10 @@ class Classify_faces_globally {
           f_src.tag = side == CGAL::ON_POSITIVE_SIDE ? Face_tag::EXTERIOR : Face_tag::INTERIOR;
           local_warnings |= propagate_face_tags(m, border_edges, fi_src);
         },
-        [&](const auto& local_warnings) { warnings |= local_warnings; });
+        [&](auto& local_state) {
+          auto& [local_warnings, propagate_face_tags, side_of_triangle_soup] = local_state;
+          warnings |= local_warnings;
+        });
 
     return warnings;
   }

@@ -58,13 +58,16 @@ class Mix {
     Warnings warnings{};
 
     parallel_do(
-        intersecting_edges.begin(), intersecting_edges.end(), Warnings{},
-        [&](const auto& edge, auto& local_warnings) {
-          thread_local Classify_faces_locally classify_faces_locally;
-
+        intersecting_edges.begin(), intersecting_edges.end(),
+        [&] { return std::make_pair(Warnings{}, Classify_faces_locally{}); },
+        [&](const auto& edge, auto& local_state) {
+          auto& [local_warnings, classify_faces_locally] = local_state;
           local_warnings |= classify_faces_locally(m, edge, border_edges);
         },
-        [&](const auto& local_warnings) { warnings |= local_warnings; });
+        [&](auto& local_state) {
+          auto& [local_warnings, classify_faces_locally] = local_state;
+          warnings |= local_warnings;
+        });
 
     std::cout << "Global classification..." << std::endl;
 
