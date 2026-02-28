@@ -16,6 +16,7 @@
 #include <boost/variant/get.hpp>
 #include <functional>
 #include <iterator>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -259,7 +260,7 @@ class Find_defects {
     std::vector<Face_index> fis;
 
     parallel_do(
-        m.faces_begin(), m.faces_end(), std::vector<Face_index>{},
+        m.faces_begin(), m.faces_end(), [] { return std::vector<Face_index>{}; },
         [&](auto fi, auto& local_fis) {
           const auto& f = m.face(fi);
           if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
@@ -300,11 +301,13 @@ class Find_defects {
     const auto& tree = m.aabb_tree();
 
     parallel_do(
-        m.faces_begin(), m.faces_end(), std::vector<Face_index>{},
-        [&](auto fi, auto& local_fis) {
-          thread_local Face_face_intersection face_face_intersection{points};
-          thread_local std::vector<const Leaf*> leaves;
-          thread_local std::vector<Vertex_index> shared_vertices;
+        m.faces_begin(), m.faces_end(),
+        [&] {
+          return std::make_tuple(std::vector<Face_index>{}, Face_face_intersection{points},
+                                 std::vector<const Leaf*>{}, std::vector<Vertex_index>{});
+        },
+        [&](auto fi, auto& local_state) {
+          auto& [local_fis, face_face_intersection, leaves, shared_vertices] = local_state;
 
           if (degenerate_faces.contains(fi)) {
             return;
@@ -352,7 +355,8 @@ class Find_defects {
             }
           }
         },
-        [&](auto& local_fis) {
+        [&](auto& local_state) {
+          auto& [local_fis, face_face_intersection, leaves, shared_vertices] = local_state;
           if (fis.empty()) {
             fis = std::move(local_fis);
           } else {

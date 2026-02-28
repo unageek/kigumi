@@ -62,10 +62,13 @@ class Corefine {
 
     std::size_t num_intersections{};
     parallel_do(
-        pairs.begin(), pairs.end(), std::pair<std::vector<Intersection_info>, std::size_t>{},
+        pairs.begin(), pairs.end(),
+        [&] {
+          return std::make_tuple(std::vector<Intersection_info>{}, std::size_t{},
+                                 Face_face_intersection{points_});
+        },
         [&](const auto& pair, auto& local_state) {
-          thread_local Face_face_intersection face_face_intersection{points_};
-
+          auto& [local_infos, local_num_intersections, face_face_intersection] = local_state;
           auto [left_fi, right_fi] = pair;
           const auto& left_face = left_.face(left_fi);
           const auto& right_face = right_.face(right_fi);
@@ -79,12 +82,11 @@ class Corefine {
           if (sym_inters.empty()) {
             return;
           }
-          auto& [local_infos, local_num_intersections] = local_state;
           local_infos.emplace_back(left_fi, right_fi, sym_inters);
           local_num_intersections += sym_inters.size();
         },
         [&](auto& local_state) {
-          auto& [local_infos, local_num_intersections] = local_state;
+          auto& [local_infos, local_num_intersections, face_face_intersection] = local_state;
           if (infos_.empty()) {
             infos_ = std::move(local_infos);
           } else {
