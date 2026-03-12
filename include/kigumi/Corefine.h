@@ -11,6 +11,7 @@
 #include <kigumi/Triangle_region.h>
 #include <kigumi/Triangle_soup.h>
 #include <kigumi/Triangulation.h>
+#include <kigumi/Triangulation_simple.h>
 #include <kigumi/parallel_do.h>
 
 #include <algorithm>
@@ -36,7 +37,7 @@ class Corefine {
   using Point = typename K::Point_3;
   using Point_list = Point_list<K>;
   using Triangle_soup = Triangle_soup<K, FaceData>;
-  using Triangulation = Triangulation<K>;
+  using Triangulation = Triangulation_simple<K>;
 
  public:
   Corefine(const Triangle_soup& left, const Triangle_soup& right) : left_{left}, right_{right} {
@@ -156,6 +157,7 @@ class Corefine {
         for (const auto& info : range) {
           insert_intersection(triangulation, info);
         }
+        triangulation.finalize();
       });
     } catch (const typename Triangulation::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the second mesh has self-intersections");
@@ -194,6 +196,7 @@ class Corefine {
         for (const auto& info : range) {
           insert_intersection(triangulation, info);
         }
+        triangulation.finalize();
       });
     } catch (const typename Triangulation::Intersection_of_constraints_exception&) {
       throw std::runtime_error("the first mesh has self-intersections");
@@ -263,7 +266,7 @@ class Corefine {
   }
 
   void insert_intersection(Triangulation& triangulation, const Intersection_info& info) {
-    typename Triangulation::Vertex_handle null_vh;
+    typename Triangulation::Vertex_handle null_vh{};
     auto first = null_vh;
     auto prev = null_vh;
     for (std::size_t i = 0; i < info.intersections.size(); ++i) {
