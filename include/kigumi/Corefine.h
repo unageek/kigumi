@@ -150,12 +150,9 @@ class Corefine {
         auto a = left_point_ids_.at(f[0].idx());
         auto b = left_point_ids_.at(f[1].idx());
         auto c = left_point_ids_.at(f[2].idx());
-        const auto& pa = points_.at(a);
-        const auto& pb = points_.at(b);
-        const auto& pc = points_.at(c);
 
         auto& triangulation =
-            left_triangulations_.at(fi).emplace(Triangle_region::LEFT_FACE, pa, pb, pc, a, b, c);
+            left_triangulations_.at(fi).emplace(points_, Triangle_region::LEFT_FACE, a, b, c);
         for (const auto& info : range) {
           insert_intersection(triangulation, info);
         }
@@ -191,12 +188,9 @@ class Corefine {
         auto a = right_point_ids_.at(f[0].idx());
         auto b = right_point_ids_.at(f[1].idx());
         auto c = right_point_ids_.at(f[2].idx());
-        const auto& pa = points_.at(a);
-        const auto& pb = points_.at(b);
-        const auto& pc = points_.at(c);
 
         auto& triangulation = right_triangulations_.at(any_info.right_fi)
-                                  .emplace(Triangle_region::RIGHT_FACE, pa, pb, pc, a, b, c);
+                                  .emplace(points_, Triangle_region::RIGHT_FACE, a, b, c);
         for (const auto& info : range) {
           insert_intersection(triangulation, info);
         }
@@ -275,7 +269,7 @@ class Corefine {
     for (std::size_t i = 0; i < info.intersections.size(); ++i) {
       auto id = info.intersections.at(i);
       auto sym = info.symbolic_intersections.at(i);
-      auto cur = triangulation.insert(points_.at(id), id, sym);
+      auto cur = triangulation.insert(id, sym);
       if (prev != null_vh) {
         triangulation.insert_constraint(prev, cur);
       }
