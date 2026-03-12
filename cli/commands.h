@@ -28,7 +28,7 @@ class Boolean_command : public Command {
   void operator()(const std::vector<std::string>& args) const override;
 };
 
-class Convert_command : public Command {
+class Check_command : public Command {
  public:
   std::string name() const override;
 
@@ -37,7 +37,7 @@ class Convert_command : public Command {
   void operator()(const std::vector<std::string>& args) const override;
 };
 
-class Defects_command : public Command {
+class Convert_command : public Command {
  public:
   std::string name() const override;
 

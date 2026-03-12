@@ -2,8 +2,8 @@ set(TARGET kigumi_cli)
 
 add_executable(${TARGET}
     boolean_command.cc
+    check_command.cc
     convert_command.cc
-    defects_command.cc
     main.cc
 )
 

@@ -24,11 +24,11 @@ struct Options {
 
 }  // namespace
 
-std::string Defects_command::name() const { return "defects"; }
+std::string Check_command::name() const { return "check"; }
 
-std::string Defects_command::description() const { return "find defects in a mesh"; }
+std::string Check_command::description() const { return "check for defects in a mesh"; }
 
-void Defects_command::operator()(const std::vector<std::string>& args) const {
+void Check_command::operator()(const std::vector<std::string>& args) const {
   namespace po = boost::program_options;
 
   Options opts;
@@ -48,7 +48,7 @@ void Defects_command::operator()(const std::vector<std::string>& args) const {
               vm);
     po::notify(vm);
   } catch (const std::exception&) {
-    std::cerr << "usage: kigumi defects [--in] <file>\n"
+    std::cerr << "usage: kigumi check [--in] <file>\n"
                  "\n"
               << opts_desc;
     throw;
