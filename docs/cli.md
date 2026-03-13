@@ -8,8 +8,8 @@ usage: kigumi <command> [<args>]
 
 Commands:
   boolean       apply boolean operations to two meshes
+  check         check for defects in a mesh
   convert       convert between mesh formats
-  defects       find defects in a mesh
 ```
 
 ## kigumi boolean
@@ -31,6 +31,15 @@ Options:
   --sym <file>                output the symmetric difference of the two meshes
 ```
 
+## kigumi check
+
+```
+usage: kigumi check [--in] <file>
+
+Options:
+  --in <file>           the input mesh
+```
+
 ## kigumi convert
 
 ```
@@ -39,13 +48,4 @@ usage: kigumi convert [--in] <file> [--out] <file>
 Options:
   --in <file>           the input mesh
   --out <file>          the output mesh
-```
-
-## kigumi defects
-
-```
-usage: kigumi defects [--in] <file>
-
-Options:
-  --in <file>           the input mesh
 ```
