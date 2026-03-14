@@ -1,4 +1,4 @@
-# Using kigumi CLI
+# Using the kigumi CLI
 
 Once you have followed the build instructions, a program named `kigumi` (or `kigumi.exe` on Windows) is created under
 `build/cli`. Here is the usage of the program:
