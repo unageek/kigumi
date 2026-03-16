@@ -293,7 +293,7 @@ class Face_face_intersection {
     auto parity = CGAL::POSITIVE;
     for (std::size_t i = 1; i < ids.size(); ++i) {
       auto j = i;
-      while (j > 0 && ids.at(j) > ids.at(j - 1)) {
+      while (j > 0 && ids.at(j - 1) > ids.at(j)) {
         std::swap(ids.at(j), ids.at(j - 1));
         parity = -parity;
         --j;
