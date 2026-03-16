@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <boost/container/static_vector.hpp>
+#include <boost/iterator/function_output_iterator.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 #include <functional>
@@ -251,7 +252,11 @@ class Corefine {
                         const std::vector<std::size_t>& point_ids, OutputIterator faces) const {
     auto it = triangulations.find(fi);
     if (it != triangulations.end()) {
-      return it->second.value().get_faces(faces);
+      return it->second.value().get_faces(
+          boost::make_function_output_iterator([&](const auto& face) {
+            auto [a, b, c] = face;
+            *faces++ = {Vertex_index{a}, Vertex_index{b}, Vertex_index{c}};
+          }));
     }
 
     const auto& f = soup.face(fi);
@@ -263,23 +268,22 @@ class Corefine {
   }
 
   void insert_intersection(Triangulation& triangulation, const Intersection_info& info) {
-    typename Triangulation::Vertex_handle null_vh;
-    auto first = null_vh;
-    auto prev = null_vh;
+    using Vertex_handle = typename Triangulation::Vertex_handle;
+    Vertex_handle first;
+    Vertex_handle last;
     for (std::size_t i = 0; i < info.intersections.size(); ++i) {
       auto id = info.intersections.at(i);
       auto sym = info.symbolic_intersections.at(i);
       auto cur = triangulation.insert(id, sym);
-      if (prev != null_vh) {
-        triangulation.insert_constraint(prev, cur);
-      }
-      if (first == null_vh) {
+      if (i == 0) {
         first = cur;
+      } else {
+        triangulation.insert_constraint(last, cur);
       }
-      prev = cur;
+      last = cur;
     }
     if (info.intersections.size() > 2) {
-      triangulation.insert_constraint(prev, first);
+      triangulation.insert_constraint(last, first);
     }
   }
 
