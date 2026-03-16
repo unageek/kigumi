@@ -25,15 +25,18 @@ bool read_manifold(const std::string& filename, manifold::Manifold& manifold) {
     return false;
   }
 
-  manifold::Mesh mesh;
+  manifold::MeshGL64 mesh;
   for (auto vi : soup.vertices()) {
     const auto& p = soup.point(vi);
-    mesh.vertPos.emplace_back(CGAL::to_double(p.x()), CGAL::to_double(p.y()),
-                              CGAL::to_double(p.z()));
+    mesh.vertProperties.push_back(CGAL::to_double(p.x()));
+    mesh.vertProperties.push_back(CGAL::to_double(p.y()));
+    mesh.vertProperties.push_back(CGAL::to_double(p.z()));
   }
   for (auto fi : soup.faces()) {
     const auto& f = soup.face(fi);
-    mesh.triVerts.emplace_back(f[0].idx(), f[1].idx(), f[2].idx());
+    mesh.triVerts.push_back(f[0].idx());
+    mesh.triVerts.push_back(f[1].idx());
+    mesh.triVerts.push_back(f[2].idx());
   }
 
   manifold = manifold::Manifold{mesh};
@@ -41,14 +44,16 @@ bool read_manifold(const std::string& filename, manifold::Manifold& manifold) {
 }
 
 bool write_manifold(const std::string& filename, const manifold::Manifold& manifold) {
-  auto mesh = manifold.GetMesh();
+  auto mesh = manifold.GetMeshGL64();
 
   Triangle_soup soup;
-  for (const auto& p : mesh.vertPos) {
-    soup.add_vertex({p.x, p.y, p.z});
+  for (std::size_t i = 0; i < mesh.vertProperties.size(); i += 3) {
+    soup.add_vertex(
+        {mesh.vertProperties.at(i), mesh.vertProperties.at(i + 1), mesh.vertProperties.at(i + 2)});
   }
-  for (const auto& tri : mesh.triVerts) {
-    soup.add_face({Vertex_index(tri.x), Vertex_index(tri.y), Vertex_index(tri.z)});
+  for (std::size_t i = 0; i < mesh.triVerts.size(); i += 3) {
+    soup.add_face({Vertex_index(mesh.triVerts.at(i)), Vertex_index(mesh.triVerts.at(i + 1)),
+                   Vertex_index(mesh.triVerts.at(i + 2))});
   }
 
   return write_triangle_soup(filename, soup);

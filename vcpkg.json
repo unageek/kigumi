@@ -24,9 +24,7 @@
         "eigen3",
         {
           "name": "libigl",
-          "features": [
-            "cgal"
-          ]
+          "features": ["cgal"]
         }
       ]
     },
@@ -34,7 +32,6 @@
       "description": "Build the benchmark for manifold",
       "dependencies": [
         "clipper2",
-        "glm",
         {
           "name": "pkgconf",
           "host": true
