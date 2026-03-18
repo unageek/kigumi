@@ -11,11 +11,7 @@ FetchContent_Declare(
 set(MANIFOLD_CROSS_SECTION OFF CACHE BOOL "")
 set(MANIFOLD_PAR "TBB" CACHE STRING "")
 set(MANIFOLD_TEST OFF CACHE BOOL "")
-FetchContent_GetProperties(manifold)
-if(NOT manifold_POPULATED)
-    FetchContent_Populate(manifold)
-    add_subdirectory(${manifold_SOURCE_DIR} ${manifold_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
+FetchContent_MakeAvailable(manifold)
 
 set(TARGET kigumi_bench_manifold)
 

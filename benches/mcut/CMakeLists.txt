@@ -5,11 +5,7 @@ FetchContent_Declare(
     GIT_TAG master
     GIT_SHALLOW ON
 )
-FetchContent_GetProperties(mcut)
-if(NOT mcut_POPULATED)
-    FetchContent_Populate(mcut)
-    add_subdirectory(${mcut_SOURCE_DIR} ${mcut_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
+FetchContent_MakeAvailable(mcut)
 
 set(TARGET kigumi_bench_mcut)
 

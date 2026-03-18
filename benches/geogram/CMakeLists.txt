@@ -12,11 +12,7 @@ set(GEOGRAM_WITH_LEGACY_NUMERICS OFF CACHE BOOL "")
 set(GEOGRAM_WITH_LUA OFF CACHE BOOL "")
 set(GEOGRAM_WITH_TETGEN OFF CACHE BOOL "")
 set(GEOGRAM_WITH_TRIANGLE OFF CACHE BOOL "")
-FetchContent_GetProperties(geogram)
-if(NOT geogram_POPULATED)
-    FetchContent_Populate(geogram)
-    add_subdirectory(${geogram_SOURCE_DIR} ${geogram_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
+FetchContent_MakeAvailable(geogram)
 
 set(TARGET kigumi_bench_geogram)
 
