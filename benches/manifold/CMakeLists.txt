@@ -9,7 +9,7 @@ FetchContent_Declare(
     GIT_SHALLOW ON
 )
 set(MANIFOLD_CROSS_SECTION OFF CACHE BOOL "")
-set(MANIFOLD_PAR "TBB" CACHE STRING "")
+set(MANIFOLD_PAR ON CACHE STRING "")
 set(MANIFOLD_TEST OFF CACHE BOOL "")
 FetchContent_MakeAvailable(manifold)
 
