@@ -25,8 +25,8 @@ struct Mesh {
   std::vector<double> vertices;
   std::vector<McUint32> vertex_indices;
   std::vector<McUint32> face_sizes;
-  McUint32 num_vertices;
-  McUint32 num_faces;
+  McUint32 num_vertices{};
+  McUint32 num_faces{};
 };
 
 bool read_mesh(const std::string& filename, Mesh& mesh) {
