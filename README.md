@@ -19,18 +19,19 @@ With **kigumi**, you can, for example:
 
 ## Benchmarks
 
-Here are the timings (in seconds) for computing the Boolean intersection between meshes, excluding I/O time:
+Here are the timings (in seconds) for computing the Boolean intersection between two meshes, excluding I/O time.
 
 | Test case         | [coref.][coref] (seq.) | [geogram][geogram] (par.) | kigumi (seq.)¹ | kigumi (par.) | [libigl][libigl] (par.)² | [manif.][manif] (seq.)³ | manif. (par.) | [MCUT][mcut] (par.) |
 | ----------------- | ---------------------: | ------------------------: | -------------: | ------------: | -----------------------: | ----------------------: | ------------: | ------------------: |
-| **Open**          |                    4.6 |                    FAILED |            2.0 |           1.1 |                   FAILED |                  FAILED |        FAILED |              FAILED |
-| **Open & closed** |                 FAILED |                      70.5 |            1.3 |           0.7 |                   FAILED |                  FAILED |        FAILED |              FAILED |
-| **Closed**        |                   57.4 |                    FAILED |            4.6 |           2.2 |                     61.0 |                     8.9 |           1.7 |                24.5 |
-| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.2 |                   FAILED |                  FAILED |        FAILED |              FAILED |
+| **Open**          |                    3.2 |                    FAILED |            2.4 |           0.6 |                   FAILED |                  FAILED |        FAILED |              FAILED |
+| **Open & closed** |                 FAILED |                       5.5 |            1.0 |           0.4 |                   FAILED |                  FAILED |        FAILED |              FAILED |
+| **Closed**        |                   27.2 |                    FAILED |            4.6 |           1.1 |                     39.3 |                     1.3 |           0.2 |              FAILED |
+| **Non-manifold**  |                 FAILED |                    FAILED |            0.5 |           0.1 |                   FAILED |                  FAILED |        FAILED |              FAILED |
+| **Exactness**     |                  Exact |                     Exact |          Exact |         Exact |                    Exact |                 Approx. |       Approx. |             Approx. |
 
-¹ Ran with `KIGUMI_NUM_THREADS=1`. ² `igl::copyleft::cgal::mesh_boolean` with `CGAL::Lazy_exact_nt<mpq_class>` as the number type was used. ³ Configured with `-DMANIFOLD_PAR=NONE`.
+¹ Ran with `KIGUMI_NUM_THREADS=1`. ² `igl::copyleft::cgal::mesh_boolean` with `CGAL::Lazy_exact_nt<mpq_class>` as the number type was used. ³ Configured with `-DMANIFOLD_PAR=OFF`.
 
-Benchmarks were performed on a MacBook Pro 13" (M1, 2020). Programs were built with Homebrew Clang 18.1.8. The following commands were used:
+Benchmarks were performed on a MacBook Pro (14-inch, M4, 2024) with a 16-core CPU. Programs were built with Homebrew Clang 22.1.1. Spotlight was disabled during benchmarking. The following commands were used:
 
 ```
 ./tools/gen_bench_meshes.sh
