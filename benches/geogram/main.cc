@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
     read_mesh(args.at(1), second);
 
     auto start = std::chrono::high_resolution_clock::now();
-    GEO::mesh_intersection(result, first, second);
+    GEO::mesh_intersection(result, first, second, GEO::MESH_BOOL_OPS_NO_SIMPLIFY);
     auto end = std::chrono::high_resolution_clock::now();
     std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start) << std::endl;
 
