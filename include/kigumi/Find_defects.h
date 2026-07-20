@@ -54,15 +54,18 @@ class Find_defects {
 
   const std::vector<Vertex_index>& non_manifold_vertices() const { return non_manifold_vertices_; }
 
-  const std::vector<Face_index>& non_trivial_degenerate_faces() const {
+  const boost::unordered_flat_set<Face_index>& non_trivial_degenerate_faces() const {
     return non_trivial_degenerate_faces_;
   }
 
-  const std::vector<Face_index>& overlapping_faces() const { return overlapping_faces_; }
+  const boost::unordered_flat_map<Face_index, boost::unordered_flat_set<Face_index>>&
+  overlapping_faces() const {
+    return overlapping_faces_;
+  }
 
   const Triangle_soup& triangle_soup() const { return m_; }
 
-  const std::vector<Face_index>& trivial_degenerate_faces() const {
+  const boost::unordered_flat_set<Face_index>& trivial_degenerate_faces() const {
     return trivial_degenerate_faces_;
   }
 
@@ -243,24 +246,25 @@ class Find_defects {
     return edges;
   }
 
-  static std::vector<Face_index> trivial_degenerate_faces(const Triangle_soup& m) {
-    std::vector<Face_index> fis;
+  static boost::unordered_flat_set<Face_index> trivial_degenerate_faces(const Triangle_soup& m) {
+    boost::unordered_flat_set<Face_index> fis;
 
     for (auto fi : m.faces()) {
       const auto& f = m.face(fi);
       if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
-        fis.push_back(fi);
+        fis.insert(fi);
       }
     }
 
     return fis;
   }
 
-  static std::vector<Face_index> non_trivial_degenerate_faces(const Triangle_soup& m) {
-    std::vector<Face_index> fis;
+  static boost::unordered_flat_set<Face_index> non_trivial_degenerate_faces(
+      const Triangle_soup& m) {
+    boost::unordered_flat_set<Face_index> fis;
 
     parallel_do(
-        m.faces_begin(), m.faces_end(), [] { return std::vector<Face_index>{}; },
+        m.faces_begin(), m.faces_end(), [] { return boost::unordered_flat_set<Face_index>{}; },
         [&](auto fi, auto& local_fis) {
           const auto& f = m.face(fi);
           if (f[0] == f[1] || f[1] == f[2] || f[2] == f[0]) {
@@ -268,30 +272,25 @@ class Find_defects {
           }
           auto tri = m.triangle(fi);
           if (tri.is_degenerate()) {
-            local_fis.push_back(fi);
+            local_fis.insert(fi);
           }
         },
         [&](auto& local_fis) {
           if (fis.empty()) {
             fis = std::move(local_fis);
           } else {
-            fis.insert(fis.end(), local_fis.begin(), local_fis.end());
+            fis.insert(local_fis.begin(), local_fis.end());
           }
         });
 
     return fis;
   }
 
-  static std::vector<Face_index> overlapping_faces(
-      const Triangle_soup& m, const std::vector<Face_index>& trivial_degenerate_faces,
-      const std::vector<Face_index>& non_trivial_degenerate_faces) {
-    std::vector<Face_index> fis;
-
-    boost::unordered_flat_set<Face_index, std::hash<Face_index>> degenerate_faces;
-    degenerate_faces.reserve(trivial_degenerate_faces.size() + non_trivial_degenerate_faces.size());
-    degenerate_faces.insert(trivial_degenerate_faces.begin(), trivial_degenerate_faces.end());
-    degenerate_faces.insert(non_trivial_degenerate_faces.begin(),
-                            non_trivial_degenerate_faces.end());
+  static boost::unordered_flat_map<Face_index, boost::unordered_flat_set<Face_index>>
+  overlapping_faces(const Triangle_soup& m,
+                    const boost::unordered_flat_set<Face_index>& trivial_degenerate_faces,
+                    const boost::unordered_flat_set<Face_index>& non_trivial_degenerate_faces) {
+    boost::unordered_flat_map<Face_index, boost::unordered_flat_set<Face_index>> fis;
 
     Point_list points;
     for (auto vi : m.vertices()) {
@@ -303,13 +302,15 @@ class Find_defects {
     parallel_do(
         m.faces_begin(), m.faces_end(),
         [&] {
-          return std::make_tuple(std::vector<Face_index>{}, Face_face_intersection{points},
-                                 std::vector<const Leaf*>{}, std::vector<Vertex_index>{});
+          return std::make_tuple(
+              boost::unordered_flat_map<Face_index, boost::unordered_flat_set<Face_index>>{},
+              Face_face_intersection{points}, std::vector<const Leaf*>{},
+              std::vector<Vertex_index>{});
         },
         [&](auto fi, auto& local_state) {
           auto& [local_fis, face_face_intersection, leaves, shared_vertices] = local_state;
 
-          if (degenerate_faces.contains(fi)) {
+          if (trivial_degenerate_faces.contains(fi) || non_trivial_degenerate_faces.contains(fi)) {
             return;
           }
 
@@ -321,7 +322,8 @@ class Find_defects {
 
           for (const auto* leaf : leaves) {
             auto fi2 = leaf->face_index();
-            if (fi2 <= fi || degenerate_faces.contains(fi2)) {
+            if (fi2 <= fi || trivial_degenerate_faces.contains(fi2) ||
+                non_trivial_degenerate_faces.contains(fi2)) {
               continue;
             }
 
@@ -339,19 +341,9 @@ class Find_defects {
                                   std::back_inserter(shared_vertices));
             auto num_shared_vertices = shared_vertices.size();
 
-            if (inter.size() == 1) {
-              if (num_shared_vertices < 1) {
-                local_fis.push_back(fi);
-                return;
-              }
-            } else if (inter.size() == 2) {
-              if (num_shared_vertices < 2) {
-                local_fis.push_back(fi);
-                return;
-              }
-            } else {
-              local_fis.push_back(fi);
-              return;
+            if (num_shared_vertices < inter.size()) {
+              local_fis[fi].insert(fi2);
+              local_fis[fi2].insert(fi);
             }
           }
         },
@@ -360,7 +352,9 @@ class Find_defects {
           if (fis.empty()) {
             fis = std::move(local_fis);
           } else {
-            fis.insert(fis.end(), local_fis.begin(), local_fis.end());
+            for (auto [fi, fis2] : local_fis) {
+              fis[fi].insert(fis2.begin(), fis2.end());
+            }
           }
         });
 
@@ -374,9 +368,9 @@ class Find_defects {
   std::vector<Edge> boundary_edges_;
   std::vector<Edge> inconsistent_edges_;
   std::vector<Edge> non_manifold_edges_;
-  std::vector<Face_index> trivial_degenerate_faces_;
-  std::vector<Face_index> non_trivial_degenerate_faces_;
-  std::vector<Face_index> overlapping_faces_;
+  boost::unordered_flat_set<Face_index> trivial_degenerate_faces_;
+  boost::unordered_flat_set<Face_index> non_trivial_degenerate_faces_;
+  boost::unordered_flat_map<Face_index, boost::unordered_flat_set<Face_index>> overlapping_faces_;
 };
 
 }  // namespace kigumi
