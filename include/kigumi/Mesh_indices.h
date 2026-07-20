@@ -2,6 +2,7 @@
 
 #include <kigumi/io.h>
 
+#include <boost/container_hash/hash.hpp>
 #include <cstdint>
 #include <functional>
 #include <limits>
@@ -56,6 +57,8 @@ class Index {
  private:
   friend Read<Index>;
   friend Write<Index>;
+
+  friend std::size_t hash_value(const Index& index) { return index.i_; }
 
   std::size_t i_{std::numeric_limits<std::size_t>::max()};
 };
